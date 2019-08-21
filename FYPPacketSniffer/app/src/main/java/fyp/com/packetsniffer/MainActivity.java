@@ -17,6 +17,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initView();
+    }
+
+    private void initView(){
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         adapter = new TabAdapter(getSupportFragmentManager());
@@ -25,9 +29,11 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(new Tab1Fragment(), "Tab 3");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(1).setIcon(R.drawable.packet_capture);
         View view1 = getLayoutInflater().inflate(R.layout.tab_one, null);
-        view1.findViewById(R.id.icon).setBackgroundResource(R.drawable.packet_capture);
+        view1.findViewById(R.id.icon).setBackgroundResource(R.drawable.packet1);
         tabLayout.getTabAt(0).setCustomView(view1);
+        View view2 = getLayoutInflater().inflate(R.layout.tab_one, null);
+        view2.findViewById(R.id.icon).setBackgroundResource(R.drawable.packet2);
+        tabLayout.getTabAt(1).setCustomView(view2);
     }
 }
