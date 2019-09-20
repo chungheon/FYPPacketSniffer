@@ -39,7 +39,7 @@ public class WifiInfoFragment extends Fragment {
                 refresh();
             }
         });
-        this.mWifiManager = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);
+        this.mWifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         getInfo();
 
         return view;
