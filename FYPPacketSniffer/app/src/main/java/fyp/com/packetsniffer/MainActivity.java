@@ -36,16 +36,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         askForMultiplePermissions();
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-        adapter = new TabAdapter(getSupportFragmentManager());
-        WifiInfoFragment wifiInfoFragment = new WifiInfoFragment();
-        adapter.addFragment(wifiInfoFragment, "Wifi Information");
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-        View view1 = getLayoutInflater().inflate(R.layout.tab_one, null);
-        view1.findViewById(R.id.icon).setBackgroundResource(R.drawable.packet_capture);
-        tabLayout.getTabAt(0).setCustomView(view1);
     }
 
     public boolean hasPermission(String permission) {
