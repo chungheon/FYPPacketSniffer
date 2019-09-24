@@ -226,12 +226,6 @@ public class WifiInfoFragment extends Fragment {
     private void getNetworkState(){
         WifiInfo connInfo = mWifiManager.getConnectionInfo();
         DhcpInfo dhcpInfo = mWifiManager.getDhcpInfo();
-        Network cellNetwork = null;
-        for(Network n: mConnManager.getAllNetworks()){
-            if(mConnManager.getNetworkCapabilities(n).hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)){
-                cellNetwork = n;
-            }
-        }
         List<Pair<String, String>> detailItem = new ArrayList<>();
 
         if(mWifiManager.isWifiEnabled()){

@@ -1,14 +1,11 @@
 package fyp.com.packetsniffer.Fragments.DevicesConnected;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.Network;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
@@ -19,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -35,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import fyp.com.packetsniffer.Fragments.DevicesConnected.IPv4;
+import fyp.com.packetsniffer.Fragments.IPv4;
 import fyp.com.packetsniffer.R;
 
 public class DeviceConnectFragment extends Fragment {
