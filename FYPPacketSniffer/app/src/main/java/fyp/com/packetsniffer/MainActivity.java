@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -38,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         adapter = new TabAdapter(getSupportFragmentManager());
-        adapter.addFragment(new WifiInfoFragment(), "Wifi Information");
+        WifiInfoFragment wifiInfoFragment = new WifiInfoFragment();
+        adapter.addFragment(wifiInfoFragment, "Wifi Information");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         View view1 = getLayoutInflater().inflate(R.layout.tab_one, null);
