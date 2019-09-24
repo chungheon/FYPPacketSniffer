@@ -6,6 +6,7 @@ import android.net.DhcpInfo;
 import android.net.Network;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
@@ -84,13 +85,22 @@ public class DeviceConnectFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 wifiInfo = mWifiManager.getConnectionInfo();
-                if(wifiInfo.getNetworkId() != -1 && !scanInProgress){
-                    runBtn.setEnabled(true);
-                    network = mConnectivityManager.getActiveNetwork();
-                    readARPTable();
-                }else if(wifiInfo.getNetworkId() != -1){
-                    network = mConnectivityManager.getActiveNetwork();
-                    readARPTable();
+                if(Build.VERSION.SDK_INT >= 23){
+                    if(wifiInfo.getNetworkId() != -1 && !scanInProgress){
+                        runBtn.setEnabled(true);
+                        network = mConnectivityManager.getActiveNetwork();
+                        readARPTableNew();
+                    }else if(wifiInfo.getNetworkId() != -1){
+                        network = mConnectivityManager.getActiveNetwork();
+                        readARPTableNew();
+                    }
+                }else{
+                    if(wifiInfo.getNetworkId() != -1 && !scanInProgress){
+                        runBtn.setEnabled(true);
+                        readARPTableOld();
+                    }else if(wifiInfo.getNetworkId() != -1){
+                        readARPTableOld();
+                    }
                 }
             }
         });
@@ -98,7 +108,7 @@ public class DeviceConnectFragment extends Fragment {
         return view;
     }
 
-    private void readARPTable(){
+    private void readARPTableNew(){
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader("/proc/net/arp"));
@@ -111,8 +121,11 @@ public class DeviceConnectFragment extends Fragment {
 
             String ip = ipAddressToString(wifiInfo.getIpAddress());
             String userMac = getMacAddr();
-
-            hostnames.add(network.getByName(ip).getHostName());
+            if(Build.VERSION.SDK_INT >= 23){
+                hostnames.add(network.getByName(ip).getHostName());
+            }else{
+                hostnames.add(ip);
+            }
             ipaddrs.add(ip);
             vendors.add(getVendor(getMacVendor(userMac)));
             macs.add(userMac);
@@ -127,7 +140,64 @@ public class DeviceConnectFragment extends Fragment {
                         Log.d(TAG, "check: " + getMacVendor(mac));
                         String vendor = getVendor(getMacVendor(mac));
                         Log.d(TAG, "VENDOR: " + vendor);
-                        String hostname = network.getByName(info[0]).getHostName();
+                        String hostname = ip;
+                        if(Build.VERSION.SDK_INT >= 23){
+                            hostname = network.getByName(info[0]).getHostName();
+                        }
+                        Log.d(TAG, hostname);
+                        if (!duplicate(ipaddrs, info[0])) {
+                            hostnames.add(hostname);
+                            ipaddrs.add(info[0]);
+                            vendors.add(vendor);
+                            macs.add(mac);
+                        }
+                    } catch (Exception e) {
+
+                    }
+                }
+            }
+            Log.d("CHECKNULL", hostnames.size() + "");
+            RecyclerViewDeviceAdapter adapter = new RecyclerViewDeviceAdapter(hostnames, ipaddrs, vendors, macs, getContext().getApplicationContext());
+            wifiNetworkList.setAdapter(adapter);
+            wifiNetworkList.setLayoutManager(new LinearLayoutManager(getContext().getApplicationContext()));
+        } catch (FileNotFoundException e) {
+
+        } catch (IOException e){
+
+        }
+    }
+
+    private void readARPTableOld(){
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader("/proc/net/arp"));
+            String line;
+            line = br.readLine();
+            ArrayList<String> hostnames = new ArrayList<>();
+            ArrayList<String> ipaddrs = new ArrayList<>();
+            ArrayList<String> vendors = new ArrayList<>();
+            ArrayList<String> macs = new ArrayList<>();
+
+            String ip = ipAddressToString(wifiInfo.getIpAddress());
+            String userMac = getMacAddr();
+            InetAddress address = InetAddress.getByName(ip);
+            hostnames.add(address.getHostName());
+            ipaddrs.add(ip);
+            vendors.add(getVendor(getMacVendor(userMac)));
+            macs.add(userMac);
+
+            while ((line = br.readLine()) != null) {
+                Log.d("lod", line);
+                String mac = line.substring(41, 58);
+                String[] info = line.split(" ");
+                Log.d("test", mac);
+                if (!mac.equals("00:00:00:00:00:00")) {
+                    try {
+                        Log.d(TAG, "check: " + getMacVendor(mac));
+                        String vendor = getVendor(getMacVendor(mac));
+                        Log.d(TAG, "VENDOR: " + vendor);
+                        InetAddress host = InetAddress.getByName(info[0]);
+                        String hostname = host.getHostName();
                         Log.d(TAG, hostname);
                         if (!duplicate(ipaddrs, info[0])) {
                             hostnames.add(hostname);

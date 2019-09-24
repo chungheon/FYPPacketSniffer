@@ -1,6 +1,7 @@
 package fyp.com.packetsniffer.Fragments.DevicesConnected;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -33,7 +34,12 @@ public class RecyclerViewDeviceAdapter extends RecyclerView.Adapter<RecyclerView
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_devicelistitem, viewGroup, false);
+        View view = null;
+        if(Build.VERSION.SDK_INT >= 23){
+            view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_devicelistitem, viewGroup, false);
+        }else{
+            view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_devicelistitemold, viewGroup, false);
+        }
         ViewHolder holder = new ViewHolder(view);
 
         return holder;

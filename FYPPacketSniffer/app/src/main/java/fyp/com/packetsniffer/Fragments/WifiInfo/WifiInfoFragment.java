@@ -10,6 +10,7 @@ import android.net.NetworkCapabilities;
 import android.net.RouteInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
@@ -64,14 +65,19 @@ public class WifiInfoFragment extends Fragment {
     }
 
     public void refresh(){
-        Network network = mConnManager.getActiveNetwork();
-        NetworkCapabilities capabilities = mConnManager.getNetworkCapabilities(network);
-        if(capabilities == null){
+        if(Build.VERSION.SDK_INT > 23){
+            Network network = mConnManager.getActiveNetwork();
+            NetworkCapabilities capabilities = mConnManager.getNetworkCapabilities(network);
+            if(capabilities == null){
 
-        }else if(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)){
-            wifiDetails(network);
-        }else if(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)){
-            cellDetails(network);
+            }else if(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)){
+                wifiDetails(network);
+            }else if(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)){
+                cellDetails(network);
+            }
+
+        }else{
+
         }
 
         getNetworkState();
@@ -97,17 +103,20 @@ public class WifiInfoFragment extends Fragment {
         Pair<String, String> defGateway = new Pair<>("Default Gateway", dhcpData[3]);
         Pair<String, String> dnsIP = new Pair<>("DNS Server IP", dhcpData[7]);
         StringBuilder ipv6 = new StringBuilder("N/A");
-        List<LinkAddress> linkAddress = mConnManager.getLinkProperties(network).getLinkAddresses();
-        int count = 0;
-        for(LinkAddress l: linkAddress){
-            String[] info = l.toString().split(":");
-            if(info.length > 1 && count == 0){
-                ipv6 = new StringBuilder("\n").append(l.toString());
-                count++;
-            }else if(info.length > 1){
-                ipv6.append("\n").append(l.toString());
+        if(Build.VERSION.SDK_INT > 23){
+            List<LinkAddress> linkAddress = mConnManager.getLinkProperties(network).getLinkAddresses();
+            int count = 0;
+            for(LinkAddress l: linkAddress){
+                String[] info = l.toString().split(":");
+                if(info.length > 1 && count == 0){
+                    ipv6 = new StringBuilder("\n").append(l.toString());
+                    count++;
+                }else if(info.length > 1){
+                    ipv6.append("\n").append(l.toString());
+                }
             }
         }
+
         Pair<String, String> ipv6Address = new Pair<>("IPv6 Addresses", ipv6.toString());
         connItem.add(connType);
         connItem.add(ipAddr);
@@ -121,7 +130,7 @@ public class WifiInfoFragment extends Fragment {
     }
 
     private void displayCell(Network network){
-        networkType.setText("CELL CONNECTION");
+        /*networkType.setText("CELL CONNECTION");
         LinkProperties linkProp = mConnManager.getLinkProperties(network);
         List<Pair<String, String>> connItem = new ArrayList<>();
         Pair<String, String> connType = new Pair<>("Connection Type", "Cellular");
@@ -220,7 +229,7 @@ public class WifiInfoFragment extends Fragment {
         connItem.add(dnsIP6);
 
         ListViewWifiInfoAdaptor connAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) connItem);
-        wifiList.setAdapter(connAdaptor);
+        wifiList.setAdapter(connAdaptor);*/
     }
 
     private void getNetworkState(){
@@ -403,7 +412,7 @@ public class WifiInfoFragment extends Fragment {
         return vendor;
     }
 
-    public class ConnNetworkCallBack extends ConnectivityManager.NetworkCallback{
+    /*public class ConnNetworkCallBack extends ConnectivityManager.NetworkCallback{
         private WifiInfoFragment mInfoFragment;
 
         public ConnNetworkCallBack(WifiInfoFragment infoFragment) {
@@ -458,5 +467,5 @@ public class WifiInfoFragment extends Fragment {
         public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
             super.onLinkPropertiesChanged(network, linkProperties);
         }
-    }
+    }*/
 }
