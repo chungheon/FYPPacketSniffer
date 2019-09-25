@@ -65,34 +65,30 @@ public class WifiInfoFragment extends Fragment {
     }
 
     public void refresh(){
-        if(Build.VERSION.SDK_INT > 23){
+        if(Build.VERSION.SDK_INT >= 23){
             Network network = mConnManager.getActiveNetwork();
             NetworkCapabilities capabilities = mConnManager.getNetworkCapabilities(network);
             if(capabilities == null){
 
             }else if(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)){
-                wifiDetails(network);
+                displayWifi();
             }else if(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)){
-                cellDetails(network);
+                displayCell(network);
             }
-
         }else{
-
+            if(mConnManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI) != null){
+                displayWifi();
+            }else if(mConnManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null){
+                displayCell();
+            }
         }
 
         getNetworkState();
     }
 
-    public void wifiDetails(Network network){
-        displayWifi(network);
-    }
 
-    public void cellDetails(Network network){
-        displayCell(network);
-    }
-
-    private void displayWifi(Network network){
-        WifiInfo connInfo = mWifiManager.getConnectionInfo();
+    private void displayWifi(){
+        //WifiInfo connInfo = mWifiManager.getConnectionInfo();
         DhcpInfo dhcpInfo = mWifiManager.getDhcpInfo();
         networkType.setText("WI-FI CONNECTION");
         List<Pair<String, String>> connItem = new ArrayList<>();
@@ -104,6 +100,7 @@ public class WifiInfoFragment extends Fragment {
         Pair<String, String> dnsIP = new Pair<>("DNS Server IP", dhcpData[7]);
         StringBuilder ipv6 = new StringBuilder("N/A");
         if(Build.VERSION.SDK_INT > 23){
+            Network network = mConnManager.getActiveNetwork();
             List<LinkAddress> linkAddress = mConnManager.getLinkProperties(network).getLinkAddresses();
             int count = 0;
             for(LinkAddress l: linkAddress){
@@ -129,107 +126,143 @@ public class WifiInfoFragment extends Fragment {
         wifiList.setAdapter(connAdaptor);
     }
 
-    private void displayCell(Network network){
-        /*networkType.setText("CELL CONNECTION");
-        LinkProperties linkProp = mConnManager.getLinkProperties(network);
+    private void displayCell(){
+        networkType.setText("CELL CONNECTION");
         List<Pair<String, String>> connItem = new ArrayList<>();
+        String connInfo = mConnManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).toString();
+        String[] info = connInfo.split(",");
         Pair<String, String> connType = new Pair<>("Connection Type", "Cellular");
-        List<LinkAddress> linkAddress = linkProp.getLinkAddresses();
-        IPv4 ipv4 = null;
-        StringBuilder ipv6 = new StringBuilder("N/A");
-        int count = 0;
-        for(LinkAddress l: linkAddress){
-            String[] ip4 = l.toString().split("\\.");
-            String[] ip6 = l.toString().split(":");
-            if(ip4.length > 1){
-                ipv4 = new IPv4(l.toString());
-            }
-            if(ip6.length > 1 && count == 0){
-                ipv6 = new StringBuilder("\n").append(l.toString());
-                count++;
-            }else if(ipv6.length() > 1){
-                ipv6.append("\n").append(l.toString());
-            }
-        }
-        Pair<String, String> ipAddress = new Pair<>("IP address", "N/A");
-        Pair<String, String> netmask = new Pair<>("Subnet mask", "N/A");
-        if(ipv4 != null){
-            ipAddress = new Pair<>("IP address", ipv4.getIP());
-            netmask = new Pair<>("Subnet mask", ipv4.getNetmask());
-        }
+        String[] roam = info[6].split(":");
+        String roaming  = roam[1].substring(0,roam[1].length() - 2);
+        Pair<String, String> roamFlag = new Pair<>("Roaming", roaming);
+        Pair<String, String> ipAddr = new Pair<>("IP Address", getMobileIPAddress());
 
-        Pair<String, String> ipv6Address = new Pair<>("IPv6 Addresses", ipv6.toString());
+        connItem.add(connType);
+        connItem.add(roamFlag);
+        connItem.add(ipAddr);
 
-        List<RouteInfo> routeInfo = linkProp.getRoutes();
+        ListViewWifiInfoAdaptor connAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) connItem);
+        wifiList.setAdapter(connAdaptor);
+    }
 
-        String defaultGateway = "N/A";
-        for(RouteInfo r: routeInfo){
-            String[] route = r.toString().split("\\.");
-            if(route.length > 1){
-                String[] routeAddr = r.getGateway().toString().split("/");
-                if(routeAddr.length > 1){
-                    if(routeAddr[1] != "0.0.0.0"){
-                        defaultGateway = routeAddr[1];
+    private String getMobileIPAddress() {
+        try {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+                for (InetAddress addr : addrs) {
+                    if (!addr.isLoopbackAddress()) {
+                        return  addr.getHostAddress();
                     }
                 }
             }
-        }
-        Pair<String, String> gateway = new Pair<>("Default Gateway IP", defaultGateway);
+        } catch (Exception ex) { } // for now eat exceptions
+        return "";
+    }
 
-        List<InetAddress> dnsAddress = linkProp.getDnsServers();
-        StringBuilder ip4Str = new StringBuilder("N/A");
-        StringBuilder ip6Str = new StringBuilder("N/A");
-        int count4 = 0;
-        int count6 = 0;
-        for(InetAddress d: dnsAddress){
-            String[] ip4 = d.toString().split("\\.");
-            String[] ip6 = d.toString().split(":");
-            if(ip4.length > 1 && count4 == 0){
-                String[] dnsAddr = d.toString().split("/");
-                if(dnsAddr.length > 1){
-                    ip4Str = new StringBuilder(dnsAddr[1]);
-                }else{
-                    ip4Str = new StringBuilder(d.toString());
+    private void displayCell(Network network){
+        networkType.setText("CELL CONNECTION");
+        if(Build.VERSION.SDK_INT >= 23) {
+            LinkProperties linkProp = mConnManager.getLinkProperties(network);
+            List<Pair<String, String>> connItem = new ArrayList<>();
+            Pair<String, String> connType = new Pair<>("Connection Type", "Cellular");
+            List<LinkAddress> linkAddress = linkProp.getLinkAddresses();
+            IPv4 ipv4 = null;
+            StringBuilder ipv6 = new StringBuilder("N/A");
+            int count = 0;
+            for (LinkAddress l : linkAddress) {
+                String[] ip4 = l.toString().split("\\.");
+                String[] ip6 = l.toString().split(":");
+                if (ip4.length > 1) {
+                    ipv4 = new IPv4(l.toString());
                 }
-                count4++;
-            }else if(ip4.length > 1){
-                String[] dnsAddr = d.toString().split("/");
-                if(dnsAddr.length > 1) {
-                    ip4Str.append("\n").append(dnsAddr[1]);
-                }else{
-                    ip4Str.append("\n").append(d.toString());
+                if (ip6.length > 1 && count == 0) {
+                    ipv6 = new StringBuilder("\n").append(l.toString());
+                    count++;
+                } else if (ipv6.length() > 1) {
+                    ipv6.append("\n").append(l.toString());
                 }
             }
+            Pair<String, String> ipAddress = new Pair<>("IP address", "N/A");
+            Pair<String, String> netmask = new Pair<>("Subnet mask", "N/A");
+            if (ipv4 != null) {
+                ipAddress = new Pair<>("IP address", ipv4.getIP());
+                netmask = new Pair<>("Subnet mask", ipv4.getNetmask());
+            }
 
-            if(ip6.length > 1 && count6 == 0){
-                String[] dnsAddr = d.toString().split("/");
-                if(dnsAddr.length > 1) {
-                    ip6Str = new StringBuilder("\n").append(dnsAddr[1]);
-                }else{
-                    ip6Str = new StringBuilder("\n").append(d.toString());
-                }
-                count++;
-            }else if(ipv6.length() > 1){
-                String[] dnsAddr = d.toString().split("/");
-                if(dnsAddr.length > 1) {
-                    ip6Str.append("\n").append(dnsAddr[1]);
-                }else{
-                    ip6Str.append("\n").append(d.toString());
+            Pair<String, String> ipv6Address = new Pair<>("IPv6 Addresses", ipv6.toString());
+
+            List<RouteInfo> routeInfo = linkProp.getRoutes();
+
+            String defaultGateway = "N/A";
+            for (RouteInfo r : routeInfo) {
+                String[] route = r.toString().split("\\.");
+                if (route.length > 1) {
+                    String[] routeAddr = r.getGateway().toString().split("/");
+                    if (routeAddr.length > 1) {
+                        if (routeAddr[1] != "0.0.0.0") {
+                            defaultGateway = routeAddr[1];
+                        }
+                    }
                 }
             }
-        }
-        Pair<String, String> dnsIP4 = new Pair<>("DNS Server IP", ip4Str.toString());
-        Pair<String, String> dnsIP6 = new Pair<>("DNS Server IPv6", ip6Str.toString());
-        connItem.add(connType);
-        connItem.add(ipAddress);
-        connItem.add(netmask);
-        connItem.add(gateway);
-        connItem.add(dnsIP4);
-        connItem.add(ipv6Address);
-        connItem.add(dnsIP6);
+            Pair<String, String> gateway = new Pair<>("Default Gateway IP", defaultGateway);
 
-        ListViewWifiInfoAdaptor connAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) connItem);
-        wifiList.setAdapter(connAdaptor);*/
+            List<InetAddress> dnsAddress = linkProp.getDnsServers();
+            StringBuilder ip4Str = new StringBuilder("N/A");
+            StringBuilder ip6Str = new StringBuilder("N/A");
+            int count4 = 0;
+            int count6 = 0;
+            for (InetAddress d : dnsAddress) {
+                String[] ip4 = d.toString().split("\\.");
+                String[] ip6 = d.toString().split(":");
+                if (ip4.length > 1 && count4 == 0) {
+                    String[] dnsAddr = d.toString().split("/");
+                    if (dnsAddr.length > 1) {
+                        ip4Str = new StringBuilder(dnsAddr[1]);
+                    } else {
+                        ip4Str = new StringBuilder(d.toString());
+                    }
+                    count4++;
+                } else if (ip4.length > 1) {
+                    String[] dnsAddr = d.toString().split("/");
+                    if (dnsAddr.length > 1) {
+                        ip4Str.append("\n").append(dnsAddr[1]);
+                    } else {
+                        ip4Str.append("\n").append(d.toString());
+                    }
+                }
+
+                if (ip6.length > 1 && count6 == 0) {
+                    String[] dnsAddr = d.toString().split("/");
+                    if (dnsAddr.length > 1) {
+                        ip6Str = new StringBuilder("\n").append(dnsAddr[1]);
+                    } else {
+                        ip6Str = new StringBuilder("\n").append(d.toString());
+                    }
+                    count++;
+                } else if (ipv6.length() > 1) {
+                    String[] dnsAddr = d.toString().split("/");
+                    if (dnsAddr.length > 1) {
+                        ip6Str.append("\n").append(dnsAddr[1]);
+                    } else {
+                        ip6Str.append("\n").append(d.toString());
+                    }
+                }
+            }
+            Pair<String, String> dnsIP4 = new Pair<>("DNS Server IP", ip4Str.toString());
+            Pair<String, String> dnsIP6 = new Pair<>("DNS Server IPv6", ip6Str.toString());
+            connItem.add(connType);
+            connItem.add(ipAddress);
+            connItem.add(netmask);
+            connItem.add(gateway);
+            connItem.add(dnsIP4);
+            connItem.add(ipv6Address);
+            connItem.add(dnsIP6);
+
+            ListViewWifiInfoAdaptor connAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) connItem);
+            wifiList.setAdapter(connAdaptor);
+        }
     }
 
     private void getNetworkState(){
@@ -411,61 +444,4 @@ public class WifiInfoFragment extends Fragment {
 
         return vendor;
     }
-
-    /*public class ConnNetworkCallBack extends ConnectivityManager.NetworkCallback{
-        private WifiInfoFragment mInfoFragment;
-
-        public ConnNetworkCallBack(WifiInfoFragment infoFragment) {
-            super();
-            this.mInfoFragment = infoFragment;
-        }
-
-        @Override
-        public void onAvailable(Network network) {
-            super.onAvailable(network);
-            NetworkCapabilities capabilities = mConnManager.getNetworkCapabilities(network);
-            if(capabilities == null){
-
-            }else if(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)){
-                mInfoFragment.wifiDetails(network);
-            }else if(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)){
-                mInfoFragment.cellDetails(network);
-            }
-
-        }
-
-        @Override
-        public void onLosing(Network network, int maxMsToLive) {
-            super.onLosing(network, maxMsToLive);
-        }
-
-        @Override
-        public void onLost(Network network) {
-            super.onLost(network);
-        }
-
-        @Override
-        public void onUnavailable() {
-            super.onUnavailable();
-        }
-
-        @Override
-        public void onCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) {
-            super.onCapabilitiesChanged(network, networkCapabilities);
-            if(networkCapabilities == null){
-
-            }else if(networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)){
-                mInfoFragment.wifiDetails(network);
-            }else if(networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)){
-                mInfoFragment.cellDetails(network);
-            }else{
-
-            }
-        }
-
-        @Override
-        public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
-            super.onLinkPropertiesChanged(network, linkProperties);
-        }
-    }*/
 }

@@ -3,27 +3,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tabLayout"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:minHeight="?actionBarSize"
-        app:tabGravity="fill"
-        app:tabMaxWidth="150dp"
-        app:tabMinWidth="150dp"
-        app:tabIndicatorColor="@color/white"
-        app:tabIndicatorHeight="4dp"
-        app:tabBackground="@color/white"
-        app:tabMode="fixed">
-
-    </android.support.design.widget.TabLayout>
+    android:orientation="vertical"
+    android:background="@color/purple2">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </android.support.v4.view.ViewPager>
+        android:layout_height="0dp"
+        android:layout_weight="1"></android.support.v4.view.ViewPager>
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:minHeight="?actionBarSize"
+        app:tabMaxWidth="75dp"
+        app:tabMinWidth="75dp"
+        app:tabIndicatorGravity="top"
+        app:tabIndicatorColor="@color/colorPrimaryDark"
+        app:tabIndicatorHeight="0dp"
+        app:tabBackground="@color/purple2"
+        app:tabMode="scrollable">
+
+    </android.support.design.widget.TabLayout>
 
 </LinearLayout>

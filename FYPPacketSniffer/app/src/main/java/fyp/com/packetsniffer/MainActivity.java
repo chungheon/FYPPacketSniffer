@@ -1,6 +1,7 @@
 package fyp.com.packetsniffer;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -38,14 +39,18 @@ public class MainActivity extends AppCompatActivity {
         adapter = new TabAdapter(getSupportFragmentManager());
         adapter.addFragment(new DeviceConnectFragment(), "Devices Connected");
         adapter.addFragment(new WifiInfoFragment(), "Wifi Information");
+        adapter.addFragment(new DeviceConnectFragment(), "Records");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         View view1 = getLayoutInflater().inflate(R.layout.layout_tab, null);
-        view1.findViewById(R.id.icon).setBackgroundResource(R.drawable.deviceconn);
+        view1.findViewById(R.id.icon).setBackgroundResource(R.drawable.deviceconn2);
         tabLayout.getTabAt(0).setCustomView(view1);
         View view2 = getLayoutInflater().inflate(R.layout.layout_tab, null);
-        view2.findViewById(R.id.icon).setBackgroundResource(R.drawable.wifiinfo);
+        view2.findViewById(R.id.icon).setBackgroundResource(R.drawable.wifiinfo2);
         tabLayout.getTabAt(1).setCustomView(view2);
+        View view3 = getLayoutInflater().inflate(R.layout.layout_tab, null);
+        view3.findViewById(R.id.icon).setBackgroundResource(R.drawable.records);
+        tabLayout.getTabAt(2).setCustomView(view3);
     }
 
     public void askForMultiplePermissions(){
