@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fyp.com.packetsniffer.Fragments.DevicesConnected.DeviceConnectFragment;
+import fyp.com.packetsniffer.Fragments.PacketCapture.PacketCaptureFragment;
 import fyp.com.packetsniffer.Fragments.WifiInfo.WifiInfoFragment;
 
 import fyp.com.packetsniffer.Fragments.TabAdapter;
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         adapter = new TabAdapter(getSupportFragmentManager());
         adapter.addFragment(new DeviceConnectFragment(), "Devices Connected");
         adapter.addFragment(new WifiInfoFragment(), "Wifi Information");
-        adapter.addFragment(new DeviceConnectFragment(), "Records");
+        adapter.addFragment(new PacketCaptureFragment(), "Packet Capture");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         View view1 = getLayoutInflater().inflate(R.layout.layout_tab, null);
