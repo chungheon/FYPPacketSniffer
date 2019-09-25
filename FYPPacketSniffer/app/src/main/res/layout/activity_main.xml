@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/purple2">
+    android:background="@color/colorPrimaryDark">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
@@ -17,13 +17,12 @@
         android:layout_width="match_parent"
         android:layout_height="75dp"
         android:minHeight="?actionBarSize"
+        app:tabGravity="fill"
         app:tabMaxWidth="75dp"
         app:tabMinWidth="75dp"
-        app:tabIndicatorGravity="top"
-        app:tabIndicatorColor="@color/colorPrimaryDark"
         app:tabIndicatorHeight="0dp"
         app:tabBackground="@color/purple2"
-        app:tabMode="scrollable">
+        app:tabMode="fixed">
 
     </android.support.design.widget.TabLayout>
 

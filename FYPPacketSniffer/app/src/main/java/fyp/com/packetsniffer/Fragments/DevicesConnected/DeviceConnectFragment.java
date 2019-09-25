@@ -70,6 +70,7 @@ public class DeviceConnectFragment extends Fragment {
         runBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                runBtn.setText("SCANNING DEVICES...");
                 scanInProgress = true;
                 dhcpInfo = mWifiManager.getDhcpInfo();
                 String[] ipInfo = dhcpInfo.toString().split(" ");
@@ -88,6 +89,7 @@ public class DeviceConnectFragment extends Fragment {
                 if(Build.VERSION.SDK_INT >= 23){
                     if(wifiInfo.getNetworkId() != -1 && !scanInProgress){
                         runBtn.setEnabled(true);
+                        runBtn.setText("Start Scan");
                         network = mConnectivityManager.getActiveNetwork();
                         readARPTableNew();
                     }else if(wifiInfo.getNetworkId() != -1){
@@ -97,6 +99,7 @@ public class DeviceConnectFragment extends Fragment {
                 }else{
                     if(wifiInfo.getNetworkId() != -1 && !scanInProgress){
                         runBtn.setEnabled(true);
+                        runBtn.setText("Start Scan");
                         readARPTableOld();
                     }else if(wifiInfo.getNetworkId() != -1){
                         readARPTableOld();
@@ -223,6 +226,7 @@ public class DeviceConnectFragment extends Fragment {
 
     public void scanDone(){
         scanInProgress = false;
+        runBtn.setText("SCANNING DONE...");
     }
 
     private String getVendor(String macAddr){
