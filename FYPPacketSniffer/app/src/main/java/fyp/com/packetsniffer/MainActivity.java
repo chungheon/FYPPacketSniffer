@@ -6,7 +6,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import fyp.com.packetsniffer.Fragments.Tab1Fragment;
+import fyp.com.packetsniffer.Fragments.PacketCapture.PacketCaptureFragment;
 import fyp.com.packetsniffer.Fragments.TabAdapter;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,12 +20,9 @@ public class MainActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         adapter = new TabAdapter(getSupportFragmentManager());
-        adapter.addFragment(new Tab1Fragment(), "Tab 1");
-        adapter.addFragment(new Tab1Fragment(), "");
-        adapter.addFragment(new Tab1Fragment(), "Tab 3");
+        adapter.addFragment(new PacketCaptureFragment(), "PacketCapture");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(1).setIcon(R.drawable.packet_capture);
         View view1 = getLayoutInflater().inflate(R.layout.tab_one, null);
         view1.findViewById(R.id.icon).setBackgroundResource(R.drawable.packet_capture);
         tabLayout.getTabAt(0).setCustomView(view1);
