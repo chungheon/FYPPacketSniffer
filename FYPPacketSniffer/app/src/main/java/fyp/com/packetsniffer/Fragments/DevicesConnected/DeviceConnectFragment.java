@@ -3,6 +3,8 @@ package fyp.com.packetsniffer.Fragments.DevicesConnected;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
+import android.net.LinkAddress;
+import android.net.LinkProperties;
 import android.net.Network;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -25,7 +27,9 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -72,7 +76,13 @@ public class DeviceConnectFragment extends Fragment {
                 scanInProgress = true;
                 dhcpInfo = mWifiManager.getDhcpInfo();
                 String[] ipInfo = dhcpInfo.toString().split(" ");
-                networkIP = new IPv4(ipInfo[3], ipInfo[5]);
+                String subMask = ipInfo[5];
+                try{
+                    networkIP = new IPv4(ipInfo[1], subMask);
+                }catch (NumberFormatException e){
+                    subMask = getSubMask();
+                    networkIP = new IPv4(ipInfo[1], subMask);
+                }
                 runBtn.setEnabled(false);
                 ScanSubNetThread scanNet = new ScanSubNetThread(networkIP, connFragment);
                 Thread thread = new Thread(scanNet);
@@ -105,6 +115,32 @@ public class DeviceConnectFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private String getSubMask(){
+        if(Build.VERSION.SDK_INT >= 23){
+            Network network = mConnectivityManager.getActiveNetwork();
+            LinkProperties linkProp = mConnectivityManager.getLinkProperties(network);
+            List<LinkAddress> linkAddress = linkProp.getLinkAddresses();
+            IPv4 ipv4 = null;
+            StringBuilder ipv6 = new StringBuilder("N/A");
+            for (LinkAddress l : linkAddress) {
+                String[] ip4 = l.toString().split("\\.");
+                String[] ip6 = l.toString().split(":");
+                if (ip4.length > 1) {
+                    try {
+                        ipv4 = new IPv4(l.toString());
+                    }catch (NumberFormatException e){
+                        return "255.255.255.255";
+                    }
+                }
+            }
+            if(ipv4 != null){
+                return ipv4.getNetmask();
+            }
+        }
+
+        return "255.255.255.255";
     }
 
     private void readARPTableNew(){

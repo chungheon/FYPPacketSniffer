@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +26,10 @@ import android.widget.TextView;
 
 import java.lang.reflect.Field;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -95,7 +99,13 @@ public class WifiInfoFragment extends Fragment {
         String[] dhcpData = dhcpInfo.toString().split(" ");
         Pair<String, String> connType = new Pair<>("Connection Type", "Wi-Fi");
         Pair<String, String> ipAddr = new Pair<>("IP Address", dhcpData[1]);
-        Pair<String, String> subnetMask = new Pair<>("Subnet Mask", dhcpData[5]);
+        String subMask = dhcpData[5];
+        try{
+            IPv4 ipv4 = new IPv4(dhcpData[1], subMask);
+        }catch (NumberFormatException e){
+            subMask = getSubMask();
+        }
+        Pair<String, String> subnetMask = new Pair<>("Subnet Mask", subMask);
         Pair<String, String> defGateway = new Pair<>("Default Gateway", dhcpData[3]);
         Pair<String, String> dnsIP = new Pair<>("DNS Server IP", dhcpData[7]);
         StringBuilder ipv6 = new StringBuilder("N/A");
@@ -124,6 +134,33 @@ public class WifiInfoFragment extends Fragment {
 
         ListViewWifiInfoAdaptor connAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) connItem);
         wifiList.setAdapter(connAdaptor);
+    }
+
+    private String getSubMask(){
+        if(Build.VERSION.SDK_INT >= 23){
+            Network network = mConnManager.getActiveNetwork();
+            LinkProperties linkProp = mConnManager.getLinkProperties(network);
+            List<LinkAddress> linkAddress = linkProp.getLinkAddresses();
+            IPv4 ipv4 = null;
+            StringBuilder ipv6 = new StringBuilder("N/A");
+            int count = 0;
+            for (LinkAddress l : linkAddress) {
+                String[] ip4 = l.toString().split("\\.");
+                String[] ip6 = l.toString().split(":");
+                if (ip4.length > 1) {
+                    try {
+                        ipv4 = new IPv4(l.toString());
+                    }catch (NumberFormatException e){
+                        return "N/A";
+                    }
+                }
+            }
+            if(ipv4 != null){
+                return ipv4.getNetmask();
+            }
+        }
+
+        return "N/A";
     }
 
     private void displayCell(){
