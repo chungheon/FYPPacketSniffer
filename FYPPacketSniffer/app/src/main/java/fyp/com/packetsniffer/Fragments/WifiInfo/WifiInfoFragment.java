@@ -73,7 +73,7 @@ public class WifiInfoFragment extends Fragment {
             Network network = mConnManager.getActiveNetwork();
             NetworkCapabilities capabilities = mConnManager.getNetworkCapabilities(network);
             if(capabilities == null){
-
+                displayEmpty();
             }else if(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)){
                 displayWifi();
             }else if(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)){
@@ -84,12 +84,21 @@ public class WifiInfoFragment extends Fragment {
                 displayWifi();
             }else if(mConnManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null){
                 displayCell();
+            }else{
+                displayEmpty();
             }
         }
 
         getNetworkState();
     }
+    private void displayEmpty(){
+        networkType.setText("NO CONNECTION");
+        List<Pair<String, String>> connItem = new ArrayList<>();
+        Pair<String, String> connType = new Pair<>("Connection Type", "DISCONNECTED");
 
+        ListViewWifiInfoAdaptor connAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) connItem);
+        wifiList.setAdapter(connAdaptor);
+    }
 
     private void displayWifi(){
         //WifiInfo connInfo = mWifiManager.getConnectionInfo();
@@ -329,7 +338,7 @@ public class WifiInfoFragment extends Fragment {
                 detailItem.add(speed);
                 detailItem.add(signal);
 
-                detailList.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 360));
+                //detailList.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 360));
                 ListViewWifiInfoAdaptor detailAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) detailItem);
                 detailList.setAdapter(detailAdaptor);
             }else{
@@ -339,13 +348,13 @@ public class WifiInfoFragment extends Fragment {
                 detailItem.add(state);
 
                 ListViewWifiInfoAdaptor detailAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) detailItem);
-                detailList.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 90));
+                //detailList.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 90));
                 detailList.setAdapter(detailAdaptor);
             }
         }else{
             Pair<String, String> enabled = new Pair<>("Enabled", "No");
             detailItem.add(enabled);
-            detailList.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            //detailList.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             ListViewWifiInfoAdaptor detailAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) detailItem);
             detailList.setAdapter(detailAdaptor);
         }

@@ -13,8 +13,9 @@ import fyp.com.packetsniffer.R;
 
 public class PacketCaptureFragment extends Fragment {
 
-    private static final int VPN_REQUEST_CODE = 0x0F;
-
+    private final String TAG = "PCapFragment";
+    private final int PCAP_NORMAL_STREAM = 1;
+    private final int PCAP_ERROR_STREAM = 2;
     private View view;
 
     private TextView output;
@@ -28,20 +29,18 @@ public class PacketCaptureFragment extends Fragment {
         sniffBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String args = "su:-c:tcpdump -tttt -vvv -e -c 5";
-                String[] cmd = args.split(":");
-                CmdExec test = new CmdExec();
-                String result = test.executeCMD(cmd);
-                output.setText(result);
+                String getVersion = runCmd("su:-c:tcpdump --version", PCAP_ERROR_STREAM);
+                String testPacket = runCmd("su:-c:tcpdump -tttt -vvv -e -c 5", PCAP_NORMAL_STREAM);
+                output.setText(getVersion + "\n\n" + testPacket);
+
             }
         });
-
-        /*String args = "su:-c:tcpdump -tttt -vvv -e -c 5";
-        String[] cmd = args.split(":");
-        CmdExec test = new CmdExec();
-        String result = test.executeCMD(cmd);
-        this.output.setText(result);*/
         return view;
     }
 
+    private String runCmd(String args, int mode){
+        String[] cmd = args.split(":");
+        CmdExec exec = new CmdExec();
+        return exec.executeCMD(cmd, mode);
+    }
 }

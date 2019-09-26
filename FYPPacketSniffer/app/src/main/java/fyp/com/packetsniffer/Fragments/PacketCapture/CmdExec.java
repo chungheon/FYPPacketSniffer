@@ -9,18 +9,25 @@ import java.io.InputStreamReader;
 public class CmdExec {
     private final String TAG = "CmdExecution";
 
-    public String executeCMD(String[] command){
+    public String executeCMD(String[] command, int mode){
         Process p;
 
         StringBuilder output = new StringBuilder("");
         try{
             p = Runtime.getRuntime().exec(command);
             p.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
+            BufferedReader reader = null;
             String line = "";
-            while ((line = reader.readLine())!= null) {
-                output.append(line + "\n\n");
+            if(mode == 1){
+                reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                while ((line = reader.readLine())!= null) {
+                    output.append(line + "\n\n");
+                }
+            }else if(mode == 2){
+                reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                while((line = reader.readLine()) != null){
+                    output.append(line + "\n\n");
+                }
             }
         }catch(Exception e){
             Log.e(TAG, e.getMessage());

@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         view2.findViewById(R.id.icon).setBackgroundResource(R.drawable.wifiinfo2);
         tabLayout.getTabAt(1).setCustomView(view2);
         View view3 = getLayoutInflater().inflate(R.layout.layout_tab, null);
-        view3.findViewById(R.id.icon).setBackgroundResource(R.drawable.records);
+        view3.findViewById(R.id.icon).setBackgroundResource(R.drawable.pcap);
         tabLayout.getTabAt(2).setCustomView(view3);
     }
 
