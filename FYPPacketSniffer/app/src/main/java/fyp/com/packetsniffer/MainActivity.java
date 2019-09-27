@@ -17,9 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fyp.com.packetsniffer.Fragments.DevicesConnected.DeviceConnectFragment;
-import fyp.com.packetsniffer.Fragments.PacketCapture.PacketCaptureFragment;
-import fyp.com.packetsniffer.Fragments.RecordsStore.RecordStoreFragment;
-import fyp.com.packetsniffer.Fragments.WifiInfo.WifiInfoFragment;
 
 import fyp.com.packetsniffer.Fragments.TabAdapter;
 
@@ -40,23 +37,11 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         adapter = new TabAdapter(getSupportFragmentManager());
         adapter.addFragment(new DeviceConnectFragment(), "Devices Connected");
-        adapter.addFragment(new WifiInfoFragment(), "Wifi Information");
-        adapter.addFragment (new RecordStoreFragment(), "Records Store");
-        adapter.addFragment(new PacketCaptureFragment(), "Packet Capture");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         View view1 = getLayoutInflater().inflate(R.layout.layout_tab, null);
         view1.findViewById(R.id.icon).setBackgroundResource(R.drawable.deviceconn2);
         tabLayout.getTabAt(0).setCustomView(view1);
-        view1 = getLayoutInflater().inflate(R.layout.layout_tab, null);
-        view1.findViewById(R.id.icon).setBackgroundResource(R.drawable.wifiinfo2);
-        tabLayout.getTabAt(1).setCustomView(view1);
-        view1 = getLayoutInflater().inflate(R.layout.layout_tab, null);
-        view1.findViewById(R.id.icon).setBackgroundResource(R.drawable.records);
-        tabLayout.getTabAt(2).setCustomView(view1);
-        view1 = getLayoutInflater().inflate(R.layout.layout_tab, null);
-        view1.findViewById(R.id.icon).setBackgroundResource(R.drawable.pcap);
-        tabLayout.getTabAt(3).setCustomView(view1);
     }
 
     public void askForMultiplePermissions(){
