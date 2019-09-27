@@ -6,6 +6,7 @@ import android.net.DhcpInfo;
 import android.net.LinkAddress;
 import android.net.LinkProperties;
 import android.net.Network;
+import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -68,7 +69,7 @@ public class DeviceConnectFragment extends Fragment {
         wifiInfo = mWifiManager.getConnectionInfo();
         scanInProgress = false;
         runBtn.setEnabled(false);
-        if(wifiInfo.getNetworkId() != -1){
+        if(wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)){
             runBtn.setEnabled(true);
         }
         runBtn.setOnClickListener(new View.OnClickListener() {
@@ -96,19 +97,23 @@ public class DeviceConnectFragment extends Fragment {
             public void onClick(View v) {
                 wifiInfo = mWifiManager.getConnectionInfo();
                 if(Build.VERSION.SDK_INT >= 23){
-                    if(wifiInfo.getNetworkId() != -1 && !scanInProgress){
+                    if(wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED) && !scanInProgress){
                         runBtn.setEnabled(true);
                         network = mConnectivityManager.getActiveNetwork();
-                        readARPTableNew();
-                    }else if(wifiInfo.getNetworkId() != -1){
+                        if(network != null){
+                            readARPTableNew();
+                        }
+                    }else if(wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)){
                         network = mConnectivityManager.getActiveNetwork();
-                        readARPTableNew();
+                        if(network != null){
+                            readARPTableNew();
+                        }
                     }
                 }else{
-                    if(wifiInfo.getNetworkId() != -1 && !scanInProgress){
+                    if(wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED) && !scanInProgress){
                         runBtn.setEnabled(true);
                         readARPTableOld();
-                    }else if(wifiInfo.getNetworkId() != -1){
+                    }else if(wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)){
                         readARPTableOld();
                     }
                 }
