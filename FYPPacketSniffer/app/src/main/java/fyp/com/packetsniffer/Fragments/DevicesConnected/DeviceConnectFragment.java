@@ -44,6 +44,7 @@ public class DeviceConnectFragment extends Fragment {
     private WifiManager mWifiManager;
     private ConnectivityManager mConnectivityManager;
     private RecyclerView wifiNetworkList;
+    private View view;
     private Network network;
     private Button runBtn;
     private Button updateBtn;
@@ -55,7 +56,7 @@ public class DeviceConnectFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_device_connect, container, false);
+        view = inflater.inflate(R.layout.fragment_device_connect, container, false);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         wifiNetworkList = (RecyclerView) view.findViewById(R.id.recycler_view_Net);

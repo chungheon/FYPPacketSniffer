@@ -30,8 +30,9 @@ public class PacketCaptureFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String getVersion = runCmd("su:-c:tcpdump --version", PCAP_ERROR_STREAM);
+                String getInterfaces = runCmd("su:-c:tcpdump -D", PCAP_NORMAL_STREAM);
                 String testPacket = runCmd("su:-c:tcpdump -tttt -vvv -e -c 5", PCAP_NORMAL_STREAM);
-                output.setText(getVersion + "\n\n" + testPacket);
+                output.setText(getVersion + "\n\n" + getInterfaces + "\n\n" + testPacket);
 
             }
         });

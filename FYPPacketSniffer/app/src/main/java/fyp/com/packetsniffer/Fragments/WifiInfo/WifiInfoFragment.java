@@ -42,6 +42,7 @@ public class WifiInfoFragment extends Fragment {
     private WifiManager mWifiManager;
     private ConnectivityManager mConnManager;
     private TelephonyManager mTeleManager;
+    private View view;
     private ListView wifiList;
     private ListView detailList;
     private ListView cellList;
@@ -49,7 +50,7 @@ public class WifiInfoFragment extends Fragment {
     private Button refreshBtn;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_wifiinfo, container, false);
+        this.view = inflater.inflate(R.layout.fragment_wifiinfo, container, false);
         this.wifiList = (ListView) view.findViewById(R.id.wifiList);
         this.detailList = (ListView) view.findViewById(R.id.detailList);
         this.cellList = (ListView) view.findViewById(R.id.cellList);
