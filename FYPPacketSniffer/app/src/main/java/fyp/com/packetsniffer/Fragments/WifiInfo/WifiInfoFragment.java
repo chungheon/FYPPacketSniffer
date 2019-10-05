@@ -1,6 +1,9 @@
 package fyp.com.packetsniffer.Fragments.WifiInfo;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.LinkAddress;
@@ -14,6 +17,7 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.Pair;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -39,7 +43,7 @@ import fyp.com.packetsniffer.Fragments.IPv4;
 import fyp.com.packetsniffer.R;
 
 public class WifiInfoFragment extends Fragment {
-
+    public final static String TAG = "WifiInfoFragment";
     private WifiManager mWifiManager;
     private ConnectivityManager mConnManager;
     private TelephonyManager mTeleManager;
@@ -48,26 +52,70 @@ public class WifiInfoFragment extends Fragment {
     private ListView detailList;
     private ListView cellList;
     private TextView networkType;
-    private Button refreshBtn;
+    private NetworkStateChangeReceiver receiver;
+    private IntentFilter intentFilter;
+
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_wifiinfo, container, false);
+        initView();
+        return view;
+    }
+
+    private void initView(){
         this.wifiList = (ListView) view.findViewById(R.id.wifiList);
         this.detailList = (ListView) view.findViewById(R.id.detailList);
         this.cellList = (ListView) view.findViewById(R.id.cellList);
-        this.refreshBtn = (Button) view.findViewById(R.id.refresh);
         this.networkType = (TextView) view.findViewById(R.id.networkType);
-        refreshBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refresh();
-            }
-        });
         this.mWifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         this.mConnManager = (ConnectivityManager) getContext().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         this.mTeleManager = (TelephonyManager) getContext().getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+        receiver = new NetworkStateChangeReceiver();
+        intentFilter = new IntentFilter();
+        if(Build.VERSION.SDK_INT < 28){
+            intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        }
+        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        getActivity().registerReceiver(receiver, intentFilter);
+        getActivity().registerReceiver(receiver, intentFilter);
         refresh();
-        return view;
+    }
+
+    private class NetworkStateChangeReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if(action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)){
+                refresh();
+            }else if(Build.VERSION.SDK_INT < 28){
+                    if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+                        refresh();
+                    }
+            }
+            //Log.d(TAG, "Detected intent " + action);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        try {
+            getActivity().unregisterReceiver(receiver);
+        }catch(IllegalArgumentException e){ }
+        //Log.d(TAG, "Fragment Destroyed");
+        super.onDestroyView();
+    }
+    @Override
+    public void onPause(){
+        try {
+            getActivity().unregisterReceiver(receiver);
+        }catch(IllegalArgumentException e){ }
+        super.onPause();
+    }
+    @Override
+    public void onResume() {
+        getActivity().registerReceiver(receiver, intentFilter);
+        refresh();
+        super.onResume();
     }
 
     public void refresh(){
@@ -93,6 +141,7 @@ public class WifiInfoFragment extends Fragment {
 
         getNetworkState();
     }
+
     private void displayEmpty(){
         networkType.setText("NO CONNECTION");
         List<Pair<String, String>> connItem = new ArrayList<>();
@@ -340,7 +389,6 @@ public class WifiInfoFragment extends Fragment {
                 detailItem.add(speed);
                 detailItem.add(signal);
 
-                //detailList.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 360));
                 ListViewWifiInfoAdaptor detailAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) detailItem);
                 detailList.setAdapter(detailAdaptor);
             }else{
@@ -350,13 +398,11 @@ public class WifiInfoFragment extends Fragment {
                 detailItem.add(state);
 
                 ListViewWifiInfoAdaptor detailAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) detailItem);
-                //detailList.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 90));
                 detailList.setAdapter(detailAdaptor);
             }
         }else{
             Pair<String, String> enabled = new Pair<>("Enabled", "No");
             detailItem.add(enabled);
-            //detailList.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             ListViewWifiInfoAdaptor detailAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) detailItem);
             detailList.setAdapter(detailAdaptor);
         }
@@ -443,6 +489,7 @@ public class WifiInfoFragment extends Fragment {
         }
         return netType;
     }
+
     private String getMacAddr() {
         try {
             List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());

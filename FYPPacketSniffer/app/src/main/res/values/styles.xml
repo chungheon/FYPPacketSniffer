@@ -17,4 +17,8 @@
         <item name="android:listDivider">@color/black</item>
     </style>
 
+    <style name="SplashTheme">
+        <item name="android:windowBackground">@drawable/background_splash</item>
+    </style>
+
 </resources>

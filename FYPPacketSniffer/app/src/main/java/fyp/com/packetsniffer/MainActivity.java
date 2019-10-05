@@ -1,5 +1,12 @@
 package fyp.com.packetsniffer;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -14,6 +21,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -24,8 +32,10 @@ import java.util.List;
 import fyp.com.packetsniffer.Fragments.Tab1Fragment;
 
 import fyp.com.packetsniffer.Fragments.TabAdapter;
+import fyp.com.packetsniffer.Fragments.WifiInfo.WifiInfoFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private final static String TAG = "MainActivity";
     private TabAdapter adapter;
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -39,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         NavigationView navView = findViewById(R.id.nav_view);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
         setSupportActionBar(toolbar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
@@ -71,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.test1: getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment1).commit();
                             toolbar.setTitle("Scan Network");
                             break;
-            case R.id.test2: getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new Tab1Fragment()).commit();
+            case R.id.test2: getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WifiInfoFragment()).commit();
                              toolbar.setTitle("Network Details");
                             break;
             case R.id.test3: getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new Tab1Fragment()).commit();

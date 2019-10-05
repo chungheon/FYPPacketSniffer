@@ -1,11 +1,14 @@
 package fyp.com.packetsniffer.Fragments.WifiInfo;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -32,6 +35,18 @@ public class ListViewWifiInfoAdaptor extends ArrayAdapter<Pair<String, String>> 
 
         TextView title = (TextView) view.findViewById(R.id.title);
         TextView value = (TextView) view.findViewById(R.id.value);
+        ConstraintLayout layout = (ConstraintLayout) view.findViewById(R.id.info_bg);
+
+        try{
+            int bgColor = mContext.getResources().getColor(R.color.colorPrimary);
+            if(position % 2 == 0){
+                bgColor = mContext.getResources().getColor(R.color.wifi_info_1);
+            }else{
+                bgColor = mContext.getResources().getColor(R.color.wifi_info_2);
+            }
+
+            layout.setBackgroundColor(bgColor);
+        }catch(Resources.NotFoundException e){ }
 
         title.setText(info.get(position).first);
         value.setText(info.get(position).second);
