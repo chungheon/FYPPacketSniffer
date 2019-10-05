@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PacketSniffer</string>
+    <string name="app_name">Network Sniffer</string>
     
     <string name="nav_drawer_open">Open Navigation Drawer</string>
     <string name="nav_drawer_close">Close Navigation Drawer</string>
