@@ -23,22 +23,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TabAdapter adapter;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        NavigationView navView = findViewById(R.id.nav_view);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        drawerLayout = findViewById(R.id.drawer_layout);
+        setSupportActionBar(toolbar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
                 R.string.nav_drawer_open, R.string.nav_drawer_close);
 
-        NavigationView nv = findViewById(R.id.nav_view);
-        nv.setNavigationItemSelectedListener(this);
+
+        navView.setNavigationItemSelectedListener(this);
+        navView.setItemIconTintList(null);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -48,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             args.putInt("num", 1);
             fragment1.setArguments(args);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment1).commit();
-            nv.setCheckedItem(R.id.test1);
+            navView.setCheckedItem(R.id.test1);
         }
 
 
@@ -72,20 +75,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Bundle args = new Bundle();
         args.putInt("num", 1);
         fragment1.setArguments(args);
-        Tab1Fragment fragment2 = new Tab1Fragment();
-        args = new Bundle();
-        args.putInt("num", 2);
-        fragment2.setArguments(args);
-        Tab1Fragment fragment3 = new Tab1Fragment();
-        args = new Bundle();
-        args.putInt("num", 3);
-        fragment3.setArguments(args);
         switch(menuItem.getItemId()){
             case R.id.test1: getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment1).commit();
+                            toolbar.setTitle("Scan Network");
                             break;
-            case R.id.test2: getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment2).commit();
+            case R.id.test2: getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new Tab1Fragment()).commit();
+                             toolbar.setTitle("Network Details");
                             break;
-            case R.id.test3: getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment3).commit();
+            case R.id.test3: getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new Tab1Fragment()).commit();
+                             toolbar.setTitle("Device Records Store");
                             break;
 
         }

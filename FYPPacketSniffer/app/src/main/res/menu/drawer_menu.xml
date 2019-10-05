@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn="navigation_view">
+    tools:shownIn="navigation_view">
+
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/test1"
-            android:icon="@drawable/ic_test1"
-            android:title="Test1" />
+            android:icon="@mipmap/device_conn"
+            android:title="Scan Network" />
         <item
             android:id="@+id/test2"
-            android:icon="@drawable/ic_test1"
-            android:title="Test2" />
+            android:icon="@mipmap/wifi_details"
+            android:title="Network Details" />
         <item
             android:id="@+id/test3"
-            android:icon="@drawable/ic_test1"
-            android:title="Test3" />
+            android:icon="@mipmap/records"
+            android:title="Device Records Store" />
+        <item
+            android:id="@+id/test7"
+            android:icon="@mipmap/packet_capture"
+            android:title="Packet Capture"/>
     </group>
 
-    <item android:title="test4">
+    <item android:title="test4"
+        android:id="@+id/test4">
         <menu>
             <item
                 android:id="@+id/test5"

@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.Random;
+
 import fyp.com.packetsniffer.R;
 
 public class Tab1Fragment extends Fragment {
@@ -16,7 +18,10 @@ public class Tab1Fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_one, container, false);
         TextView tx = view.findViewById(R.id.fragText);
-        num = this.getArguments().getInt("num");
+        if(this.getArguments() != null){
+            Random r = new Random();
+            num = r.nextInt();
+        }
         tx.setText(num + " fragment");
         return view;
     }
