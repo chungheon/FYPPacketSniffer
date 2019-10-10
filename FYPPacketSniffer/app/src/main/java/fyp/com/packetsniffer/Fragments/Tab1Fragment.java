@@ -1,6 +1,7 @@
 package fyp.com.packetsniffer.Fragments;
 
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import java.util.Random;
 
+import fyp.com.packetsniffer.Fragments.DevicesConnected.ScanManager;
 import fyp.com.packetsniffer.R;
 
 public class Tab1Fragment extends Fragment {
@@ -23,6 +25,7 @@ public class Tab1Fragment extends Fragment {
             num = r.nextInt();
         }
         tx.setText(num + " fragment");
+
         return view;
     }
 }

@@ -3,27 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-<<<<<<< HEAD
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:fitsSystemWindows="true"
     tools:context="fyp.com.packetsniffer.MainActivity"
     tools:openDrawer="start">
-=======
-    android:orientation="vertical"
-    android:background="@color/colorPrimaryDark">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"></android.support.v4.view.ViewPager>
->>>>>>> DevicesConnected
 
     <LinearLayout
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-<<<<<<< HEAD
         android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
@@ -58,15 +52,3 @@
 
 
 </android.support.v4.widget.DrawerLayout>
-=======
-        android:layout_height="wrap_content"
-        android:minHeight="?actionBarSize"
-        app:tabGravity="fill"
-        app:tabIndicatorHeight="0dp"
-        app:tabBackground="@color/purple2"
-        app:tabMode="fixed">
-
-    </android.support.design.widget.TabLayout>
-
-</LinearLayout>
->>>>>>> DevicesConnected

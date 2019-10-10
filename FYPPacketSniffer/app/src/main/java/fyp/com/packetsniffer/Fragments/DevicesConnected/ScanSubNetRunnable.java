@@ -1,5 +1,10 @@
 package fyp.com.packetsniffer.Fragments.DevicesConnected;
 
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
@@ -10,38 +15,47 @@ import fyp.com.packetsniffer.Fragments.IPv4;
 
 import static java.lang.Thread.interrupted;
 
-public class ScanSubNetThread implements Runnable {
+public class ScanSubNetRunnable implements Runnable {
 
     private static final String TAG = "ScanningSubNet";
-    private IPv4 ipAddress;
-    private DeviceConnectFragment mFragment;
 
-    public ScanSubNetThread(IPv4 ipAddress, DeviceConnectFragment fragment){
+    private final int SCAN_MSG = 1;
+    private final int SCAN_DONE = 12;
+
+    private IPv4 ipAddress;
+    private Handler mHandler;
+    private DeviceConnectFragment mFragment;
+    private boolean stopThread;
+    private Looper mLooper;
+    private ScanManager mScanManager;
+
+    public ScanSubNetRunnable(IPv4 ipAddress){
+        //this.mScanManager = scanManager;
         this.ipAddress = ipAddress;
-        this.mFragment = fragment;
     }
 
     @Override
-    public void run() {
-        scanSubNet();
-    }
+    public void run() { scanSubNet(); }
 
     private void scanSubNet(){
+        Log.d(TAG, "Start Scan");
         String hostAddr = ipAddress.getFirstHostAddress();
         String[] hostIP = hostAddr.split("\\.");
         int firstBit = Integer.parseInt(hostIP[0]);
         int secondBit = Integer.parseInt(hostIP[1]);
         int thirdBit = Integer.parseInt(hostIP[2]);
         int lastBit = Integer.parseInt(hostIP[3]);
+        stopThread = false;
 
         String endAddr = ipAddress.getLastHostAddress();
         InetAddress inetAddress = null;
+        int i = 0;
         try {
-            for(int i = 0 ; i < (ipAddress.getNumberOfHosts() - 2); i++){
+            while(i < (ipAddress.getNumberOfHosts() - 2) && !stopThread){
                 String fullBit = firstBit + "." + secondBit + "." + thirdBit + "." + lastBit;
                 Log.d(TAG, "Trying: " + fullBit);
                 inetAddress = InetAddress.getByName(fullBit);
-                inetAddress.isReachable(10);
+                inetAddress.isReachable(1);
                 lastBit++;
                 if(lastBit > 255){
                     thirdBit++;
@@ -64,13 +78,18 @@ public class ScanSubNetThread implements Runnable {
                 if(interrupted()){
                     break;
                 }
+                i++;
             }
 
-            mFragment.scanDone();
         } catch (UnknownHostException e) {
 
         } catch (IOException e) {
 
         }
+    }
+
+    public synchronized void stopRun(){
+        stopThread = true;
+        Log.d(TAG, "Scan stopped");
     }
 }

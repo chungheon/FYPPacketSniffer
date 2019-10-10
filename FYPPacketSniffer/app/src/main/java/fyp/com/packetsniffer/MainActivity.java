@@ -1,31 +1,25 @@
 package fyp.com.packetsniffer;
 
-<<<<<<< HEAD
-import android.drm.DrmStore;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
-=======
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
->>>>>>> DevicesConnected
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -33,19 +27,23 @@ import java.util.List;
 
 import fyp.com.packetsniffer.Fragments.DevicesConnected.DeviceConnectFragment;
 
+import fyp.com.packetsniffer.Fragments.DevicesConnected.ScanManager;
+import fyp.com.packetsniffer.Fragments.Tab1Fragment;
 import fyp.com.packetsniffer.Fragments.TabAdapter;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private final static String TAG = "MainActivity";
     private TabAdapter adapter;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
+    private Handler mHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-<<<<<<< HEAD
+        askForMultiplePermissions();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         NavigationView navView = findViewById(R.id.nav_view);
@@ -63,34 +61,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         if(savedInstanceState == null){
-            Tab1Fragment fragment1 = new Tab1Fragment();
-            Bundle args = new Bundle();
-            args.putInt("num", 1);
-            fragment1.setArguments(args);
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment1).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new DeviceConnectFragment()).commit();
             navView.setCheckedItem(R.id.test1);
         }
 
-
-        /*viewPager = (ViewPager) findViewById(R.id.viewPager);
-=======
-        askForMultiplePermissions();
-        initView();
-    }
-
-    private void initView(){
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
->>>>>>> DevicesConnected
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-        adapter = new TabAdapter(getSupportFragmentManager());
-        adapter.addFragment(new DeviceConnectFragment(), "Devices Connected");
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-<<<<<<< HEAD
-        tabLayout.getTabAt(1).setIcon(R.drawable.packet_capture);
-        View view1 = getLayoutInflater().inflate(R.layout.tab_one, null);
-        view1.findViewById(R.id.icon).setBackgroundResource(R.drawable.packet_capture);
-        tabLayout.getTabAt(0).setCustomView(view1);*/
     }
 
     @Override
@@ -100,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         args.putInt("num", 1);
         fragment1.setArguments(args);
         switch(menuItem.getItemId()){
-            case R.id.test1: getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment1).commit();
+            case R.id.test1: getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new DeviceConnectFragment()).commit();
                             toolbar.setTitle("Scan Network");
                             break;
             case R.id.test2: getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new Tab1Fragment()).commit();
@@ -123,18 +97,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }else{
             super.onBackPressed();
         }
-
-=======
-        View view1 = getLayoutInflater().inflate(R.layout.layout_tab, null);
-        view1.findViewById(R.id.icon).setBackgroundResource(R.drawable.deviceconn2);
-        tabLayout.getTabAt(0).setCustomView(view1);
->>>>>>> DevicesConnected
     }
 
     public void askForMultiplePermissions(){
         final int REQUEST_CODE = 13;
         String accessFineLocation = Manifest.permission.ACCESS_FINE_LOCATION;
-        String accessCoarseLocation = Manifest.permission.ACCESS_FINE_LOCATION;
+        String accessCoarseLocation = Manifest.permission.ACCESS_COARSE_LOCATION;
         String accessWifi = Manifest.permission.ACCESS_WIFI_STATE;
         String changeWifi = Manifest.permission.CHANGE_WIFI_STATE;
         String internet = Manifest.permission.INTERNET;

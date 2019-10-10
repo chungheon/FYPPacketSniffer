@@ -1,6 +1,9 @@
 package fyp.com.packetsniffer.Fragments.DevicesConnected;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.LinkAddress;
@@ -11,6 +14,9 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,6 +26,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -42,86 +49,170 @@ import fyp.com.packetsniffer.R;
 
 public class DeviceConnectFragment extends Fragment {
     private static final String TAG = "DeviceConnFrag";
-    private WifiManager mWifiManager;
-    private ConnectivityManager mConnectivityManager;
+
+    private final int FRAG_MSG = 2;
+    private final int START_SCAN = 10;
+    private final int STOP_SCAN = 11;
+
     private RecyclerView wifiNetworkList;
     private View view;
-    private Network network;
     private Button runBtn;
     private Button updateBtn;
+    private TextView wifiName;
+
+    private NetworkChangeReceiver networkReceiver;
+    private IntentFilter intentFilter;
+
+    private Handler mHandler;
+    private Thread subNetThread;
+
+    private WifiManager mWifiManager;
+    private ConnectivityManager mConnectivityManager;
     private WifiInfo wifiInfo;
     private DhcpInfo dhcpInfo;
     private IPv4 networkIP;
-    private boolean scanInProgress;
-    private DeviceConnectFragment connFragment = this;
+    private Network network;
+    private DeviceConnectFragment connFragment;
+    private ScanSubNetRunnable scanRunnable;
+    private UpdateListRunnable updateListRunnable;
+    private ScanManager scanManager;
+    private UpdateManager updateManager;
+
+    private boolean scanInProgress = false;
+    private boolean foundAll;
+    private int found;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_device_connect, container, false);
+        initView();
+        initBtn();
+        return view;
+    }
+
+    private void initView(){
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
         wifiNetworkList = (RecyclerView) view.findViewById(R.id.recycler_view_Net);
         runBtn = (Button) view.findViewById(R.id.startScan);
         updateBtn = (Button) view.findViewById(R.id.updateDev);
+        wifiName = (TextView) view.findViewById(R.id.wifiName);
+
         mConnectivityManager = (ConnectivityManager)this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         mWifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        dhcpInfo = mWifiManager.getDhcpInfo();
-        wifiInfo = mWifiManager.getConnectionInfo();
+
         scanInProgress = false;
         runBtn.setEnabled(false);
-        if(wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)){
-            runBtn.setEnabled(true);
-        }
+        networkReceiver = new NetworkChangeReceiver();
+
+        intentFilter = new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        getActivity().registerReceiver(networkReceiver, intentFilter);
+
+        connFragment = this;
+    }
+
+    private void initBtn(){
+
         runBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                scanInProgress = true;
                 dhcpInfo = mWifiManager.getDhcpInfo();
                 String[] ipInfo = dhcpInfo.toString().split(" ");
                 String subMask = ipInfo[5];
                 try{
                     networkIP = new IPv4(ipInfo[1], subMask);
-                }catch (NumberFormatException e){
+                }catch (NumberFormatException e) {
                     subMask = getSubMask();
                     networkIP = new IPv4(ipInfo[1], subMask);
                 }
-                runBtn.setEnabled(false);
-                ScanSubNetThread scanNet = new ScanSubNetThread(networkIP, connFragment);
-                Thread thread = new Thread(scanNet);
-                thread.start();
+                if(!scanInProgress){
+                    scanInProgress = true;
+                    updateListRunnable = new UpdateListRunnable(mConnectivityManager, mWifiManager,
+                            getContext().getApplicationContext(), networkIP);
+                    Thread update = new Thread(updateListRunnable);
+                    update.start();
+
+                    scanRunnable = new ScanSubNetRunnable(networkIP);
+                    Thread scan = new Thread(scanRunnable);
+                    scan.start();
+
+                }else{
+                    updateListRunnable.stopRun();
+                    scanRunnable.stopRun();
+                    scanInProgress = false;
+                }
+
             }
         });
+    }
 
-        updateBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wifiInfo = mWifiManager.getConnectionInfo();
-                if(Build.VERSION.SDK_INT >= 23){
-                    if(wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED) && !scanInProgress){
-                        runBtn.setEnabled(true);
-                        network = mConnectivityManager.getActiveNetwork();
-                        if(network != null){
-                            readARPTableNew();
+    @Override
+    public void onDestroy() {
+        getActivity().unregisterReceiver(networkReceiver);
+        super.onDestroy();
+    }
+
+    public class NetworkChangeReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction().toString();
+            final WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
+            final DhcpInfo dhcpInfo = mWifiManager.getDhcpInfo();
+            if(action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)){
+                if(!scanInProgress && wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)){
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runBtn.setEnabled(true);
+                            wifiName.setText(wifiInfo.getSSID());
                         }
-                    }else if(wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)){
-                        network = mConnectivityManager.getActiveNetwork();
-                        if(network != null){
-                            readARPTableNew();
-                        }
+                    });
+                }
+            }
+        }
+    }
+
+    /*private void updateList(IPv4 networkIP){
+        wifiInfo = mWifiManager.getConnectionInfo();
+        ArrayList<String> hosts = new ArrayList<>();
+        ArrayList<String> addrs = new ArrayList<>();
+        ArrayList<String> vendors = new ArrayList<>();
+        ArrayList<String> macs = new ArrayList<>();
+        if(Build.VERSION.SDK_INT >= 23){
+            if(wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)) {
+                network = mConnectivityManager.getActiveNetwork();
+                if (network != null) {
+                    int hostsFound = readARPTableNew(hosts, addrs, vendors, macs);
+                    Log.d(TAG, "hostsFound " + hostsFound + " " + hosts.size() + " " + networkIP.getNumberOfHosts());
+                    if(found < hostsFound){
+                        getActivity().runOnUiThread(new UpdateWifiListRunnable(hosts, addrs, vendors, macs));
+                        found = hostsFound;
                     }
-                }else{
-                    if(wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED) && !scanInProgress){
-                        runBtn.setEnabled(true);
-                        readARPTableOld();
-                    }else if(wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)){
-                        readARPTableOld();
+                    if(networkIP.getNumberOfHosts() - 2 <= hostsFound + 1){
+                        foundAll = true;
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                runBtn.setEnabled(true);
+                            }
+                        });
                     }
                 }
             }
-        });
-
-        return view;
-    }
+        }else{
+            if(wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)){
+                int hostsFound = readARPTableOld(hosts, addrs, vendors, macs);
+                if(found < hostsFound){
+                    getActivity().runOnUiThread(new UpdateWifiListRunnable(hosts, addrs, vendors, macs));
+                    found = hostsFound;
+                }
+                if(networkIP.getNumberOfHosts() - 2 <= hostsFound + 1){
+                    foundAll = true;
+                }
+            }
+        }
+    }*/
 
     private String getSubMask(){
         if(Build.VERSION.SDK_INT >= 23){
@@ -149,200 +240,27 @@ public class DeviceConnectFragment extends Fragment {
         return "255.255.255.255";
     }
 
-    private void readARPTableNew(){
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader("/proc/net/arp"));
-            String line;
-            line = br.readLine();
-            ArrayList<String> hostnames = new ArrayList<>();
-            ArrayList<String> ipaddrs = new ArrayList<>();
-            ArrayList<String> vendors = new ArrayList<>();
-            ArrayList<String> macs = new ArrayList<>();
-
-            String ip = ipAddressToString(wifiInfo.getIpAddress());
-            String userMac = getMacAddr();
-            if(Build.VERSION.SDK_INT >= 23){
-                hostnames.add(network.getByName(ip).getHostName());
-            }else{
-                hostnames.add(ip);
-            }
-            ipaddrs.add(ip);
-            vendors.add(getVendor(getMacVendor(userMac)));
-            macs.add(userMac);
-
-            while ((line = br.readLine()) != null) {
-                Log.d("lod", line);
-                String mac = line.substring(41, 58);
-                String[] info = line.split(" ");
-                Log.d("test", mac);
-                if (!mac.equals("00:00:00:00:00:00")) {
-                    try {
-                        Log.d(TAG, "check: " + getMacVendor(mac));
-                        String vendor = getVendor(getMacVendor(mac));
-                        Log.d(TAG, "VENDOR: " + vendor);
-                        String hostname = ip;
-                        if(Build.VERSION.SDK_INT >= 23){
-                            hostname = network.getByName(info[0]).getHostName();
-                        }
-                        Log.d(TAG, hostname);
-                        if (!duplicate(ipaddrs, info[0])) {
-                            hostnames.add(hostname);
-                            ipaddrs.add(info[0]);
-                            vendors.add(vendor);
-                            macs.add(mac);
-                        }
-                    } catch (Exception e) {
-
-                    }
-                }
-            }
-            Log.d("CHECKNULL", hostnames.size() + "");
-            RecyclerViewDeviceAdapter adapter = new RecyclerViewDeviceAdapter(hostnames, ipaddrs, vendors, macs, getContext().getApplicationContext());
-            wifiNetworkList.setAdapter(adapter);
-            wifiNetworkList.setLayoutManager(new LinearLayoutManager(getContext().getApplicationContext()));
-        } catch (FileNotFoundException e) {
-
-        } catch (IOException e){
-
+    public class UpdateWifiListRunnable implements Runnable{
+        ArrayList<String> hostnames;
+        ArrayList<String> ipaddrs;
+        ArrayList<String> vendors;
+        ArrayList<String> macs;
+        public UpdateWifiListRunnable(ArrayList<String> hosts, ArrayList<String> addrs, ArrayList<String> vendors, ArrayList<String> macs){
+            this.hostnames = hosts;
+            this.ipaddrs = addrs;
+            this.vendors = vendors;
+            this.macs = macs;
         }
-    }
-
-    private void readARPTableOld(){
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader("/proc/net/arp"));
-            String line;
-            line = br.readLine();
-            ArrayList<String> hostnames = new ArrayList<>();
-            ArrayList<String> ipaddrs = new ArrayList<>();
-            ArrayList<String> vendors = new ArrayList<>();
-            ArrayList<String> macs = new ArrayList<>();
-
-            String ip = ipAddressToString(wifiInfo.getIpAddress());
-            String userMac = getMacAddr();
-            InetAddress address = InetAddress.getByName(ip);
-            hostnames.add(address.getHostName());
-            ipaddrs.add(ip);
-            vendors.add(getVendor(getMacVendor(userMac)));
-            macs.add(userMac);
-
-            while ((line = br.readLine()) != null) {
-                Log.d("lod", line);
-                String mac = line.substring(41, 58);
-                String[] info = line.split(" ");
-                Log.d("test", mac);
-                if (!mac.equals("00:00:00:00:00:00")) {
-                    try {
-                        Log.d(TAG, "check: " + getMacVendor(mac));
-                        String vendor = getVendor(getMacVendor(mac));
-                        Log.d(TAG, "VENDOR: " + vendor);
-                        InetAddress host = InetAddress.getByName(info[0]);
-                        String hostname = host.getHostName();
-                        Log.d(TAG, hostname);
-                        if (!duplicate(ipaddrs, info[0])) {
-                            hostnames.add(hostname);
-                            ipaddrs.add(info[0]);
-                            vendors.add(vendor);
-                            macs.add(mac);
-                        }
-                    } catch (Exception e) {
-
-                    }
-                }
-            }
-            Log.d("CHECKNULL", hostnames.size() + "");
+        @Override
+        public void run() {
             RecyclerViewDeviceAdapter adapter = new RecyclerViewDeviceAdapter(hostnames, ipaddrs, vendors, macs, getContext().getApplicationContext());
             wifiNetworkList.setAdapter(adapter);
             wifiNetworkList.setLayoutManager(new LinearLayoutManager(getContext().getApplicationContext()));
-        } catch (FileNotFoundException e) {
-
-        } catch (IOException e){
-
         }
     }
 
     public void scanDone(){
         scanInProgress = false;
-    }
-
-    private String getVendor(String macAddr){
-        String vendor = "";
-        try {
-            //Get the ID
-            Field resourceField = R.string.class.getDeclaredField(macAddr);
-            //Here we are getting the String id in R file...But you can change to R.drawable or any other resource you want...
-            int resourceId = resourceField.getInt(resourceField);
-            //Here you can use it as usual
-            vendor = getContext().getApplicationContext().getString(resourceId);
-        }catch(NoSuchFieldException e){
-            vendor = "Unidentified";
-        }catch(IllegalAccessException e){
-            vendor = "Unidentified";
-        }
-
-        return vendor;
-    }
-
-    private String ipAddressToString(int ipAddress) {
-
-        if (ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN)) {
-            ipAddress = Integer.reverseBytes(ipAddress);
-        }
-
-        byte[] ipByteArray = BigInteger.valueOf(ipAddress).toByteArray();
-
-        String ipAddressString;
-        try {
-            ipAddressString = InetAddress.getByAddress(ipByteArray)
-                    .getHostAddress();
-        } catch (UnknownHostException ex) {
-            Log.e("WIFI_IP", "Unable to get host address.");
-            ipAddressString = "NaN";
-        }
-
-        return ipAddressString;
-    }
-
-    private boolean duplicate(ArrayList<String> ipaddrs, String ipaddr){
-        for(String ip: ipaddrs){
-            if(ip.equals(ipaddr)){
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private String getMacVendor(String data){
-        String info[] = data.split(":");
-        String macLook = info[0] + info[1] + info[2];
-        return "RE" + macLook.toUpperCase();
-    }
-
-    private String getMacAddr() {
-        try {
-            List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
-            for (NetworkInterface nif : all) {
-                if (!nif.getName().equalsIgnoreCase("wlan0")) continue;
-
-                byte[] macBytes = nif.getHardwareAddress();
-                if (macBytes == null) {
-                    return "";
-                }
-
-                StringBuilder res1 = new StringBuilder();
-                for (byte b : macBytes) {
-                    res1.append(String.format("%02X:",b));
-                }
-
-                if (res1.length() > 0) {
-                    res1.deleteCharAt(res1.length() - 1);
-                }
-                return res1.toString();
-            }
-        } catch (Exception ex) {
-        }
-        return "02:00:00:00:00:00";
+        Log.d(TAG, "Scan Done");
     }
 }
