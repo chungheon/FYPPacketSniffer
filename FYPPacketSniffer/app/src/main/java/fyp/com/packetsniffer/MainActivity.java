@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fyp.com.packetsniffer.Fragments.DevicesConnected.DeviceConnectFragment;
+
+import fyp.com.packetsniffer.Fragments.DevicesConnected.ScanManager;
 import fyp.com.packetsniffer.Fragments.Tab1Fragment;
 import fyp.com.packetsniffer.Fragments.TabAdapter;
 
