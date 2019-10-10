@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import java.util.Random;
 
-import fyp.com.packetsniffer.Fragments.DevicesConnected.ScanManager;
 import fyp.com.packetsniffer.R;
 
 public class Tab1Fragment extends Fragment {

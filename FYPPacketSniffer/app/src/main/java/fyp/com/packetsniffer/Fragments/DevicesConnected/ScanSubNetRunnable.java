@@ -23,21 +23,16 @@ public class ScanSubNetRunnable implements Runnable {
     private final int SCAN_DONE = 12;
 
     private IPv4 ipAddress;
-    private Handler mHandler;
-    private DeviceConnectFragment mFragment;
     private boolean stopThread;
-    private Looper mLooper;
-    private ScanManager mScanManager;
 
     public ScanSubNetRunnable(IPv4 ipAddress){
-        //this.mScanManager = scanManager;
         this.ipAddress = ipAddress;
     }
 
     @Override
     public void run() { scanSubNet(); }
 
-    private void scanSubNet(){
+    private synchronized void scanSubNet(){
         Log.d(TAG, "Start Scan");
         String hostAddr = ipAddress.getFirstHostAddress();
         String[] hostIP = hostAddr.split("\\.");
@@ -55,7 +50,7 @@ public class ScanSubNetRunnable implements Runnable {
                 String fullBit = firstBit + "." + secondBit + "." + thirdBit + "." + lastBit;
                 Log.d(TAG, "Trying: " + fullBit);
                 inetAddress = InetAddress.getByName(fullBit);
-                inetAddress.isReachable(1);
+                inetAddress.isReachable(10);
                 lastBit++;
                 if(lastBit > 255){
                     thirdBit++;

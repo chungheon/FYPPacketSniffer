@@ -33,17 +33,17 @@ public class UpdateListRunnable implements Runnable{
     private static final String TAG = "UpdateList";
     private final int UPDATE_MSG = 3;
     private final int STOP_UPDATE = 11;
-    //private UpdateScanHandler mUpdateHandler;
     private Context mContext;
     private Network network;
     private WifiManager mWifiManager;
     private ConnectivityManager mConnManager;
+    private DeviceConnectFragment mConnFragment;
     private ArrayList<String> hosts, addrs, vendors, macs;
     private IPv4 mNetAddress;
     private boolean running;
 
-    public UpdateListRunnable(ConnectivityManager connectivityManager,
-                              WifiManager wifiManager, Context context, IPv4 netAddress){
+    public UpdateListRunnable(ConnectivityManager connectivityManager, WifiManager wifiManager,
+                       Context context, IPv4 netAddress, DeviceConnectFragment connectFragment){
         this.hosts = new ArrayList<>();
         this.addrs = new ArrayList<>();
         this.vendors = new ArrayList<>();
@@ -51,8 +51,8 @@ public class UpdateListRunnable implements Runnable{
         this.mContext = context;
         this.mWifiManager = wifiManager;
         this.mConnManager = connectivityManager;
-        //this.mUpdateHandler = updateHandler;
         this.mNetAddress = netAddress;
+        this.mConnFragment = connectFragment;
     }
     @Override
     public synchronized void run() {
@@ -70,6 +70,7 @@ public class UpdateListRunnable implements Runnable{
                     network = mConnManager.getActiveNetwork();
                     if (network != null) {
                         int hostsFound = readARPTableNew(hosts, addrs, vendors, macs);
+
                         for(String h: hosts){
                             Log.d(TAG, h);
                         }
@@ -85,16 +86,13 @@ public class UpdateListRunnable implements Runnable{
                     Log.d(TAG, "Found: " + hostsFound);
                 }
             }
+            /*long numOfHosts = mNetAddress.getNumberOfHosts();
+            mConnFragment.updateSearch(numOfHosts, hosts, addrs, vendors, macs);*/
 
-            try{
-                wait(500);
-            }catch (InterruptedException e) { }
+                try{
+                    wait(500);
+                }catch (InterruptedException e) { }
         }
-
-        Message msg = new Message();
-        msg.arg1 = UPDATE_MSG;
-        msg.arg2 = STOP_UPDATE;
-        //mUpdateHandler.sendMessage(msg);
     }
 
     public synchronized void stopRun(){
@@ -102,7 +100,7 @@ public class UpdateListRunnable implements Runnable{
         Log.d(TAG, "Stop Update Thread");
     }
 
-    private synchronized int readARPTableNew(ArrayList<String> hosts, ArrayList<String> addrs, ArrayList<String> vendors, ArrayList<String> macs){
+    private int readARPTableNew(ArrayList<String> hosts, ArrayList<String> addrs, ArrayList<String> vendors, ArrayList<String> macs){
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader("/proc/net/arp"));
@@ -112,8 +110,7 @@ public class UpdateListRunnable implements Runnable{
             String ip = ipAddressToString(mWifiManager.getConnectionInfo().getIpAddress());
             String userMac = getMacAddr();
             if(Build.VERSION.SDK_INT >= 23){
-                //hosts.add(network.getByName(ip).getHostName());
-                hosts.add(ip);
+                hosts.add(network.getByName(ip).getHostName());
             }else{
                 hosts.add(ip);
             }
@@ -127,14 +124,22 @@ public class UpdateListRunnable implements Runnable{
                 try {
                     String vendor = getVendor(getMacVendor(mac));
                     String hostname = info[0];
-                    /*if(Build.VERSION.SDK_INT >= 23){
+                    if(Build.VERSION.SDK_INT >= 23){
                         hostname = network.getByName(info[0]).getHostName();
-                    }*/
+                    }
                     if (!duplicate(addrs, info[0])) {
                         hosts.add(hostname);
                         addrs.add(info[0]);
                         vendors.add(vendor);
                         macs.add(mac);
+                    }else if (!mac.equals("00:00:00:00:00:00")){
+                        int index = getHost(addrs, info[0]);
+                        if(index != -1 && index < hosts.size()){
+                            hosts.set(index, hostname);
+                            addrs.set(index, info[0]);
+                            vendors.set(index, vendor);
+                            macs.set(index, mac);
+                        }
                     }
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage());
@@ -151,7 +156,7 @@ public class UpdateListRunnable implements Runnable{
         return -1;
     }
 
-    private synchronized int readARPTableOld(ArrayList<String> hosts, ArrayList<String> addrs, ArrayList<String> vendors, ArrayList<String> macs){
+    private int readARPTableOld(ArrayList<String> hosts, ArrayList<String> addrs, ArrayList<String> vendors, ArrayList<String> macs){
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader("/proc/net/arp"));
@@ -172,13 +177,21 @@ public class UpdateListRunnable implements Runnable{
                 String[] info = line.split(" ");
                 try {
                     String vendor = getVendor(getMacVendor(mac));
-                    //InetAddress host = InetAddress.getByName(info[0]);
-                    String hostname = info[0];
+                    InetAddress host = InetAddress.getByName(info[0]);
+                    String hostname = host.getHostName();
                     if (!duplicate(addrs, info[0])) {
                         hosts.add(hostname);
                         addrs.add(info[0]);
                         vendors.add(vendor);
                         macs.add(mac);
+                    }else if (!mac.equals("00:00:00:00:00:00")) {
+                        int index = getHost(addrs, info[0]);
+                        if(index != -1 && index < hosts.size()){
+                            hosts.set(index, hostname);
+                            addrs.set(index, info[0]);
+                            vendors.set(index, vendor);
+                            macs.set(index, mac);
+                        }
                     }
                 } catch (Exception e) {
 
@@ -191,6 +204,18 @@ public class UpdateListRunnable implements Runnable{
 
         } catch (IOException e){
 
+        }
+
+        return -1;
+    }
+
+    private int getHost(ArrayList<String> addrs, String address){
+        int count = 0;
+        for(String addr: addrs){
+            if(addr.equals(address)){
+                return count;
+            }
+            count++;
         }
 
         return -1;
