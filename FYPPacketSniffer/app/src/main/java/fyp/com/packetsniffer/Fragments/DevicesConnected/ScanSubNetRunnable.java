@@ -23,14 +23,9 @@ public class ScanSubNetRunnable implements Runnable {
     private final int SCAN_DONE = 12;
 
     private IPv4 ipAddress;
-    private Handler mHandler;
-    private DeviceConnectFragment mFragment;
     private boolean stopThread;
-    private Looper mLooper;
-    private ScanManager mScanManager;
 
     public ScanSubNetRunnable(IPv4 ipAddress){
-        //this.mScanManager = scanManager;
         this.ipAddress = ipAddress;
     }
 

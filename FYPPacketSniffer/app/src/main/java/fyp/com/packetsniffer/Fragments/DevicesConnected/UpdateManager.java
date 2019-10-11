@@ -43,12 +43,6 @@ public class UpdateManager {
 
 
     public void onReceived(int msg){
-        if(msg == START_UPDATE){
-            updateThread = new UpdateListRunnable(mConnectivityManager,
-                    mWifiManager, mContext, mNetAddress);
-            Thread update = new Thread(updateThread);
-        }else if(msg == STOP_UPDATE){
-            updateThread.stopRun();
-        }
+
     }
 }

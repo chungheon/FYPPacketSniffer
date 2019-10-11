@@ -19,6 +19,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -77,6 +79,9 @@ public class DeviceConnectFragment extends Fragment {
     private UpdateListRunnable updateListRunnable;
     private ScanManager scanManager;
     private UpdateManager updateManager;
+    private TextView numDevices;
+    private TextView percentText;
+    private ProgressBar percentBar;
 
     private boolean scanInProgress = false;
     private boolean foundAll;
@@ -98,6 +103,9 @@ public class DeviceConnectFragment extends Fragment {
         runBtn = (Button) view.findViewById(R.id.startScan);
         updateBtn = (Button) view.findViewById(R.id.updateDev);
         wifiName = (TextView) view.findViewById(R.id.wifiName);
+        numDevices = (TextView) view.findViewById(R.id.numDevices);
+        percentText = (TextView) view.findViewById(R.id.percentText);
+        percentBar = (ProgressBar) view.findViewById(R.id.percentBar);
 
         mConnectivityManager = (ConnectivityManager)this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         mWifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -129,7 +137,7 @@ public class DeviceConnectFragment extends Fragment {
                 if(!scanInProgress){
                     scanInProgress = true;
                     updateListRunnable = new UpdateListRunnable(mConnectivityManager, mWifiManager,
-                            getContext().getApplicationContext(), networkIP);
+                            getContext().getApplicationContext(), networkIP, connFragment);
                     Thread update = new Thread(updateListRunnable);
                     update.start();
 
@@ -143,6 +151,36 @@ public class DeviceConnectFragment extends Fragment {
                     scanInProgress = false;
                 }
 
+            }
+        });
+    }
+
+    public void updateSearch(final long numOfHosts, final ArrayList<String> hosts, final ArrayList<String> addrs,
+                             final ArrayList<String> vendors, final ArrayList<String> macs){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int percentage = (int) (((double)hosts.size()/(numOfHosts - 2)) * 100);
+                percentBar.setProgress(percentage);
+                percentText.setText(percentage + " %" + " " + (numOfHosts - 2) + "/" + hosts.size());
+                ArrayList<String> foundHosts = new ArrayList<>();
+                ArrayList<String> foundAddrs = new ArrayList<>();
+                ArrayList<String> foundVendors = new ArrayList<>();
+                ArrayList<String> foundMacs = new ArrayList<>();
+                for(int i = 0; i < hosts.size(); i++){
+                    if(!macs.get(i).equals("00:00:00:00:00:00")){
+                        foundHosts.add(hosts.get(i));
+                        foundAddrs.add(addrs.get(i));
+                        foundVendors.add(vendors.get(i));
+                        foundMacs.add(macs.get(i));
+                    }
+                }
+                numDevices.setText(foundHosts.size() + " Devices");
+
+                RecyclerViewDeviceAdapter adapter = new RecyclerViewDeviceAdapter(foundHosts,
+                        foundAddrs, foundVendors, foundMacs, getContext());
+                wifiNetworkList.setAdapter(adapter);
+                wifiNetworkList.setLayoutManager(new LinearLayoutManager(getActivity()));
             }
         });
     }
