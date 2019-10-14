@@ -14,11 +14,14 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,12 +30,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.Toolbar;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
@@ -43,23 +52,24 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
+import javax.crypto.Mac;
+
 import fyp.com.packetsniffer.Fragments.IPv4;
+import fyp.com.packetsniffer.MainActivity;
 import fyp.com.packetsniffer.R;
 
 public class DeviceConnectFragment extends Fragment {
     private static final String TAG = "DeviceConnFrag";
 
-    private final int FRAG_MSG = 2;
-    private final int START_SCAN = 10;
-    private final int STOP_SCAN = 11;
-
     private RecyclerView wifiNetworkList;
     private View view;
-    private Button runBtn;
-    private Button updateBtn;
+    private ImageButton runBtn;
+    private ImageButton historyBtn;
     private TextView wifiName;
 
     private NetworkChangeReceiver networkReceiver;
@@ -77,8 +87,6 @@ public class DeviceConnectFragment extends Fragment {
     private DeviceConnectFragment connFragment;
     private ScanSubNetRunnable scanRunnable;
     private UpdateListRunnable updateListRunnable;
-    private ScanManager scanManager;
-    private UpdateManager updateManager;
     private TextView numDevices;
     private TextView percentText;
     private ProgressBar percentBar;
@@ -100,24 +108,42 @@ public class DeviceConnectFragment extends Fragment {
         StrictMode.setThreadPolicy(policy);
 
         wifiNetworkList = (RecyclerView) view.findViewById(R.id.recycler_view_Net);
-        runBtn = (Button) view.findViewById(R.id.startScan);
-        updateBtn = (Button) view.findViewById(R.id.updateDev);
+        runBtn = (ImageButton) view.findViewById(R.id.startScan);
         wifiName = (TextView) view.findViewById(R.id.wifiName);
         numDevices = (TextView) view.findViewById(R.id.numDevices);
         percentText = (TextView) view.findViewById(R.id.percentText);
         percentBar = (ProgressBar) view.findViewById(R.id.percentBar);
+        historyBtn = (ImageButton) view.findViewById(R.id.historyBtn);
 
         mConnectivityManager = (ConnectivityManager)this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         mWifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
-        scanInProgress = false;
-        runBtn.setEnabled(false);
         networkReceiver = new NetworkChangeReceiver();
-
         intentFilter = new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION);
         getActivity().registerReceiver(networkReceiver, intentFilter);
 
         connFragment = this;
+        scanInProgress = false;
+
+        defaultDisplay();
+    }
+
+    private void defaultDisplay(){
+        runBtn.setEnabled(false);
+        runBtn.setVisibility(View.INVISIBLE);
+        numDevices.setVisibility(View.INVISIBLE);
+        percentText.setVisibility(View.INVISIBLE);
+        percentBar.setVisibility(View.INVISIBLE);
+    }
+
+    private void displayPercentage(){
+        runBtn.setImageResource(R.mipmap.stop_btn);
+        numDevices.setText("0 Devices");
+        numDevices.setVisibility(View.VISIBLE);
+        percentText.setText("0%");
+        percentText.setVisibility(View.VISIBLE);
+        percentBar.setProgress(0);
+        percentBar.setVisibility(View.VISIBLE);
     }
 
     private void initBtn(){
@@ -134,51 +160,72 @@ public class DeviceConnectFragment extends Fragment {
                     subMask = getSubMask();
                     networkIP = new IPv4(ipInfo[1], subMask);
                 }
-                if(!scanInProgress){
-                    scanInProgress = true;
-                    updateListRunnable = new UpdateListRunnable(mConnectivityManager, mWifiManager,
-                            getContext().getApplicationContext(), networkIP, connFragment);
-                    Thread update = new Thread(updateListRunnable);
-                    update.start();
-
-                    scanRunnable = new ScanSubNetRunnable(networkIP);
-                    Thread scan = new Thread(scanRunnable);
-                    scan.start();
-
+                if(networkIP.getNumberOfHosts() > (255*255)){
+                    Toast.makeText(getContext().getApplicationContext(), "Network too big use NMAP instead", Toast.LENGTH_LONG);
                 }else{
-                    updateListRunnable.stopRun();
-                    scanRunnable.stopRun();
-                    scanInProgress = false;
-                }
+                    if(!scanInProgress){
+                        scanInProgress = true;
+                        updateListRunnable = new UpdateListRunnable(mConnectivityManager, mWifiManager,
+                                getContext().getApplicationContext(), networkIP, connFragment);
+                        Thread update = new Thread(updateListRunnable);
+                        update.start();
 
+                        scanRunnable = new ScanSubNetRunnable(networkIP, updateListRunnable);
+                        Thread scan = new Thread(scanRunnable);
+                        scan.start();
+
+                        displayPercentage();
+                    }else{
+                        updateListRunnable.stopRun();
+                        scanRunnable.stopRun();
+                        scanInProgress = false;
+                    }
+                }
+            }
+        });
+
+        historyBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity)getActivity()).getSupportActionBar().setTitle("Scan History");
+                ((MainActivity)getActivity()).enableViews(true);
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new ScanHistoryFragment(), "test")
+                        .addToBackStack(null)
+                        .commit();
             }
         });
     }
 
-    public void updateSearch(final long numOfHosts, final ArrayList<String> hosts, final ArrayList<String> addrs,
-                             final ArrayList<String> vendors, final ArrayList<String> macs){
+    public void updateSearch(final long numOfHosts, ArrayList<DeviceInformation> devices, final String userHost,
+                             final String userIP, final String userMac, final String userVendor){
+        DeviceInformation devInfo = new DeviceInformation();
+        devInfo.setHostName(userHost);
+        devInfo.setIpAddrs(userIP);
+        devInfo.setMacVendor(userVendor);
+        devInfo.setMacAddrs(userMac);
+        ArrayList<DeviceInformation> devInfos = new ArrayList<>(devices);
+        devInfos.add(0, devInfo);
+        final ArrayList<DeviceInformation> devicesInfo = new ArrayList<>(devInfos);
+
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                int percentage = (int) (((double)hosts.size()/(numOfHosts - 2)) * 100);
+                int percentage = (int) (((double)devicesInfo.size()/(numOfHosts - 2)) * 100);
                 percentBar.setProgress(percentage);
-                percentText.setText(percentage + " %" + " " + (numOfHosts - 2) + "/" + hosts.size());
-                ArrayList<String> foundHosts = new ArrayList<>();
-                ArrayList<String> foundAddrs = new ArrayList<>();
-                ArrayList<String> foundVendors = new ArrayList<>();
-                ArrayList<String> foundMacs = new ArrayList<>();
-                for(int i = 0; i < hosts.size(); i++){
-                    if(!macs.get(i).equals("00:00:00:00:00:00")){
-                        foundHosts.add(hosts.get(i));
-                        foundAddrs.add(addrs.get(i));
-                        foundVendors.add(vendors.get(i));
-                        foundMacs.add(macs.get(i));
+                percentText.setText(percentage + " %" + " " + (numOfHosts - 2) + "/" + devicesInfo.size());
+                ArrayList<DeviceInformation> foundDev = new ArrayList<>();
+                for(int i = 0; i < devicesInfo.size(); i++){
+                    if(!devicesInfo.get(i).getMacAddrs().equals("00:00:00:00:00:00")){
+                        foundDev.add(devicesInfo.get(i));
                     }
                 }
-                numDevices.setText(foundHosts.size() + " Devices");
 
-                RecyclerViewDeviceAdapter adapter = new RecyclerViewDeviceAdapter(foundHosts,
-                        foundAddrs, foundVendors, foundMacs, getContext());
+
+                numDevices.setText(foundDev.size() + " Devices");
+
+                RecyclerViewDeviceAdapter adapter = new RecyclerViewDeviceAdapter(foundDev, getContext());
+                wifiNetworkList.setVisibility(View.VISIBLE);
                 wifiNetworkList.setAdapter(adapter);
                 wifiNetworkList.setLayoutManager(new LinearLayoutManager(getActivity()));
             }
@@ -187,7 +234,15 @@ public class DeviceConnectFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        getActivity().unregisterReceiver(networkReceiver);
+        if(networkReceiver != null){
+            getActivity().unregisterReceiver(networkReceiver);
+        }
+        if(updateListRunnable != null){
+            updateListRunnable.stopRun();
+        }
+        if(scanRunnable != null){
+            scanRunnable.stopRun();
+        }
         super.onDestroy();
     }
 
@@ -198,59 +253,43 @@ public class DeviceConnectFragment extends Fragment {
             final WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
             final DhcpInfo dhcpInfo = mWifiManager.getDhcpInfo();
             if(action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)){
-                if(!scanInProgress && wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)){
+                if(!scanInProgress && dhcpInfo.ipAddress != 0){
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             runBtn.setEnabled(true);
-                            wifiName.setText(wifiInfo.getSSID());
+                            runBtn.setVisibility(View.VISIBLE);
+                            runBtn.setImageResource(R.mipmap.refresh_scan_btn);
+                            wifiName.setText(wifiInfo.getSSID().replace("\"",""));
+                            wifiNetworkList.setVisibility(View.INVISIBLE);
+                        }
+                    });
+                }else if(scanInProgress && dhcpInfo.ipAddress == 0){
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runBtn.setEnabled(false);
+                            runBtn.setVisibility(View.INVISIBLE);
+                            if (updateListRunnable != null) {
+                                updateListRunnable.stopRun();
+                            }
+                            if (scanRunnable != null) {
+                                scanRunnable.stopRun();
+                            }
+                        }
+                    });
+                }else if(!scanInProgress && dhcpInfo.ipAddress == 0){
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runBtn.setEnabled(false);
+                            runBtn.setVisibility(View.INVISIBLE);
                         }
                     });
                 }
             }
         }
     }
-
-    /*private void updateList(IPv4 networkIP){
-        wifiInfo = mWifiManager.getConnectionInfo();
-        ArrayList<String> hosts = new ArrayList<>();
-        ArrayList<String> addrs = new ArrayList<>();
-        ArrayList<String> vendors = new ArrayList<>();
-        ArrayList<String> macs = new ArrayList<>();
-        if(Build.VERSION.SDK_INT >= 23){
-            if(wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)) {
-                network = mConnectivityManager.getActiveNetwork();
-                if (network != null) {
-                    int hostsFound = readARPTableNew(hosts, addrs, vendors, macs);
-                    Log.d(TAG, "hostsFound " + hostsFound + " " + hosts.size() + " " + networkIP.getNumberOfHosts());
-                    if(found < hostsFound){
-                        getActivity().runOnUiThread(new UpdateWifiListRunnable(hosts, addrs, vendors, macs));
-                        found = hostsFound;
-                    }
-                    if(networkIP.getNumberOfHosts() - 2 <= hostsFound + 1){
-                        foundAll = true;
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                runBtn.setEnabled(true);
-                            }
-                        });
-                    }
-                }
-            }
-        }else{
-            if(wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)){
-                int hostsFound = readARPTableOld(hosts, addrs, vendors, macs);
-                if(found < hostsFound){
-                    getActivity().runOnUiThread(new UpdateWifiListRunnable(hosts, addrs, vendors, macs));
-                    found = hostsFound;
-                }
-                if(networkIP.getNumberOfHosts() - 2 <= hostsFound + 1){
-                    foundAll = true;
-                }
-            }
-        }
-    }*/
 
     private String getSubMask(){
         if(Build.VERSION.SDK_INT >= 23){
@@ -278,27 +317,75 @@ public class DeviceConnectFragment extends Fragment {
         return "255.255.255.255";
     }
 
-    public class UpdateWifiListRunnable implements Runnable{
-        ArrayList<String> hostnames;
-        ArrayList<String> ipaddrs;
-        ArrayList<String> vendors;
-        ArrayList<String> macs;
-        public UpdateWifiListRunnable(ArrayList<String> hosts, ArrayList<String> addrs, ArrayList<String> vendors, ArrayList<String> macs){
-            this.hostnames = hosts;
-            this.ipaddrs = addrs;
-            this.vendors = vendors;
-            this.macs = macs;
-        }
-        @Override
-        public void run() {
-            RecyclerViewDeviceAdapter adapter = new RecyclerViewDeviceAdapter(hostnames, ipaddrs, vendors, macs, getContext().getApplicationContext());
-            wifiNetworkList.setAdapter(adapter);
-            wifiNetworkList.setLayoutManager(new LinearLayoutManager(getContext().getApplicationContext()));
-        }
-    }
-
-    public void scanDone(){
+    public void scanDone(ArrayList<DeviceInformation> devices, WifiInfo wifiInfo){
         scanInProgress = false;
         Log.d(TAG, "Scan Done");
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                runBtn.setImageResource(R.mipmap.refresh_scan_btn);
+                percentBar.setVisibility(View.INVISIBLE);
+                percentText.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        storeCache(devices, wifiInfo);
+    }
+
+    private void storeCache(ArrayList<DeviceInformation> devices, WifiInfo wifiInfo){
+        String macName = wifiInfo.getBSSID().replace(":", "");
+        String fileName = wifiInfo.getSSID().replace("\"", "") + '_' + macName + ".txt";
+        File newDir = new File(getActivity().getCacheDir().toString(), "ScanHistory");
+        newDir.mkdir();
+        String path = getActivity().getCacheDir().toString();
+        Log.d("Files", "Path: " + path);
+        File cacheFile = new File(path + "/ScanHistory", fileName);
+
+        Log.d(TAG, "Cache File:" + fileName);
+        ArrayList<DeviceInformation> foundDev = new ArrayList<>();
+        for(int i = 0; i < devices.size(); i++){
+            if(!devices.get(i).getMacAddrs().equals("00:00:00:00:00:00")){
+                foundDev.add(devices.get(i));
+            }
+        }
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(cacheFile));
+            Date currentTime = Calendar.getInstance().getTime();
+            bw.write(currentTime.toString());
+            bw.newLine();
+            bw.write(wifiInfo.getSSID() + ":");
+            bw.write(wifiInfo.getMacAddress());
+            bw.newLine();
+            for(DeviceInformation dev: foundDev){
+                bw.write(dev.getHostName() + ":" + dev.getIpAddrs() + ":");
+                bw.write(dev.getMacAddrs() + ":" + dev.getMacVendor());
+                if(!dev.getIpAddrs().equals(devices.get(devices.size()-1).getIpAddrs())){
+                    bw.newLine();
+                }
+                Log.d(TAG, dev.getHostName() + ":" + dev.getIpAddrs());
+            }
+
+            bw.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Error storing to cache");
+        }
+
+        path = getActivity().getCacheDir().toString() + "/ScanHistory/";
+        Log.d("Files", "Path: " + path);
+        File directory = new File(path);
+        File[] files = directory.listFiles();
+        Log.d("Files", "Size: "+ files.length);
+        for (int i = 0; i < files.length; i++)
+        {
+            Log.d("Files", "FileName:" + files[i].getName());
+        }
+
+        directory = new File(getActivity().getCacheDir().toString());
+        files = directory.listFiles();
+        Log.d("Files", "Size: "+ files.length);
+        for (int i = 0; i < files.length; i++)
+        {
+            Log.d("Files", "FileName:" + files[i].getName());
+        }
     }
 }

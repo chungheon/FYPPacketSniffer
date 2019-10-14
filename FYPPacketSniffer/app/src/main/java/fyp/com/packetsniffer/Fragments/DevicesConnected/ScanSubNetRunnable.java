@@ -1,10 +1,5 @@
 package fyp.com.packetsniffer.Fragments.DevicesConnected;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
@@ -19,14 +14,13 @@ public class ScanSubNetRunnable implements Runnable {
 
     private static final String TAG = "ScanningSubNet";
 
-    private final int SCAN_MSG = 1;
-    private final int SCAN_DONE = 12;
-
     private IPv4 ipAddress;
+    private UpdateListRunnable updateList;
     private boolean stopThread;
 
-    public ScanSubNetRunnable(IPv4 ipAddress){
+    public ScanSubNetRunnable(IPv4 ipAddress, UpdateListRunnable updateList){
         this.ipAddress = ipAddress;
+        this.updateList = updateList;
     }
 
     @Override
@@ -52,6 +46,7 @@ public class ScanSubNetRunnable implements Runnable {
                 inetAddress = InetAddress.getByName(fullBit);
                 inetAddress.isReachable(1);
                 lastBit++;
+
                 if(lastBit > 255){
                     thirdBit++;
                     lastBit = 0;
@@ -81,10 +76,11 @@ public class ScanSubNetRunnable implements Runnable {
         } catch (IOException e) {
 
         }
+
+        Log.d(TAG, "Scan stopped");
     }
 
     public synchronized void stopRun(){
         stopThread = true;
-        Log.d(TAG, "Scan stopped");
     }
 }

@@ -128,8 +128,8 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="color" value="8e2ec1" />
-                                                <entry key="paddingPercent" value="10" />
+                                                <entry key="color" value="ffffff" />
+                                                <entry key="paddingPercent" value="5" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -140,7 +140,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/notification/ic_system_update_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_refresh_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -161,10 +161,10 @@
                                   </option>
                                   <option name="values">
                                     <map>
+                                      <entry key="backgroundColor" value="000000" />
                                       <entry key="cropped" value="true" />
-                                      <entry key="iconShape" value="CIRCLE" />
                                       <entry key="imageAsset" value="D:\Test\FYP\ICONS\Designed\packetcapture.png" />
-                                      <entry key="outputName" value="packet_capture" />
+                                      <entry key="outputName" value="refresh_scan_btn" />
                                     </map>
                                   </option>
                                 </PersistentState>

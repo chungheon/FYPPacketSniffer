@@ -3,11 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/black">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/black">
 
 
         <TextView
@@ -23,19 +25,30 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
 
+        <ImageButton
+            android:id="@+id/historyBtn"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="10dp"
+            android:background="@mipmap/view_all_history_btn"
+            app:layout_constraintLeft_toRightOf="@+id/wifiName"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/numDevices"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Number of devices"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/wifiName"/>
 
-        <Button
+        <ImageButton
             android:id="@+id/startScan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintRight_toRightOf="parent"
-            android:text="Start Scan"/>
+            android:background="@mipmap/refresh_scan_btn"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 
@@ -60,14 +73,7 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_Net"
         android:layout_width="match_parent"
-        android:layout_height="395dp">
+        android:layout_height="match_parent">
 
     </android.support.v7.widget.RecyclerView>
-
-    <Button
-        android:id="@+id/updateDev"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Get Devices" />
-
 </LinearLayout>

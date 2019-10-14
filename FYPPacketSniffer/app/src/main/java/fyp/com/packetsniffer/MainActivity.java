@@ -20,25 +20,23 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import fyp.com.packetsniffer.Fragments.DevicesConnected.DeviceConnectFragment;
-
-import fyp.com.packetsniffer.Fragments.DevicesConnected.ScanManager;
 import fyp.com.packetsniffer.Fragments.Tab1Fragment;
-import fyp.com.packetsniffer.Fragments.TabAdapter;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private final static String TAG = "MainActivity";
-    private TabAdapter adapter;
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
-    private Handler mHandler;
+    private NavigationView navView;
+    private ActionBarDrawerToggle toggle;
+    private boolean mNavListenerReg = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,12 +44,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         askForMultiplePermissions();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        NavigationView navView = findViewById(R.id.nav_view);
+        navView = (NavigationView) findViewById(R.id.nav_view);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         setSupportActionBar(toolbar);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
                 R.string.nav_drawer_open, R.string.nav_drawer_close);
 
 
@@ -62,9 +60,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if(savedInstanceState == null){
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new DeviceConnectFragment()).commit();
+            getSupportActionBar().setTitle("Scan Network");
             navView.setCheckedItem(R.id.test1);
         }
+    }
 
+    public void enableViews(boolean enable) {
+        if(enable) {
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            toggle.setDrawerIndicatorEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        getSupportActionBar().setTitle("Scan Network");
+                        enableViews(false);
+                        onBackPressed();
+                    }
+                });
+            drawerLayout.addDrawerListener(toggle);
+            toggle.syncState();
+
+        } else {
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            toggle.setDrawerIndicatorEnabled(true);
+            toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
+                    R.string.nav_drawer_open, R.string.nav_drawer_close);
+            drawerLayout.addDrawerListener(toggle);
+            toggle.syncState();
+        }
     }
 
     @Override

@@ -18,28 +18,18 @@ import fyp.com.packetsniffer.R;
 public class RecyclerViewDeviceAdapter extends RecyclerView.Adapter<RecyclerViewDeviceAdapter.ViewHolder> {
     private static final String TAG = "RecyclerViewDevAdapter";
 
-    private ArrayList<String> hostnames = new ArrayList<String>();
-    private ArrayList<String> ipaddrs = new ArrayList<String>();
-    private ArrayList<String> vendors = new ArrayList<String>();
-    private ArrayList<String> macs = new ArrayList<String>();
+    private ArrayList<DeviceInformation> devices;
     private Context mContext;
 
-    public RecyclerViewDeviceAdapter(ArrayList<String> hostnames, ArrayList<String> ipaddrs, ArrayList<String> vendors, ArrayList<String> macs, Context context){
-        this.hostnames = hostnames;
-        this.ipaddrs = ipaddrs;
-        this.vendors = vendors;
-        this.macs = macs;
+    public RecyclerViewDeviceAdapter(ArrayList<DeviceInformation> devices, Context context){
+        this.devices = devices;
         this.mContext = context;
     }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = null;
-        if(Build.VERSION.SDK_INT >= 23){
-            view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_devicelistitem, viewGroup, false);
-        }else{
-            view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_devicelistitemold, viewGroup, false);
-        }
+        view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_devicelistitem, viewGroup, false);
         ViewHolder holder = new ViewHolder(view);
 
         return holder;
@@ -48,10 +38,10 @@ public class RecyclerViewDeviceAdapter extends RecyclerView.Adapter<RecyclerView
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         Log.d(TAG, "onBindViewHolder: called");
-        String hostname = hostnames.get(i);
-        String ipaddr = ipaddrs.get(i);
-        String vendor = vendors.get(i);
-        String mac = macs.get(i);
+        String hostname = devices.get(i).getHostName();
+        String ipaddr = devices.get(i).getIpAddrs();
+        String vendor = devices.get(i).getMacVendor();
+        String mac = devices.get(i).getMacAddrs();
         viewHolder.hostname.setText(hostname);
         viewHolder.ipaddr.setText(ipaddr);
         viewHolder.vendor.setText(vendor);
@@ -60,7 +50,7 @@ public class RecyclerViewDeviceAdapter extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public int getItemCount() {
-        return hostnames.size();
+        return devices.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
