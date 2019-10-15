@@ -4,11 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.method.KeyListener;
 import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
@@ -16,7 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import fyp.com.packetsniffer.MainActivity;
@@ -43,7 +44,7 @@ public class ScanHistoryFragment extends Fragment {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if( keyCode == KeyEvent.KEYCODE_BACK ) {
                     ((MainActivity)getActivity()).getSupportActionBar().setTitle("Scan Network");
-                    ((MainActivity)getActivity()).enableViews(false);
+                    ((MainActivity)getActivity()).enableViews(false, 1);
                 }
                 Log.d(TAG, keyCode + " pressed");
                 return false;
@@ -56,25 +57,50 @@ public class ScanHistoryFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                RecyclerViewHistoryAdapter adapter = new RecyclerViewHistoryAdapter(wifiSSIDs, getContext().getApplicationContext());
+                RecyclerViewHistoryAdapter adapter = new RecyclerViewHistoryAdapter(wifiSSIDs,
+                        getContext().getApplicationContext(),
+                        new RecyclerViewHistoryAdapter.OnItemClickListener(){
+                            @Override
+                            public void onItemClick(Pair<String, String> item) {
+                                String path = getActivity().getFilesDir() + "/ScanHistory/"
+                                        + item.first + "_" + item.second;
+                                DevicesHistoryFragment devHistory = new DevicesHistoryFragment();
+                                Bundle args = new Bundle();
+                                args.putString("Filename", path);
+                                devHistory.setArguments(args);
+                                ((MainActivity)getActivity()).getSupportActionBar().setTitle(item.first);
+                                ((MainActivity)getActivity()).enableViews(true, 2);
+                                getActivity().getSupportFragmentManager().beginTransaction()
+                                        .addToBackStack(null)
+                                        .replace(R.id.fragment_container, devHistory, "DevicesHistory")
+                                        .commit();
+                            }
+                        });
                 wifiList.setAdapter(adapter);
                 wifiList.setLayoutManager(new LinearLayoutManager(getActivity()));
             }
         });
     }
 
+
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "Destroyed");
+        super.onDestroy();
+    }
+
     private void getHistory(){
-        String path = getActivity().getCacheDir().toString() + "/ScanHistory";
+        String path = getActivity().getFilesDir().toString() + "/ScanHistory";
         File directory = new File(path);
         File[] files = directory.listFiles();
-        Log.d("Files", "Size: "+ files.length);
-        for (int i = 0; i < files.length; i++)
-        {
-            String[] wifiSSID = files[i].getName().split("_");
-            Log.d(TAG, "Wifi Name:" + files[i].getName());
-            wifiSSIDs.add(new Pair<String,String>(wifiSSID[0], wifiSSID[1]));
+        if (files != null) {
+            for (int i = 0; i < files.length; i++)
+            {
+                String[] wifiSSID = files[i].getName().split("_");
+                wifiSSIDs.add(new Pair<String,String>(wifiSSID[0], wifiSSID[1]));
+            }
         }
-
     }
 
 

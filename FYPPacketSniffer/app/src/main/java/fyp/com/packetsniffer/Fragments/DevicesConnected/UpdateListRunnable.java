@@ -86,15 +86,11 @@ public class UpdateListRunnable implements Runnable{
                             for(DeviceInformation dev: devices){
                                 Log.d(TAG, "Found: " + dev.getIpAddrs());
                             }
-                        }else{
-                            Toast.makeText(mContext.getApplicationContext(), "Wifi Not Connected Properly" ,Toast.LENGTH_LONG);
                         }
                     }
                 } else {
                     if (wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)) {
                         int hostsFound = readARPTableOld(devices);
-                    }else{
-                        Toast.makeText(mContext.getApplicationContext(), "Wifi Not Connected Properly" ,Toast.LENGTH_LONG);
                     }
                 }
                 if(lastRun && Build.VERSION.SDK_INT >= 23){

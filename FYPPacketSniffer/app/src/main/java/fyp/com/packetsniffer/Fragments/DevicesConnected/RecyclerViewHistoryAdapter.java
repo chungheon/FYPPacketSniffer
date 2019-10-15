@@ -18,11 +18,16 @@ import fyp.com.packetsniffer.R;
 
 public class RecyclerViewHistoryAdapter extends RecyclerView.Adapter<RecyclerViewHistoryAdapter.ViewHolder>{
 
+    public interface OnItemClickListener{
+        void onItemClick(Pair<String, String> item);
+    }
     private ArrayList<Pair<String, String>> wifiSSIDs;
     private Context mContext;
-    public RecyclerViewHistoryAdapter(ArrayList<Pair<String, String>> wifiSSIDs, Context context){
+    private OnItemClickListener listener;
+    public RecyclerViewHistoryAdapter(ArrayList<Pair<String, String>> wifiSSIDs, Context context, OnItemClickListener listener){
         this.wifiSSIDs = wifiSSIDs;
         this.mContext = context;
+        this.listener = listener;
     }
 
     @NonNull
@@ -31,14 +36,20 @@ public class RecyclerViewHistoryAdapter extends RecyclerView.Adapter<RecyclerVie
         View view = null;
         view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_scan_history_item, viewGroup, false);
         ViewHolder holder = new ViewHolder(view);
-
         return holder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         String wifiSSID = (String) wifiSSIDs.get(i).first;
+        final int position = i;
         viewHolder.wifiSSID.setText(wifiSSID);
+        viewHolder.viewBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                listener.onItemClick(wifiSSIDs.get(position));
+            }
+        });
     }
 
     private class ItemOnClickListener implements View.OnClickListener {

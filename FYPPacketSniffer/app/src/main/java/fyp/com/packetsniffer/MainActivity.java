@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public void enableViews(boolean enable) {
+    public void enableViews(final boolean enable, final int mode) {
         if(enable) {
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             toggle.setDrawerIndicatorEnabled(false);
@@ -74,14 +74,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     @Override
                     public void onClick(View v) {
                         getSupportActionBar().setTitle("Scan Network");
-                        enableViews(false);
+                        if(mode == 1){
+                            enableViews(false, 1);
+                        }else{
+                            enableViews(false, 2);
+                        }
+
                         onBackPressed();
                     }
                 });
             drawerLayout.addDrawerListener(toggle);
             toggle.syncState();
 
-        } else {
+        } else if(mode == 1){
+            Log.d(TAG, "Do false");
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             toggle.setDrawerIndicatorEnabled(true);
@@ -89,7 +95,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     R.string.nav_drawer_open, R.string.nav_drawer_close);
             drawerLayout.addDrawerListener(toggle);
             toggle.syncState();
+        }else if(mode == 2){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    enableViews(false, 1);
+                    onBackPressed();
+                }
+            });
+            drawerLayout.addDrawerListener(toggle);
+            toggle.syncState();
         }
+        Log.d(TAG, enable + " " + " Mode" + mode);
     }
 
     @Override
@@ -132,8 +150,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String changeWifi = Manifest.permission.CHANGE_WIFI_STATE;
         String internet = Manifest.permission.INTERNET;
         String accessNetwork = Manifest.permission.ACCESS_NETWORK_STATE;
+        String readExternal = Manifest.permission.READ_EXTERNAL_STORAGE;
+        String writeExternal = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 
         List<String> permissionList = new ArrayList<>();
+
+        if(!hasPermission(readExternal)){
+            permissionList.add(readExternal);
+        }
+
+        if(!hasPermission(writeExternal)){
+            permissionList.add(writeExternal);
+        }
 
         if(!hasPermission(accessNetwork)){
             permissionList.add(accessNetwork);

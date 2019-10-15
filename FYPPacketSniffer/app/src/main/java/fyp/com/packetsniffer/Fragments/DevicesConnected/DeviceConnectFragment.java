@@ -188,9 +188,9 @@ public class DeviceConnectFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ((MainActivity)getActivity()).getSupportActionBar().setTitle("Scan History");
-                ((MainActivity)getActivity()).enableViews(true);
+                ((MainActivity)getActivity()).enableViews(true, 1);
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new ScanHistoryFragment(), "test")
+                        .replace(R.id.fragment_container, new ScanHistoryFragment(), "ScanHistory")
                         .addToBackStack(null)
                         .commit();
             }
@@ -235,7 +235,10 @@ public class DeviceConnectFragment extends Fragment {
     @Override
     public void onDestroy() {
         if(networkReceiver != null){
-            getActivity().unregisterReceiver(networkReceiver);
+            try{
+                getActivity().unregisterReceiver(networkReceiver);
+            }catch(IllegalArgumentException e){ }
+
         }
         if(updateListRunnable != null){
             updateListRunnable.stopRun();
@@ -243,7 +246,33 @@ public class DeviceConnectFragment extends Fragment {
         if(scanRunnable != null){
             scanRunnable.stopRun();
         }
+        Log.d(TAG, "destroyed devConn");
         super.onDestroy();
+    }
+
+    @Override
+    public void onPause() {
+        if(networkReceiver != null){
+            try{
+                getActivity().unregisterReceiver(networkReceiver);
+            }catch(IllegalArgumentException e){ }
+        }
+
+        if(updateListRunnable != null){
+            updateListRunnable.stopRun();
+        }
+        if(scanRunnable != null){
+            scanRunnable.stopRun();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        if(networkReceiver != null && intentFilter != null){
+            getActivity().registerReceiver(networkReceiver, intentFilter);
+        }
+        super.onResume();
     }
 
     public class NetworkChangeReceiver extends BroadcastReceiver{
@@ -335,9 +364,9 @@ public class DeviceConnectFragment extends Fragment {
     private void storeCache(ArrayList<DeviceInformation> devices, WifiInfo wifiInfo){
         String macName = wifiInfo.getBSSID().replace(":", "");
         String fileName = wifiInfo.getSSID().replace("\"", "") + '_' + macName + ".txt";
-        File newDir = new File(getActivity().getCacheDir().toString(), "ScanHistory");
+        File newDir = new File(getActivity().getFilesDir().toString(), "ScanHistory");
         newDir.mkdir();
-        String path = getActivity().getCacheDir().toString();
+        String path = getActivity().getFilesDir().toString();
         Log.d("Files", "Path: " + path);
         File cacheFile = new File(path + "/ScanHistory", fileName);
 
@@ -357,8 +386,8 @@ public class DeviceConnectFragment extends Fragment {
             bw.write(wifiInfo.getMacAddress());
             bw.newLine();
             for(DeviceInformation dev: foundDev){
-                bw.write(dev.getHostName() + ":" + dev.getIpAddrs() + ":");
-                bw.write(dev.getMacAddrs() + ":" + dev.getMacVendor());
+                bw.write(dev.getHostName() + "," + dev.getIpAddrs() + ",");
+                bw.write(dev.getMacAddrs() + "," + dev.getMacVendor());
                 if(!dev.getIpAddrs().equals(devices.get(devices.size()-1).getIpAddrs())){
                     bw.newLine();
                 }
@@ -370,17 +399,16 @@ public class DeviceConnectFragment extends Fragment {
             Log.e(TAG, "Error storing to cache");
         }
 
-        path = getActivity().getCacheDir().toString() + "/ScanHistory/";
+        path = getActivity().getFilesDir().toString() + "/ScanHistory/";
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
         File[] files = directory.listFiles();
-        Log.d("Files", "Size: "+ files.length);
         for (int i = 0; i < files.length; i++)
         {
             Log.d("Files", "FileName:" + files[i].getName());
         }
 
-        directory = new File(getActivity().getCacheDir().toString());
+        directory = new File(getActivity().getFilesDir().toString());
         files = directory.listFiles();
         Log.d("Files", "Size: "+ files.length);
         for (int i = 0; i < files.length; i++)
