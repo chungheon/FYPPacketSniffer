@@ -27,7 +27,6 @@ public class CmdExec extends Thread {
         this.cmds = cmds;
     }
 
-<<<<<<< Updated upstream
     public class ReadOutput extends AsyncTask<String, Integer, String>{
         private InputStream input;
         private boolean stopRunning = false;
@@ -102,17 +101,6 @@ public class CmdExec extends Thread {
                         Log.d(TAG, "AsyncTask closing");
                         break;
                     }
-=======
-        StringBuilder output = new StringBuilder("");
-        try {
-            p = Runtime.getRuntime().exec(command);
-            BufferedReader reader = null;
-            String line = "";
-            if (mode == PCAP_NORMAL_STREAM) {
-                reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                while ((line = reader.readLine()) != null) {
-                    output.append(line + "\n\n");
->>>>>>> Stashed changes
                 }
 
             printToast("Scan Done");

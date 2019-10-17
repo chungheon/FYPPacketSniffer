@@ -4,7 +4,14 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#000000</color>
     <color name="white">#FFFFFF</color>
+<<<<<<< HEAD
     <color name="blue_magenta">#5B39C6</color>
     <color name="purple">#58218B</color>
     <color name="purple2">#D886F1</color>
+=======
+    <color name="black">#000000</color>
+    <color name="grey">#E3E3E3</color>
+    <color name="light_grey">#F6F6F6</color>
+    <color name="dark_grey">#797979</color>
+>>>>>>> GUI-Design
 </resources>

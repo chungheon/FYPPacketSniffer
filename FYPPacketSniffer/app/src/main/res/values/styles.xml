@@ -2,15 +2,28 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        <item name="android:windowNoTitle">true</item>
         <!-- Customize your theme here. -->
     </style>
 
     <style name="MyToolbarTheme"
+<<<<<<< HEAD
         parent="@style/Theme.AppCompat.NoActionBar">
     </style>
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/background_splash</item>
+=======
+        parent="Theme.AppCompat.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="PopupMenu">
+        <item name="android:textColorSecondary">@color/dark_grey</item>
+        <item name="android:listDivider">@color/black</item>
+
+>>>>>>> GUI-Design
     </style>
 
 </resources>
