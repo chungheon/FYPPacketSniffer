@@ -34,14 +34,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         adapter = new TabAdapter(getSupportFragmentManager());
         adapter.addFragment(new PacketCaptureFragment(), "Packet Capture");
         viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-        View view1 = getLayoutInflater().inflate(R.layout.layout_tab, null);
-        view1.findViewById(R.id.icon).setBackgroundResource(R.drawable.pcap);
-        tabLayout.getTabAt(0).setCustomView(view1);
     }
 
     public void askForMultiplePermissions(){
