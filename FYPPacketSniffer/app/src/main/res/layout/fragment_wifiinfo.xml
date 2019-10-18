@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white">
+    android:background="@color/background_color">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -14,15 +14,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <Button
-                android:id="@+id/refresh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="100dp"
-                android:text="Refresh"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
             <TextView
                 android:id="@+id/networkType"
                 android:layout_width="match_parent"
@@ -30,16 +21,14 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="10dp"
-                android:text="WI-FI CONNECTION"
-                android:textColor="@color/colorPrimaryDark"
+                android:text="CONNECTION DETAILS"
+                android:textColor="@color/wifi_text_1"
                 android:textSize="18sp" />
 
             <ListView
                 android:id="@+id/wifiList"
                 android:layout_width="match_parent"
-                android:layout_height="155dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"></ListView>
+                android:layout_height="155dp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -47,15 +36,13 @@
                 android:layout_marginLeft="10dp"
                 android:paddingTop="5dp"
                 android:text="WI-FI DETAILS"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/wifi_text_1"
                 android:textSize="18sp" />
 
             <ListView
                 android:id="@+id/detailList"
                 android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"></ListView>
+                android:layout_height="180dp"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -63,15 +50,13 @@
                 android:layout_marginLeft="10dp"
                 android:paddingTop="5dp"
                 android:text="CELL DETAILS"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/wifi_text_1"
                 android:textSize="18sp" />
 
             <ListView
                 android:id="@+id/cellList"
                 android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"></ListView>
+                android:layout_height="180dp" />
 
         </LinearLayout>
     </ScrollView>

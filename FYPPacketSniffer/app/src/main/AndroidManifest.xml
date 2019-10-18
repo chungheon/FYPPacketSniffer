@@ -26,6 +26,9 @@
         </activity>
         <activity android:name=".MainActivity"
             android:windowSoftInputMode="adjustPan"/>
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

@@ -24,10 +24,10 @@ import java.util.List;
 
 import fyp.com.packetsniffer.Fragments.DevicesConnected.DeviceConnectFragment;
 import fyp.com.packetsniffer.Fragments.PacketCapture.PacketAnalysisFragment;
-
 import fyp.com.packetsniffer.Fragments.PacketCapture.TestFragment;
 import fyp.com.packetsniffer.Fragments.PacketCapture.UpdateVersionFragment;
 import fyp.com.packetsniffer.Fragments.Tab1Fragment;
+import fyp.com.packetsniffer.Fragments.WifiInfo.WifiInfoFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private final static String TAG = "MainActivity";
@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         navView = (NavigationView) findViewById(R.id.nav_view);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
         setSupportActionBar(toolbar);
 
         toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
@@ -136,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 toolbar.setTitle("Scan Network");
                 break;
             case R.id.test2: getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new TestFragment())
+                    .replace(R.id.fragment_container, new WifiInfoFragment())
                     .commit();
                 toolbar.setTitle("Network Details");
                 break;
@@ -150,7 +149,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .commit();
                 toolbar.setTitle("Device Records Store");
                 break;
-
         }
 
         drawerLayout.closeDrawer(Gravity.START);

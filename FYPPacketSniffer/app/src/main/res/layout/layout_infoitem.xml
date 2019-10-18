@@ -5,16 +5,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/wifi_info_base">
+    android:background="@color/wifi_info_2"
+    android:id="@+id/info_bg">
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
+        android:fontFamily="@font/duru_sans"
         android:text="Title"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="16sp"
+        android:textSize="17sp"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -22,10 +23,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="15dp"
+        android:fontFamily="@font/duru_sans"
         android:text="Value"
         android:textAlignment="viewEnd"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:textColor="@color/colorPrimaryDark" />
+        android:textColor="@color/wifi_text_1"
+        android:textSize="17sp"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

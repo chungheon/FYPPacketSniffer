@@ -20,7 +20,6 @@
     <style name="PopupMenu">
         <item name="android:textColorSecondary">@color/dark_grey</item>
         <item name="android:listDivider">@color/black</item>
-        parent="@style/Theme.AppCompat.NoActionBar">
     </style>
 
 </resources>
