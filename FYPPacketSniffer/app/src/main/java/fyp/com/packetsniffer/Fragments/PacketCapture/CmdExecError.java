@@ -1,9 +1,6 @@
 package fyp.com.packetsniffer.Fragments.PacketCapture;
 
-import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -16,7 +13,7 @@ import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class CmdExec extends Thread {
+public class CmdExecError extends Thread {
     private final String TAG = "CmdExecution";
     private ArrayList<String> cmds;
     private PacketAnalysisFragment mFragment;
@@ -24,7 +21,7 @@ public class CmdExec extends Thread {
     private Thread readOutput;
     private ReadOutput fileReader;
 
-    public CmdExec(PacketAnalysisFragment fragment, ArrayList<String> cmds){
+    public CmdExecError(PacketAnalysisFragment fragment, ArrayList<String> cmds){
         this.mFragment = fragment;
         this.cmds = cmds;
     }
@@ -66,12 +63,11 @@ public class CmdExec extends Thread {
                             }else{
                                 page += "\n\n" + line;
                             }
-                            numOfPackets++;
                         }else{
                             page += "\n" + line;
                         }
 
-                        if(pagesAdded >= 10){
+                        if(pagesAdded >= 2){
                             updateResult(result, numOfPackets);
                             pagesAdded = 0;
                         }
@@ -122,7 +118,7 @@ public class CmdExec extends Thread {
             outputStream = new DataOutputStream(p.getOutputStream());
             InputStream response = p.getErrorStream();
             InputStream  normRes = p.getInputStream();
-            fileReader = new ReadOutput(normRes);
+            fileReader = new ReadOutput(response);
             readOutput = new Thread(fileReader);
             readOutput.start();
             for(String str: cmds){

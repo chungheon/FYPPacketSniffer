@@ -20,8 +20,10 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-import fyp.com.packetsniffer.Fragments.PacketCapture.PacketCaptureFragment;
+import fyp.com.packetsniffer.Fragments.PacketCapture.PacketAnalysisFragment;
 
+import fyp.com.packetsniffer.Fragments.PacketCapture.TestFragment;
+import fyp.com.packetsniffer.Fragments.PacketCapture.UpdateVersionFragment;
 import fyp.com.packetsniffer.Fragments.Tab1Fragment;
 import fyp.com.packetsniffer.Fragments.TabAdapter;
 
@@ -55,10 +57,57 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         if(savedInstanceState == null){
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PacketCaptureFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PacketAnalysisFragment()).commit();
             navView.setCheckedItem(R.id.test1);
         }
 
+    }
+
+    public void printToast(String message){
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }else{
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        Tab1Fragment fragment1 = new Tab1Fragment();
+        Bundle args = new Bundle();
+        args.putInt("num", 1);
+        fragment1.setArguments(args);
+        switch(menuItem.getItemId()){
+            case R.id.test1: getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, fragment1)
+                    .commit();
+                toolbar.setTitle("Scan Network");
+                break;
+            case R.id.test2: getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new TestFragment())
+                    .commit();
+                toolbar.setTitle("Network Details");
+                break;
+            case R.id.packet_capture: getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new UpdateVersionFragment())
+                    .commit();
+                toolbar.setTitle("Device Records Store");
+                break;
+            case R.id.packet_analysis: getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new PacketAnalysisFragment())
+                    .commit();
+                toolbar.setTitle("Device Records Store");
+                break;
+
+        }
+
+        drawerLayout.closeDrawer(Gravity.START);
+        return true;
     }
 
     public void askForMultiplePermissions(){
@@ -69,8 +118,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String changeWifi = Manifest.permission.CHANGE_WIFI_STATE;
         String internet = Manifest.permission.INTERNET;
         String accessNetwork = Manifest.permission.ACCESS_NETWORK_STATE;
+        String readExternal = Manifest.permission.READ_EXTERNAL_STORAGE;
+        String writeExternal = Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
         List<String> permissionList = new ArrayList<>();
+
+        if(!hasPermission(readExternal)){
+            permissionList.add(readExternal);
+        }
+
+        if(!hasPermission(writeExternal)){
+            permissionList.add(writeExternal);
+        }
 
         if(!hasPermission(accessNetwork)){
             permissionList.add(accessNetwork);
@@ -121,49 +180,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             }
 
-        }
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Tab1Fragment fragment1 = new Tab1Fragment();
-        Bundle args = new Bundle();
-        args.putInt("num", 1);
-        fragment1.setArguments(args);
-        switch(menuItem.getItemId()){
-            case R.id.test1: getSupportFragmentManager().beginTransaction()
-                             .replace(R.id.fragment_container, fragment1)
-                             .commit();
-                             toolbar.setTitle("Scan Network");
-                             break;
-            case R.id.test2: getSupportFragmentManager().beginTransaction()
-                             .replace(R.id.fragment_container, new Tab1Fragment())
-                             .commit();
-                             toolbar.setTitle("Network Details");
-                             break;
-            case R.id.packet_capture: getSupportFragmentManager().beginTransaction()
-                                      .replace(R.id.fragment_container, new Tab1Fragment())
-                                      .commit();
-                                      toolbar.setTitle("Device Records Store");
-                                      break;
-            case R.id.packet_analysis: getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.fragment_container, new PacketCaptureFragment())
-                                    .commit();
-                                       toolbar.setTitle("Device Records Store");
-                                       break;
-
-        }
-
-        drawerLayout.closeDrawer(Gravity.START);
-        return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-            drawerLayout.closeDrawer(GravityCompat.START);
-        }else{
-            super.onBackPressed();
         }
     }
 }

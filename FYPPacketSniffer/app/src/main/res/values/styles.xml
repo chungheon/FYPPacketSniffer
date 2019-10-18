@@ -7,13 +7,11 @@
     </style>
 
     <style name="MyToolbarTheme"
-<<<<<<< HEAD
         parent="@style/Theme.AppCompat.NoActionBar">
     </style>
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/background_splash</item>
-=======
         parent="Theme.AppCompat.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -22,8 +20,6 @@
     <style name="PopupMenu">
         <item name="android:textColorSecondary">@color/dark_grey</item>
         <item name="android:listDivider">@color/black</item>
-
->>>>>>> GUI-Design
     </style>
 
 </resources>
