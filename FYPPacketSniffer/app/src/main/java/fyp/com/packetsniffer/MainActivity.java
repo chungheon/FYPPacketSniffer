@@ -129,13 +129,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Tab1Fragment fragment1 = new Tab1Fragment();
-        Bundle args = new Bundle();
-        args.putInt("num", 1);
-        fragment1.setArguments(args);
         switch(menuItem.getItemId()){
             case R.id.test1: getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, fragment1)
+                    .replace(R.id.fragment_container, new DeviceConnectFragment())
                     .commit();
                 toolbar.setTitle("Scan Network");
                 break;
