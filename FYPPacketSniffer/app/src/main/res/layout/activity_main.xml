@@ -49,6 +49,7 @@
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_menu"
         android:theme="@style/PopupMenu"/>
+>>>>>>> GUI-Design
 
 
 </android.support.v4.widget.DrawerLayout>

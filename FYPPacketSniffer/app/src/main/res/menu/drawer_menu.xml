@@ -13,13 +13,13 @@
             android:icon="@mipmap/wifi_details"
             android:title="Network Details" />
         <item
-            android:id="@+id/test3"
-            android:icon="@mipmap/records"
-            android:title="Device Records Store" />
-        <item
-            android:id="@+id/test7"
+            android:id="@+id/packet_capture"
             android:icon="@mipmap/packet_capture"
-            android:title="Packet Capture"/>
+            android:title="Packet Capture" />
+        <item
+            android:id="@+id/packet_analysis"
+            android:icon="@mipmap/records"
+            android:title="Packet Analysis"/>
     </group>
 
     <item android:title="test4"
