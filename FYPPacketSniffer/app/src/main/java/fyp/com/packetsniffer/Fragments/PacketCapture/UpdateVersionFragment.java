@@ -1,6 +1,7 @@
 package fyp.com.packetsniffer.Fragments.PacketCapture;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,13 +26,22 @@ import java.util.ArrayList;
 
 import fyp.com.packetsniffer.R;
 
-public class UpdateVersionFragment extends PacketAnalysisFragment {
+public class UpdateVersionFragment extends Fragment implements PacketCaptureInterface {
     private final String TAG = "UpdateVersionFrag";
+    private View view;
+
+    private TextView pageText;
     private Button updateBtn;
     private Spinner optionSpinner;
-    private int selected = -1;
+    private RecyclerView output;
+    private int selected = 0;
     private UpdateVersionFragment mFragment = this;
     private CmdExecError cmdRunnable;
+
+    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerViewPageAdapter mRVAdapter;
+
+    private long movement = 1050;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_update_version, container, false);
@@ -67,7 +78,6 @@ public class UpdateVersionFragment extends PacketAnalysisFragment {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 if (dx > 0) {
-                    Log.d(TAG, "Moved Right" + dx + " " + movement);
                     final String[] pageInfo = pageText.getText().toString().split("/");
                     long totalpages = Integer.parseInt(pageInfo[1]) * 1050;
                     if(movement <= totalpages && pageInfo.length == 3){
@@ -83,7 +93,6 @@ public class UpdateVersionFragment extends PacketAnalysisFragment {
                         movement = totalpages;
                     }
                 } else {
-                    Log.d(TAG, "Moved Left" + dx + " " + movement);
                     final String[] pageInfo = pageText.getText().toString().split("/");
                     if((movement-1050)<= (dx * -1)){
                         movement = 1050;
@@ -128,7 +137,7 @@ public class UpdateVersionFragment extends PacketAnalysisFragment {
             @Override
             public void onClick(View v) {
                 if(selected < 0){
-                    printToast("Please select a spinner");
+                    printToast("Please select one of the choices");
                     return;
                 }else if(selected == 0){
 
@@ -194,4 +203,30 @@ public class UpdateVersionFragment extends PacketAnalysisFragment {
         });
     }
 
+    @Override
+    public void printResult(final ArrayList<String> result, final long numOfPackets) {
+        if(getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    int prevSize = mRVAdapter.getItemCount();
+                    mRVAdapter.bindList(result);
+                    final String[] pageInfo = pageText.getText().toString().split("/");
+                    mRVAdapter.notifyItemRangeInserted(prevSize, 5);
+                    pageText.setText(pageInfo[0] + "/" + result.size() + "/" + numOfPackets + " packets");
+
+                }
+            });
+        }
+    }
+
+    @Override
+    public void printToast(final String message) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getContext().getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 }

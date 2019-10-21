@@ -24,6 +24,7 @@ import java.util.List;
 
 import fyp.com.packetsniffer.Fragments.DevicesConnected.DeviceConnectFragment;
 import fyp.com.packetsniffer.Fragments.PacketCapture.PacketAnalysisFragment;
+import fyp.com.packetsniffer.Fragments.PacketCapture.PacketCaptureFragment;
 import fyp.com.packetsniffer.Fragments.PacketCapture.TestFragment;
 import fyp.com.packetsniffer.Fragments.PacketCapture.UpdateVersionFragment;
 import fyp.com.packetsniffer.Fragments.Tab1Fragment;
@@ -140,14 +141,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 toolbar.setTitle("Network Details");
                 break;
             case R.id.packet_capture: getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new UpdateVersionFragment())
+                    .replace(R.id.fragment_container, new PacketCaptureFragment())
                     .commit();
-                toolbar.setTitle("Device Records Store");
+                toolbar.setTitle("Packet Capture");
                 break;
             case R.id.packet_analysis: getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new PacketAnalysisFragment())
                     .commit();
-                toolbar.setTitle("Device Records Store");
+                toolbar.setTitle("Packet Analysis");
                 break;
         }
 

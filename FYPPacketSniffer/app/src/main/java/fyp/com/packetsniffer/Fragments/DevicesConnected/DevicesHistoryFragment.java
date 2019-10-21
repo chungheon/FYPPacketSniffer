@@ -1,5 +1,11 @@
 package fyp.com.packetsniffer.Fragments.DevicesConnected;
 
+/*Device History Fragment class
+This class is in-charge of the passing live data retrieved to be displayed
+on the UI for purpose of viewing pass scan results
+
+ */
+
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,6 +17,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,12 +31,15 @@ import fyp.com.packetsniffer.R;
 
 public class DevicesHistoryFragment extends Fragment {
 
-    private final String TAG = "DeviceHistoryFragment";
-    private ArrayList<DeviceInformation> devices;
-    private RecyclerView recyclerView;
+    private final String TAG = "DeviceHistoryFragment"; //Tag used for debugging purposes
+    private ArrayList<DeviceInformation> devices; //List of Devices found global variable
+    private RecyclerView listOfDevices; //RecyclerView to display Devices information
 
-    private View view;
+    private View view; //View object reference to pass data to UI
 
+    //Setup the view and listeners for when fragment is created
+    @Nullable
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_device_history, container, false);
         final Bundle args = getArguments();
@@ -40,14 +50,33 @@ public class DevicesHistoryFragment extends Fragment {
         {
             path = args.getString("Filename");
             initView(path);
+            initListener();
         }
-        catch(final Exception e) { }
+        catch(final Exception e) {
+            Toast.makeText(getContext().getApplicationContext(),
+                    "An Error has occurred unable to continue", Toast.LENGTH_LONG).show();
+            getActivity().onBackPressed();
+        }
 
         return this.view;
     }
 
+    //Initialization of all objects and UI components
     private void initView(String path){
+        devices = new ArrayList<>();
 
+        listOfDevices = (RecyclerView) this.view.findViewById(R.id.recycler_view_devices);
+
+        Log.d(TAG, "File path: " + path);
+        readFromFile(path);
+
+        RecyclerViewDeviceAdapter deviceAdapter = new RecyclerViewDeviceAdapter(devices, getContext());
+        listOfDevices.setAdapter(deviceAdapter);
+        listOfDevices.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    //Initialize all necessary listeners for buttons etc
+    private void initListener(){
         this.view.setFocusableInTouchMode(true);
         this.view.requestFocus();
         this.view.setOnKeyListener(new View.OnKeyListener() {
@@ -61,21 +90,9 @@ public class DevicesHistoryFragment extends Fragment {
                 return false;
             }
         });
-
-
-        devices = new ArrayList<>();
-
-        recyclerView = (RecyclerView) this.view.findViewById(R.id.recycler_view_devices);
-
-        Log.d(TAG, "File path: " + path);
-        readFromFile(path);
-
-        RecyclerViewDeviceAdapter deviceAdapter = new RecyclerViewDeviceAdapter(devices, getContext());
-        recyclerView.setAdapter(deviceAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
     }
 
+    //Read stored cache of past scans
     private void readFromFile(String path){
         File file = new File(path);
         BufferedReader br = null;

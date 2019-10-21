@@ -1,7 +1,10 @@
 package fyp.com.packetsniffer.Fragments.DevicesConnected;
 
+/*RecyclerView Device Adapter Class
+User Defined Class for RecyclerView to display Device information on a RecyclerView
+ */
+
 import android.content.Context;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,10 +19,10 @@ import java.util.ArrayList;
 import fyp.com.packetsniffer.R;
 
 public class RecyclerViewDeviceAdapter extends RecyclerView.Adapter<RecyclerViewDeviceAdapter.ViewHolder> {
-    private static final String TAG = "RecyclerViewDevAdapter";
+    private static final String TAG = "RecyclerViewDevAdapter"; //Tag used for debugging purposes
 
-    private ArrayList<DeviceInformation> devices;
-    private Context mContext;
+    private ArrayList<DeviceInformation> devices; //ArrayList of DeviceInformation to populate the RecyclerView
+    private Context mContext; //UI Context to display on the correct UI
 
     public RecyclerViewDeviceAdapter(ArrayList<DeviceInformation> devices, Context context){
         this.devices = devices;
@@ -29,7 +32,8 @@ public class RecyclerViewDeviceAdapter extends RecyclerView.Adapter<RecyclerView
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = null;
-        view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_devicelistitem, viewGroup, false);
+        view = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.layout_devicelistitem, viewGroup, false);
         ViewHolder holder = new ViewHolder(view);
 
         return holder;

@@ -1,13 +1,18 @@
 package fyp.com.packetsniffer.Fragments.DevicesConnected;
 
-import android.util.Log;
+/*Device Information Class
+This class is used to represent the information the devices in a network
+
+This class contains methods to get and set information to each object.
+Implements comparable interface to sort an array of device information.
+ */
 
 public class DeviceInformation implements Comparable<DeviceInformation>{
 
-    private String hostName;
-    private String ipAddrs;
-    private String macAddrs;
-    private String macVendor;
+    private String hostName; //The host name of the Device
+    private String ipAddrs; //The local ip address of the Device
+    private String macAddrs; //The mac address of the Device
+    private String macVendor; //The vendor of the Device derived from the mac address
 
 
     public void setHostName(String hostName){
@@ -42,13 +47,28 @@ public class DeviceInformation implements Comparable<DeviceInformation>{
         return this.macVendor;
     }
 
+    //Override parameters for class object to be compared
+    //The compared using the ip address numeral value
     @Override
     public int compareTo(DeviceInformation deviceInfo){
         String[] userInfo = this.ipAddrs.split("\\.");
         String[] devInfo = deviceInfo.getIpAddrs().split("\\.");
-        int userVal = Integer.parseInt(userInfo[3]);
-        int devVal = Integer.parseInt(devInfo[3]);
+        try{
 
-        return userVal - devVal;
+            if(userInfo.length == devInfo.length){
+                for(int i = 0; i < devInfo.length; i++){
+                    int userVal = Integer.parseInt(userInfo[i]);
+                    int devVal = Integer.parseInt(devInfo[i]);
+                    if(userVal != devVal){
+                        return userVal - devVal;
+                    }
+                }
+            }
+        }catch(NumberFormatException e){
+            return 0;
+        }
+
+
+        return 0;
     }
 }

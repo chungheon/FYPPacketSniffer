@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 import fyp.com.packetsniffer.R;
 
-public class SelectPacketFragment extends Fragment {
+public class SelectPacketFragment extends Fragment{
 
     private View view;
 

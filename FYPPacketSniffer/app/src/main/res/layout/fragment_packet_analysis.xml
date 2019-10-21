@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <Button android:id="@+id/sniffBtn"
+        <Button android:id="@+id/analyse_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Start Capturing"
@@ -20,13 +20,13 @@
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sniffBtn"/>
+            app:layout_constraintTop_toBottomOf="@+id/analyse_btn"/>
         <Button
             android:id="@+id/jump_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Jump To Page"
-            app:layout_constraintTop_toBottomOf="@+id/sniffBtn"
+            app:layout_constraintTop_toBottomOf="@+id/analyse_btn"
             app:layout_constraintLeft_toRightOf="@+id/jump_page"/>
 
     </android.support.constraint.ConstraintLayout>

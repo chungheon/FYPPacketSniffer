@@ -5,12 +5,14 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -78,10 +80,13 @@ public class RecyclerViewPageAdapter extends RecyclerView.Adapter<RecyclerViewPa
 
         public TextView pageText;
         public LinearLayout pageLayout;
+        public ScrollView pageScroll;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            this.pageText = (TextView) itemView.findViewById(R.id.capture_content);
+            this.pageText = (TextView) itemView.findViewById(R.id.page_content);
             this.pageLayout = (LinearLayout) itemView.findViewById(R.id.page_layout);
+            this.pageScroll = (ScrollView) itemView.findViewById(R.id.page_scroll);
+            ViewCompat.setNestedScrollingEnabled(pageScroll, true);
         }
     }
 }

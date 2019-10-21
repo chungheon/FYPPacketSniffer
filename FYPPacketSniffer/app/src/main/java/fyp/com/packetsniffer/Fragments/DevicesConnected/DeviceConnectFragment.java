@@ -1,5 +1,10 @@
 package fyp.com.packetsniffer.Fragments.DevicesConnected;
 
+/*Device Connect Fragment class
+This class is in-charge of the passing live data retrieved to be displayed
+on the UI for the purpose of scanning the network for devices connected.
+
+ */
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,105 +14,81 @@ import android.net.DhcpInfo;
 import android.net.LinkAddress;
 import android.net.LinkProperties;
 import android.net.Network;
-import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
-
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.math.BigInteger;
-import java.net.InetAddress;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import javax.crypto.Mac;
 
 import fyp.com.packetsniffer.Fragments.IPv4;
 import fyp.com.packetsniffer.MainActivity;
 import fyp.com.packetsniffer.R;
 
 public class DeviceConnectFragment extends Fragment {
-    private static final String TAG = "DeviceConnFrag";
+    private static final String TAG = "DeviceConnFrag"; //Tag used for debugging purposes
 
-    private RecyclerView wifiNetworkList;
-    private View view;
-    private ImageButton runBtn;
-    private ImageButton historyBtn;
-    private TextView wifiName;
+    private RecyclerView deviceList; //RecyclerView to display all devices found on network
+    private View view; //View object reference to pass data to UI
+    private ImageButton runBtn; //Button to run scan
+    private ImageButton historyBtn; //Button to open history of past scans
+    private TextView wifiName; //TextView displays wifi network SSID
+    private TextView numDevices; //TextView displays number of devices found on network
+    private TextView percentText; //TextView displays the percentage of scan done
+    private ProgressBar percentBar; //ProgressBar visual representation of percentage of scan done
 
+    //Broadcast Receiver to receive intent (network changes)
     private NetworkChangeReceiver networkReceiver;
+    //The intent filter for intents to be caught
     private IntentFilter intentFilter;
 
-    private Handler mHandler;
-    private Thread subNetThread;
-
+    //WifiManager class to retrieve wifi network related information
     private WifiManager mWifiManager;
+    //ConnectivityManager class to retrieve active network related information
     private ConnectivityManager mConnectivityManager;
-    private WifiInfo wifiInfo;
-    private DhcpInfo dhcpInfo;
-    private IPv4 networkIP;
-    private Network network;
+    //Instance of this object to be passed to model for reference
     private DeviceConnectFragment connFragment;
+    //ScanSubNetRunnable reference for the thread scanning the network
     private ScanSubNetRunnable scanRunnable;
+    //UpdateListRunnable reference for the thread collecting the results
     private UpdateListRunnable updateListRunnable;
-    private TextView numDevices;
-    private TextView percentText;
-    private ProgressBar percentBar;
 
+    //Boolean tracking if a scan is in progress
     private boolean scanInProgress = false;
-    private boolean foundAll;
-    private int found;
 
+    //Setup the view and listeners for when fragment is created
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_device_connect, container, false);
         initView();
-        initBtn();
+        initListener();
         return view;
     }
 
+    //Initialization of all objects and UI components
     private void initView(){
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        wifiNetworkList = (RecyclerView) view.findViewById(R.id.recycler_view_Net);
+        deviceList = (RecyclerView) view.findViewById(R.id.recycler_view_Net);
         runBtn = (ImageButton) view.findViewById(R.id.startScan);
         wifiName = (TextView) view.findViewById(R.id.wifiName);
         numDevices = (TextView) view.findViewById(R.id.numDevices);
@@ -128,7 +109,9 @@ public class DeviceConnectFragment extends Fragment {
         defaultDisplay();
     }
 
+    //The default display settings at start up.
     private void defaultDisplay(){
+        wifiName.setText("-");
         runBtn.setEnabled(false);
         runBtn.setVisibility(View.INVISIBLE);
         numDevices.setVisibility(View.INVISIBLE);
@@ -136,6 +119,7 @@ public class DeviceConnectFragment extends Fragment {
         percentBar.setVisibility(View.INVISIBLE);
     }
 
+    //Display the percentage when scanning
     private void displayPercentage(){
         runBtn.setImageResource(R.mipmap.stop_btn);
         numDevices.setText("0 Devices");
@@ -146,22 +130,31 @@ public class DeviceConnectFragment extends Fragment {
         percentBar.setVisibility(View.VISIBLE);
     }
 
-    private void initBtn(){
+    //Initialize all necessary listeners for buttons etc
+    private void initListener(){
 
         runBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dhcpInfo = mWifiManager.getDhcpInfo();
+                DhcpInfo dhcpInfo = mWifiManager.getDhcpInfo();
                 String[] ipInfo = dhcpInfo.toString().split(" ");
                 String subMask = ipInfo[5];
+                IPv4 networkIP = null;
                 try{
                     networkIP = new IPv4(ipInfo[1], subMask);
                 }catch (NumberFormatException e) {
                     subMask = getSubMask();
                     networkIP = new IPv4(ipInfo[1], subMask);
                 }
+                if(networkIP == null){
+                    Toast.makeText(getContext().getApplicationContext(),
+                            "Not Connected to Network", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 if(networkIP.getNumberOfHosts() > (255*255)){
-                    Toast.makeText(getContext().getApplicationContext(), "Network too big use NMAP instead", Toast.LENGTH_LONG);
+                    Toast.makeText(getContext().getApplicationContext(),
+                            "Network too big for scan", Toast.LENGTH_LONG).show();
                 }else{
                     if(!scanInProgress){
                         scanInProgress = true;
@@ -197,6 +190,7 @@ public class DeviceConnectFragment extends Fragment {
         });
     }
 
+    //Called by UpdateListRunnable to update the View with data retrieved
     public void updateSearch(final long numOfHosts, ArrayList<DeviceInformation> devices, final String userHost,
                              final String userIP, final String userMac, final String userVendor){
         DeviceInformation devInfo = new DeviceInformation();
@@ -225,13 +219,14 @@ public class DeviceConnectFragment extends Fragment {
                 numDevices.setText(foundDev.size() + " Devices");
 
                 RecyclerViewDeviceAdapter adapter = new RecyclerViewDeviceAdapter(foundDev, getContext());
-                wifiNetworkList.setVisibility(View.VISIBLE);
-                wifiNetworkList.setAdapter(adapter);
-                wifiNetworkList.setLayoutManager(new LinearLayoutManager(getActivity()));
+                deviceList.setVisibility(View.VISIBLE);
+                deviceList.setAdapter(adapter);
+                deviceList.setLayoutManager(new LinearLayoutManager(getActivity()));
             }
         });
     }
 
+    //Override for when the fragment is destroyed
     @Override
     public void onDestroy() {
         if(networkReceiver != null){
@@ -250,6 +245,7 @@ public class DeviceConnectFragment extends Fragment {
         super.onDestroy();
     }
 
+    //Override for when fragment is paused
     @Override
     public void onPause() {
         if(networkReceiver != null){
@@ -267,6 +263,7 @@ public class DeviceConnectFragment extends Fragment {
         super.onPause();
     }
 
+    //Override for when fragment is resumed after a pause
     @Override
     public void onResume() {
         if(networkReceiver != null && intentFilter != null){
@@ -275,6 +272,7 @@ public class DeviceConnectFragment extends Fragment {
         super.onResume();
     }
 
+    //Extends BroadcastReceiver to receive broadcast intents for network changes
     public class NetworkChangeReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -290,7 +288,7 @@ public class DeviceConnectFragment extends Fragment {
                             runBtn.setVisibility(View.VISIBLE);
                             runBtn.setImageResource(R.mipmap.refresh_scan_btn);
                             wifiName.setText(wifiInfo.getSSID().replace("\"",""));
-                            wifiNetworkList.setVisibility(View.INVISIBLE);
+                            deviceList.setVisibility(View.INVISIBLE);
                         }
                     });
                 }else if(scanInProgress && dhcpInfo.ipAddress == 0){
@@ -298,7 +296,7 @@ public class DeviceConnectFragment extends Fragment {
                         @Override
                         public void run() {
                             runBtn.setEnabled(false);
-                            runBtn.setVisibility(View.INVISIBLE);
+                            wifiName.setText("-");
                             if (updateListRunnable != null) {
                                 updateListRunnable.stopRun();
                             }
@@ -308,11 +306,11 @@ public class DeviceConnectFragment extends Fragment {
                         }
                     });
                 }else if(!scanInProgress && dhcpInfo.ipAddress == 0){
+                    wifiName.setText("-");
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             runBtn.setEnabled(false);
-                            runBtn.setVisibility(View.INVISIBLE);
                         }
                     });
                 }
@@ -320,21 +318,20 @@ public class DeviceConnectFragment extends Fragment {
         }
     }
 
+    //Called to retrieve submask when DhcpInfo does not return a valid submask
     private String getSubMask(){
         if(Build.VERSION.SDK_INT >= 23){
             Network network = mConnectivityManager.getActiveNetwork();
             LinkProperties linkProp = mConnectivityManager.getLinkProperties(network);
             List<LinkAddress> linkAddress = linkProp.getLinkAddresses();
             IPv4 ipv4 = null;
-            StringBuilder ipv6 = new StringBuilder("N/A");
             for (LinkAddress l : linkAddress) {
                 String[] ip4 = l.toString().split("\\.");
-                String[] ip6 = l.toString().split(":");
                 if (ip4.length > 1) {
                     try {
                         ipv4 = new IPv4(l.toString());
                     }catch (NumberFormatException e){
-                        return "255.255.255.255";
+                        return "1";
                     }
                 }
             }
@@ -343,9 +340,10 @@ public class DeviceConnectFragment extends Fragment {
             }
         }
 
-        return "255.255.255.255";
+        return "1";
     }
 
+    //Called by UpdateListRunnable when scan is completed and no further update would be done
     public void scanDone(ArrayList<DeviceInformation> devices, WifiInfo wifiInfo){
         scanInProgress = false;
         Log.d(TAG, "Scan Done");
@@ -361,9 +359,10 @@ public class DeviceConnectFragment extends Fragment {
         storeCache(devices, wifiInfo);
     }
 
+    //Store data of the scan done to a file for future reference
     private void storeCache(ArrayList<DeviceInformation> devices, WifiInfo wifiInfo){
         String macName = wifiInfo.getBSSID().replace(":", "");
-        String fileName = wifiInfo.getSSID().replace("\"", "") + '_' + macName + ".txt";
+        String fileName = wifiInfo.getSSID().replace("\"", "") + '_' + macName;
         File newDir = new File(getActivity().getFilesDir().toString(), "ScanHistory");
         newDir.mkdir();
         String path = getActivity().getFilesDir().toString();
@@ -397,23 +396,6 @@ public class DeviceConnectFragment extends Fragment {
             bw.close();
         } catch (IOException e) {
             Log.e(TAG, "Error storing to cache");
-        }
-
-        path = getActivity().getFilesDir().toString() + "/ScanHistory/";
-        Log.d("Files", "Path: " + path);
-        File directory = new File(path);
-        File[] files = directory.listFiles();
-        for (int i = 0; i < files.length; i++)
-        {
-            Log.d("Files", "FileName:" + files[i].getName());
-        }
-
-        directory = new File(getActivity().getFilesDir().toString());
-        files = directory.listFiles();
-        Log.d("Files", "Size: "+ files.length);
-        for (int i = 0; i < files.length; i++)
-        {
-            Log.d("Files", "FileName:" + files[i].getName());
         }
     }
 }

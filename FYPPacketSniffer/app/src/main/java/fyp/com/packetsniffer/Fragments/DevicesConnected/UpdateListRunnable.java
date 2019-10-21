@@ -1,6 +1,5 @@
 package fyp.com.packetsniffer.Fragments.DevicesConnected;
 
-import android.bluetooth.BluetoothClass;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -8,15 +7,12 @@ import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -24,12 +20,8 @@ import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import fyp.com.packetsniffer.Fragments.IPv4;
 import fyp.com.packetsniffer.R;
@@ -59,7 +51,6 @@ public class UpdateListRunnable implements Runnable{
     @Override
     public synchronized void run() {
         running = true;
-        int numOfUpdates = 0;
         int numOfRefresh = 0;
         ArrayList<DeviceInformation> devices = new ArrayList<>();
         WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
@@ -113,7 +104,6 @@ public class UpdateListRunnable implements Runnable{
                 mConnFragment.updateSearch(numOfHosts, devices, host, ip + " (ME)",
                         userMac, getVendor(getMacVendor(userMac)));
                 update = false;
-                numOfUpdates++;
             }else{
                 numOfRefresh++;
             }
@@ -129,7 +119,7 @@ public class UpdateListRunnable implements Runnable{
                 numOfRefresh = 0;
             }else{
                 try{
-                    wait(100);
+                    wait(200);
                 }catch (InterruptedException e) { }
             }
             if(lastRun){

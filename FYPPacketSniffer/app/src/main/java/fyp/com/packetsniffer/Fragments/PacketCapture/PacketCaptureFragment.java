@@ -1,16 +1,15 @@
 package fyp.com.packetsniffer.Fragments.PacketCapture;
 
 import android.os.Bundle;
-import android.os.Environment;
-import android.renderscript.ScriptGroup;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -21,56 +20,63 @@ import java.util.ArrayList;
 
 import fyp.com.packetsniffer.R;
 
-public class PacketAnalysisFragment extends Fragment implements PacketCaptureInterface {
-
-    private final String TAG = "PCapFragment";
+public class PacketCaptureFragment extends Fragment implements PacketCaptureInterface {
+    private static final String TAG = "PacketCapture";
     private View view;
+    private EditText numPacket;
+    private TextView pageText;
+    private Button captureBtn;
+    private RecyclerView captureOutput;
+
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerViewPageAdapter mRVAdapter;
 
-    private RecyclerView output;
-    private Button jumpBtn;
-    private EditText pageJump;
-    private TextView pageText;
     private CmdExec cmdRunnable;
-    private Button analyseBtn;
     private long movement = 1050;
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_packet_analysis, container, false);
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_packet_capture, container, false);
         initView();
         initListener();
         return view;
     }
 
     private void initView(){
-        this.output = (RecyclerView) view.findViewById(R.id.output_content);
-        this.analyseBtn = (Button) view.findViewById(R.id.analyse_btn);
-        this.jumpBtn = (Button) view.findViewById(R.id.jump_btn);
-        this.pageJump = (EditText) view.findViewById(R.id.jump_page);
-        this.pageText = (TextView) view.findViewById(R.id.num_page);
+        this.numPacket = (EditText) view.findViewById(R.id.capture_num);
+        this.captureOutput = (RecyclerView) view.findViewById(R.id.capture_output);
+        this.captureBtn = (Button) view.findViewById(R.id.capture_btn);
+        this.pageText = (TextView) view.findViewById(R.id.capture_num_page);
         mLayoutManager = new LinearLayoutManager(getContext().getApplicationContext(),
                 LinearLayout.HORIZONTAL,
                 false);
         mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<String>());
-        output.setAdapter(mRVAdapter);
-        output.setLayoutManager(mLayoutManager);
+        captureOutput.setAdapter(mRVAdapter);
+        captureOutput.setLayoutManager(mLayoutManager);
+        ViewCompat.setNestedScrollingEnabled(captureOutput, true);
         this.pageText.setText("0/0");
     }
 
     private void initListener(){
 
-        analyseBtn.setOnClickListener(new View.OnClickListener() {
+        captureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ArrayList<String> cmds = new ArrayList<>();
-                cmds.add("tcpdump --version");
-                String filePath = getActivity().getFilesDir().toString();
-                String[] cmd = (pageJump.getText().toString())
-                        .split(":");
-                for(String str: cmd){
-                    cmds.add(str);
+                long numOfPacket = 0;
+                try{
+                    numOfPacket = Long.parseLong(numPacket.getText().toString());
+
+                    if(numOfPacket < 0){
+                        throw new NumberFormatException();
+                    }
+                }catch (NumberFormatException e){
+                    printToast("Please choose a valid number of packets eg. 1000");
+                    return;
                 }
+
+                cmds.add("tcpdump -tttt -c " + numOfPacket);
 
                 if(cmdRunnable != null){
                     cmdRunnable.stopRun();
@@ -79,7 +85,8 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
                         @Override
                         public void run() {
                             mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<String>());
-                            output.setAdapter(mRVAdapter);
+                            captureOutput.setAdapter(mRVAdapter);
+                            ViewCompat.setNestedScrollingEnabled(captureOutput, true);
                             runCmd(allCmd);
                         }
                     });
@@ -89,7 +96,7 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
             }
         });
 
-        output.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        captureOutput.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -136,35 +143,6 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
                 }
             }
         });
-
-        jumpBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String pageNum = pageJump.getText().toString();
-                String[] totalPage = pageText.getText().toString().split("/");
-                try{
-                    int num = Integer.parseInt(pageNum);
-                    if(totalPage.length >= 2){
-                        int totalPages = Integer.parseInt(totalPage[1]);
-                        if(totalPages < num){
-                            Toast.makeText(getContext().getApplicationContext(), "Please enter a valid number", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                    }else{
-                        return;
-                    }
-                    if(num <= 0){
-                        Toast.makeText(getContext().getApplicationContext(), "Please enter a valid number", Toast.LENGTH_SHORT).show();
-                    }else{
-                        output.scrollToPosition(num - 1);
-                        movement = (num) * 1050;
-                    }
-
-                }catch (NumberFormatException e){
-                    Toast.makeText(getContext().getApplicationContext(), "Please enter a valid number", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
     }
 
     private void runCmd(ArrayList<String> args){
@@ -173,16 +151,8 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
         test.start();
     }
 
-    public void printToast(final String message){
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getContext().getApplicationContext(), message, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    public void printResult(final ArrayList<String> result, final long numOfPackets){
+    @Override
+    public void printResult(final ArrayList<String> result,final long numOfPackets) {
         if(getActivity() != null){
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -199,10 +169,12 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
     }
 
     @Override
-    public void onDestroy() {
-        if(cmdRunnable != null){
-            cmdRunnable.stopRun();
-        }
-        super.onDestroy();
+    public void printToast(final String message) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getContext().getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

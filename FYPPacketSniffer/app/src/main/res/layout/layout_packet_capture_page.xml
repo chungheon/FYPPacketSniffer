@@ -6,12 +6,13 @@
     android:layout_height="match_parent">
 
     <ScrollView
+        android:id="@+id/page_scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/capture_content"
+            android:id="@+id/page_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

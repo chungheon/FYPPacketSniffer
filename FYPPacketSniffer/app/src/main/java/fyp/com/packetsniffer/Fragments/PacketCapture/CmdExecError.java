@@ -16,12 +16,12 @@ import java.util.ArrayList;
 public class CmdExecError extends Thread {
     private final String TAG = "CmdExecution";
     private ArrayList<String> cmds;
-    private PacketAnalysisFragment mFragment;
+    private PacketCaptureInterface mFragment;
     private Process p;
     private Thread readOutput;
     private ReadOutput fileReader;
 
-    public CmdExecError(PacketAnalysisFragment fragment, ArrayList<String> cmds){
+    public CmdExecError(PacketCaptureInterface fragment, ArrayList<String> cmds){
         this.mFragment = fragment;
         this.cmds = cmds;
     }
@@ -150,15 +150,6 @@ public class CmdExecError extends Thread {
             readOutput.interrupt();
         }
         this.interrupt();
-    }
-    public static String readFully(InputStream is) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int length = 0;
-        while ((length = is.read(buffer)) != -1) {
-            baos.write(buffer, 0, length);
-        }
-        return baos.toString("UTF-8");
     }
 
     public class Closer {
