@@ -36,6 +36,8 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
     private Button analyseBtn;
     private long movement = 1050;
 
+    private boolean inProgress;
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_packet_analysis, container, false);
         initView();
@@ -56,6 +58,7 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
         output.setAdapter(mRVAdapter);
         output.setLayoutManager(mLayoutManager);
         this.pageText.setText("0/0");
+        this.inProgress = false;
     }
 
     private void initListener(){
@@ -73,18 +76,26 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
                 }
 
                 if(cmdRunnable != null){
-                    cmdRunnable.stopRun();
-                    final ArrayList<String> allCmd = cmds;
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<String>());
-                            output.setAdapter(mRVAdapter);
-                            runCmd(allCmd);
-                        }
-                    });
+                    if(inProgress){
+                        cmdRunnable.stopRun();
+                        inProgress = false;
+                    }else{
+                        final ArrayList<String> allCmd = cmds;
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<String>());
+                                output.setAdapter(mRVAdapter);
+                                pageText.setText("0/0");
+                                runCmd(allCmd);
+                            }
+                        });
+
+                        inProgress = true;
+                    }
                 }else{
                     runCmd(cmds);
+                    inProgress = true;
                 }
             }
         });
@@ -188,14 +199,20 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
                 @Override
                 public void run() {
                     int prevSize = mRVAdapter.getItemCount();
+                    int diff = result.size() - prevSize;
                     mRVAdapter.bindList(result);
                     final String[] pageInfo = pageText.getText().toString().split("/");
-                    mRVAdapter.notifyItemRangeInserted(prevSize, 5);
-                    pageText.setText(pageInfo[0] + "/" + result.size() + "/" + numOfPackets + " packets");
-
+                    mRVAdapter.notifyItemRangeInserted(prevSize - 1, 2);
+                    String text = pageInfo[0] + "/" + result.size() + "/" + numOfPackets + " packets";
+                    pageText.setText(text);
                 }
             });
         }
+    }
+
+    @Override
+    public void cmdDone() {
+        this.inProgress = false;
     }
 
     @Override

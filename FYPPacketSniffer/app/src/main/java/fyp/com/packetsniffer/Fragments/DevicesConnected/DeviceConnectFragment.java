@@ -202,28 +202,31 @@ public class DeviceConnectFragment extends Fragment {
         devInfos.add(0, devInfo);
         final ArrayList<DeviceInformation> devicesInfo = new ArrayList<>(devInfos);
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                int percentage = (int) (((double)devicesInfo.size()/(numOfHosts - 2)) * 100);
-                percentBar.setProgress(percentage);
-                percentText.setText(percentage + " %" + " " + (numOfHosts - 2) + "/" + devicesInfo.size());
-                ArrayList<DeviceInformation> foundDev = new ArrayList<>();
-                for(int i = 0; i < devicesInfo.size(); i++){
-                    if(!devicesInfo.get(i).getMacAddrs().equals("00:00:00:00:00:00")){
-                        foundDev.add(devicesInfo.get(i));
+        if(getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    int percentage = (int) (((double)devicesInfo.size()/(numOfHosts - 2)) * 100);
+                    percentBar.setProgress(percentage);
+                    percentText.setText(percentage + " %" + " " + (numOfHosts - 2) + "/" + devicesInfo.size());
+                    ArrayList<DeviceInformation> foundDev = new ArrayList<>();
+                    for(int i = 0; i < devicesInfo.size(); i++){
+                        if(!devicesInfo.get(i).getMacAddrs().equals("00:00:00:00:00:00")){
+                            foundDev.add(devicesInfo.get(i));
+                        }
                     }
+
+
+                    numDevices.setText(foundDev.size() + " Devices");
+
+                    RecyclerViewDeviceAdapter adapter = new RecyclerViewDeviceAdapter(foundDev, getContext());
+                    deviceList.setVisibility(View.VISIBLE);
+                    deviceList.setAdapter(adapter);
+                    deviceList.setLayoutManager(new LinearLayoutManager(getActivity()));
                 }
+            });
+        }
 
-
-                numDevices.setText(foundDev.size() + " Devices");
-
-                RecyclerViewDeviceAdapter adapter = new RecyclerViewDeviceAdapter(foundDev, getContext());
-                deviceList.setVisibility(View.VISIBLE);
-                deviceList.setAdapter(adapter);
-                deviceList.setLayoutManager(new LinearLayoutManager(getActivity()));
-            }
-        });
     }
 
     //Override for when the fragment is destroyed
@@ -347,16 +350,17 @@ public class DeviceConnectFragment extends Fragment {
     public void scanDone(ArrayList<DeviceInformation> devices, WifiInfo wifiInfo){
         scanInProgress = false;
         Log.d(TAG, "Scan Done");
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                runBtn.setImageResource(R.mipmap.refresh_scan_btn);
-                percentBar.setVisibility(View.INVISIBLE);
-                percentText.setVisibility(View.INVISIBLE);
-            }
-        });
-
-        storeCache(devices, wifiInfo);
+        if(getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    runBtn.setImageResource(R.mipmap.refresh_scan_btn);
+                    percentBar.setVisibility(View.INVISIBLE);
+                    percentText.setVisibility(View.INVISIBLE);
+                }
+            });
+            storeCache(devices, wifiInfo);
+        }
     }
 
     //Store data of the scan done to a file for future reference

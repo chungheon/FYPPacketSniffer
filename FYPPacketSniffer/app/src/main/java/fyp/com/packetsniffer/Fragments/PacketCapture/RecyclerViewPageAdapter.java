@@ -46,25 +46,6 @@ public class RecyclerViewPageAdapter extends RecyclerView.Adapter<RecyclerViewPa
         }else{
             viewHolder.pageLayout.setBackgroundColor(colorId2);
         }
-        /*TextView tv = new TextView(mContext);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(80, 100);
-        tv.setLayoutParams(layoutParams);
-        tv.setText(pages.get(i));
-        tv.setTextColor(Color.BLACK);
-        tv.setBackgroundColor(Color.TRANSPARENT);
-
-        Bitmap testB;
-
-        testB = Bitmap.createBitmap(80, 100, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(testB);
-        tv.layout(0, 0, 80, 100);
-        tv.draw(c);
-
-        viewHolder.pageText.setLayoutParams(layoutParams);
-        viewHolder.pageText.setBackgroundColor(Color.GRAY);
-        viewHolder.pageText.setImageBitmap(testB);
-        viewHolder.pageText.setMaxHeight(80);
-        viewHolder.pageText.setMaxWidth(80);*/
     }
 
     public void bindList(ArrayList<String> data){

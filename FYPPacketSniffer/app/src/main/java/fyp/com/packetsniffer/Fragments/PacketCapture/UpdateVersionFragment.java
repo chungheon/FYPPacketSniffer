@@ -136,6 +136,14 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
         updateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ArrayList<String> cmds = new ArrayList<>();
+
+                String dirPath = "/data/data/" + getActivity().getPackageName() + "/MyFiles";
+                File dir = new File(dirPath);
+                if(!dir.exists()){
+                    dir.mkdirs();
+                }
+
                 if(selected < 0){
                     printToast("Please select one of the choices");
                     return;
@@ -146,8 +154,7 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
                         byte[] buffer = new byte[is.available()];
                         is.read(buffer);
 
-                        String path = getActivity().getFilesDir().toString();
-                        File targetFile = new File(path + "/tcpdump");
+                        File targetFile = new File(dirPath + "/tcpdump");
                         FileOutputStream fileOutputStream = new FileOutputStream(targetFile);
                         fileOutputStream.write(buffer);
 
@@ -159,8 +166,7 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
                         byte[] buffer = new byte[is.available()];
                         is.read(buffer);
 
-                        String path = getActivity().getFilesDir().toString();
-                        File targetFile = new File(path + "/tcpdump");
+                        File targetFile = new File(dirPath + "/tcpdump");
                         FileOutputStream fileOutputStream = new FileOutputStream(targetFile);
                         fileOutputStream.write(buffer);
 
@@ -168,15 +174,12 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
                     } catch (IOException e) { }
                 }
 
-                String path = getActivity().getFilesDir().toString();
-                ArrayList<String> cmds = new ArrayList<>();
                 cmds.add("mount -o rw,remount /system");
-
-                cmds.add("cp " + path + "/tcpdump" + " /system/xbin/tcpdump");
-                cmds.add("chmod 555 /system/xbin/tcpdump");
+                cmds.add("chmod 777 " +  dirPath + "/tcpdump");
+                cmds.add("cp " + dirPath + "/tcpdump /system/xbin/tcpdump");
+                cmds.add("rm " + dirPath + "/tcpdump");
                 cmds.add("tcpdump --version");
                 cmds.add("mount -o ro,remount /system");
-                cmds.add("rm " + path + "/tcpdump");
 
                 if(cmdRunnable != null){
                     cmdRunnable.stopRun();
@@ -213,8 +216,8 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
                     mRVAdapter.bindList(result);
                     final String[] pageInfo = pageText.getText().toString().split("/");
                     mRVAdapter.notifyItemRangeInserted(prevSize, 5);
-                    pageText.setText(pageInfo[0] + "/" + result.size() + "/" + numOfPackets + " packets");
-
+                    String text = pageInfo[0] + "/" + result.size();
+                    pageText.setText(text);
                 }
             });
         }
@@ -228,5 +231,10 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
                 Toast.makeText(getContext().getApplicationContext(), message, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    public void cmdDone() {
+
     }
 }

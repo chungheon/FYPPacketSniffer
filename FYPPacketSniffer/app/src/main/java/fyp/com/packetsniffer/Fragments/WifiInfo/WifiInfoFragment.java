@@ -17,24 +17,17 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.Pair;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.lang.reflect.Field;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,6 +47,7 @@ public class WifiInfoFragment extends Fragment {
     private TextView networkType;
     private NetworkStateChangeReceiver receiver;
     private IntentFilter intentFilter;
+    private Context mContext;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,6 +64,7 @@ public class WifiInfoFragment extends Fragment {
         this.mWifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         this.mConnManager = (ConnectivityManager) getContext().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         this.mTeleManager = (TelephonyManager) getContext().getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+        this.mContext = getContext();
         receiver = new NetworkStateChangeReceiver();
         intentFilter = new IntentFilter();
         if(Build.VERSION.SDK_INT < 28){
@@ -92,7 +87,6 @@ public class WifiInfoFragment extends Fragment {
                         refresh();
                     }
             }
-            //Log.d(TAG, "Detected intent " + action);
         }
     }
 
@@ -101,7 +95,6 @@ public class WifiInfoFragment extends Fragment {
         try {
             getActivity().unregisterReceiver(receiver);
         }catch(IllegalArgumentException e){ }
-        //Log.d(TAG, "Fragment Destroyed");
         super.onDestroyView();
     }
     @Override
@@ -146,9 +139,19 @@ public class WifiInfoFragment extends Fragment {
         networkType.setText("NO CONNECTION");
         List<Pair<String, String>> connItem = new ArrayList<>();
         Pair<String, String> connType = new Pair<>("Connection Type", "DISCONNECTED");
+        final List<Pair<String, String>> items = connItem;
+        if(getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ListViewWifiInfoAdaptor connAdaptor = new ListViewWifiInfoAdaptor(mContext,
+                            R.layout.layout_infoitem,
+                            (ArrayList<Pair<String, String>>) items);
+                    wifiList.setAdapter(connAdaptor);
+                }
+            });
+        }
 
-        ListViewWifiInfoAdaptor connAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) connItem);
-        wifiList.setAdapter(connAdaptor);
     }
 
     private void displayWifi(){
@@ -192,8 +195,20 @@ public class WifiInfoFragment extends Fragment {
         connItem.add(dnsIP);
         connItem.add(ipv6Address);
 
-        ListViewWifiInfoAdaptor connAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) connItem);
-        wifiList.setAdapter(connAdaptor);
+        final List<Pair<String, String>> items = connItem;
+        if(getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ListViewWifiInfoAdaptor connAdaptor = new ListViewWifiInfoAdaptor(mContext,
+                                    R.layout.layout_infoitem,
+                                    (ArrayList<Pair<String, String>>) items);
+                    wifiList.setAdapter(connAdaptor);
+                }
+            });
+        }
+
+
     }
 
     private String getSubMask(){
@@ -238,8 +253,19 @@ public class WifiInfoFragment extends Fragment {
         connItem.add(roamFlag);
         connItem.add(ipAddr);
 
-        ListViewWifiInfoAdaptor connAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) connItem);
-        wifiList.setAdapter(connAdaptor);
+        final List<Pair<String, String>> items = connItem;
+
+        if(getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ListViewWifiInfoAdaptor connAdaptor = new ListViewWifiInfoAdaptor(mContext,
+                                    R.layout.layout_infoitem,
+                                    (ArrayList<Pair<String, String>>) items);
+                    wifiList.setAdapter(connAdaptor);
+                }
+            });
+        }
     }
 
     private String getMobileIPAddress() {
@@ -357,8 +383,19 @@ public class WifiInfoFragment extends Fragment {
             connItem.add(ipv6Address);
             connItem.add(dnsIP6);
 
-            ListViewWifiInfoAdaptor connAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) connItem);
-            wifiList.setAdapter(connAdaptor);
+            final List<Pair<String, String>> items = connItem;
+            if(getActivity() != null){
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ListViewWifiInfoAdaptor connAdaptor = new ListViewWifiInfoAdaptor(mContext,
+                                        R.layout.layout_infoitem,
+                                        (ArrayList<Pair<String, String>>) items);
+                        wifiList.setAdapter(connAdaptor);
+                    }
+                });
+            }
+
         }
     }
 
@@ -389,22 +426,55 @@ public class WifiInfoFragment extends Fragment {
                 detailItem.add(speed);
                 detailItem.add(signal);
 
-                ListViewWifiInfoAdaptor detailAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) detailItem);
-                detailList.setAdapter(detailAdaptor);
+                final List<Pair<String, String>> items = detailItem;
+                if(getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ListViewWifiInfoAdaptor detailAdaptor = new ListViewWifiInfoAdaptor(mContext,
+                                    R.layout.layout_infoitem,
+                                    (ArrayList<Pair<String, String>>) items);
+                            detailList.setAdapter(detailAdaptor);
+                        }
+                    });
+
+                }
             }else{
                 state = new Pair<>("Connection State", "Disconnected");
 
                 detailItem.add(enabled);
                 detailItem.add(state);
 
-                ListViewWifiInfoAdaptor detailAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) detailItem);
-                detailList.setAdapter(detailAdaptor);
+
+                final List<Pair<String, String>> items = detailItem;
+                if(getActivity() != null){
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ListViewWifiInfoAdaptor detailAdaptor = new ListViewWifiInfoAdaptor(mContext,
+                                    R.layout.layout_infoitem,
+                                    (ArrayList<Pair<String, String>>) items);
+                            detailList.setAdapter(detailAdaptor);
+                        }
+                    });
+                }
             }
         }else{
             Pair<String, String> enabled = new Pair<>("Enabled", "No");
             detailItem.add(enabled);
-            ListViewWifiInfoAdaptor detailAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) detailItem);
-            detailList.setAdapter(detailAdaptor);
+
+            final List<Pair<String, String>> items = detailItem;
+            if(getActivity() != null){
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ListViewWifiInfoAdaptor detailAdaptor = new ListViewWifiInfoAdaptor(mContext,
+                                R.layout.layout_infoitem,
+                                (ArrayList<Pair<String, String>>) items);
+                        detailList.setAdapter(detailAdaptor);
+                    }
+                });
+            }
         }
 
         ArrayList<Pair<String, String>> cellItem = new ArrayList<>();
@@ -440,9 +510,18 @@ public class WifiInfoFragment extends Fragment {
             cellItem.add(simCard);
         }
 
-        ListViewWifiInfoAdaptor cellAdaptor = new ListViewWifiInfoAdaptor(this.getContext(), R.layout.layout_infoitem, (ArrayList<Pair<String, String>>) cellItem);
-        cellList.setAdapter(cellAdaptor);
-
+        final List<Pair<String, String>> items = cellItem;
+        if(getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ListViewWifiInfoAdaptor cellAdaptor = new ListViewWifiInfoAdaptor(mContext,
+                            R.layout.layout_infoitem,
+                            (ArrayList<Pair<String, String>>) items);
+                    cellList.setAdapter(cellAdaptor);
+                }
+            });
+        }
     }
 
     private String getCellNetworkType(){

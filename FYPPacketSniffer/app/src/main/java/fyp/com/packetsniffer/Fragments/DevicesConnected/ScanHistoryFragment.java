@@ -65,32 +65,34 @@ public class ScanHistoryFragment extends Fragment {
     //Retrieve history of past scans saved in caches
     private void displayHistory(){
         getHistory();
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                RecyclerViewHistoryAdapter adapter = new RecyclerViewHistoryAdapter(wifiSSIDs,
-                        getContext().getApplicationContext(),
-                        new RecyclerViewHistoryAdapter.OnItemClickListener(){
-                            @Override
-                            public void onItemClick(Pair<String, String> item) {
-                                String path = getActivity().getFilesDir() + "/ScanHistory/"
-                                        + item.first + "_" + item.second;
-                                DevicesHistoryFragment devHistory = new DevicesHistoryFragment();
-                                Bundle args = new Bundle();
-                                args.putString("Filename", path);
-                                devHistory.setArguments(args);
-                                ((MainActivity)getActivity()).getSupportActionBar().setTitle(item.first);
-                                ((MainActivity)getActivity()).enableViews(true, 2);
-                                getActivity().getSupportFragmentManager().beginTransaction()
-                                        .addToBackStack(null)
-                                        .replace(R.id.fragment_container, devHistory, "DevicesHistory")
-                                        .commit();
-                            }
-                        });
-                wifiList.setAdapter(adapter);
-                wifiList.setLayoutManager(new LinearLayoutManager(getActivity()));
-            }
-        });
+        if(getActivity() != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    RecyclerViewHistoryAdapter adapter = new RecyclerViewHistoryAdapter(wifiSSIDs,
+                            getContext().getApplicationContext(),
+                            new RecyclerViewHistoryAdapter.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(Pair<String, String> item) {
+                                    String path = getActivity().getFilesDir() + "/ScanHistory/"
+                                            + item.first + "_" + item.second;
+                                    DevicesHistoryFragment devHistory = new DevicesHistoryFragment();
+                                    Bundle args = new Bundle();
+                                    args.putString("Filename", path);
+                                    devHistory.setArguments(args);
+                                    ((MainActivity) getActivity()).getSupportActionBar().setTitle(item.first);
+                                    ((MainActivity) getActivity()).enableViews(true, 2);
+                                    getActivity().getSupportFragmentManager().beginTransaction()
+                                            .addToBackStack(null)
+                                            .replace(R.id.fragment_container, devHistory, "DevicesHistory")
+                                            .commit();
+                                }
+                            });
+                    wifiList.setAdapter(adapter);
+                    wifiList.setLayoutManager(new LinearLayoutManager(getActivity()));
+                }
+            });
+        }
     }
 
     //Read cache containing past scans

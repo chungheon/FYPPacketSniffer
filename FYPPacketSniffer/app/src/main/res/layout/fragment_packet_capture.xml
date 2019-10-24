@@ -15,26 +15,49 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/capture_num"
-                android:layout_width="250dp"
-                android:layout_height="50dp"
-                android:textSize="20sp"
-                android:hint="eg.1000"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-            <Button android:id="@+id/capture_btn"
+            <TextView
+                android:id="@+id/capture_file_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:layout_marginTop="10dp"
+                android:text="Output File Name:"
+                android:textSize="20sp"/>
+
+            <EditText
+                android:id="@+id/capture_file_name"
+                android:layout_width="250dp"
+                android:layout_height="50dp"
+                android:textSize="20sp"
+                android:hint="eg. PCAP_001.pcap"
+                app:layout_constraintLeft_toRightOf="@id/capture_file_text"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <Button
+                android:id="@+id/capture_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/capture_interface"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:layout_marginTop="10dp"
+                android:text="Start Capture" />
+
+            <Button
+                android:id="@+id/capture_refresh_pages"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/capture_interface"
                 app:layout_constraintRight_toRightOf="parent"
-                android:text="Start" />
+                android:layout_marginTop="10dp"
+                android:text="refresh"
+                />
+
             <Spinner
                 android:id="@+id/capture_interface"
                 android:layout_width="150dp"
                 android:layout_height="50dp"
-                app:layout_constraintTop_toBottomOf="@+id/capture_num"
+                app:layout_constraintTop_toBottomOf="@+id/capture_file_name"
                 app:layout_constraintLeft_toRightOf="@id/capture_text_interface"/>
 
             <TextView
@@ -42,7 +65,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/capture_num"
+                app:layout_constraintTop_toBottomOf="@id/capture_file_name"
+                android:layout_marginTop="10dp"
                 android:hint="Available Interfaces:"
                 android:textSize="20sp"/>
 
