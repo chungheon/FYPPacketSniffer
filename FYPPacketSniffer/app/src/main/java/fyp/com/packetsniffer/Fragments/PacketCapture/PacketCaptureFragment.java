@@ -5,17 +5,14 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,20 +30,14 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
     private static final String TAG = "PacketCapture";
     private View view;
     private EditText fileOutput;
-    private TextView pageText;
+    private TextView numPacketsText;
     private Button captureBtn;
-    private Button refreshBtn;
-    private RecyclerView captureOutput;
     private boolean inProgress;
     private Spinner interfaceSpinner;
 
-    private RecyclerView.LayoutManager mLayoutManager;
-    private RecyclerViewPageAdapter mRVAdapter;
-
     private CmdExec cmdRunnable;
-    private long movement = 1050;
     private String fileOut;
-    private boolean background;
+    private int selected = 0;
 
     private List<String> interfaces;
     @Nullable
@@ -60,20 +51,11 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
 
     private void initView(){
         this.fileOutput = (EditText) view.findViewById(R.id.capture_file_name);
-        this.captureOutput = (RecyclerView) view.findViewById(R.id.capture_output);
         this.captureBtn = (Button) view.findViewById(R.id.capture_btn);
-        this.pageText = (TextView) view.findViewById(R.id.capture_num_page);
-        this.refreshBtn = (Button) view.findViewById(R.id.capture_refresh_pages);
+        this.numPacketsText = (TextView) view.findViewById(R.id.capture_num_page);
         this.interfaceSpinner = (Spinner) view.findViewById(R.id.capture_interface);
 
-        mLayoutManager = new LinearLayoutManager(getContext().getApplicationContext(),
-                LinearLayout.HORIZONTAL,
-                false);
-        mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<String>());
-        captureOutput.setAdapter(mRVAdapter);
-        captureOutput.setLayoutManager(mLayoutManager);
-        ViewCompat.setNestedScrollingEnabled(captureOutput, true);
-        this.pageText.setText("0/0");
+        this.numPacketsText.setText("Waiting to start");
         inProgress = false;
         interfaces = new ArrayList<String>();
         updateSpinner();
@@ -86,6 +68,7 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
             public void onClick(View v) {
                 ArrayList<String> cmds = new ArrayList<>();
                 String fileName = fileOutput.getText().toString();
+                fileName = fileName.replaceAll(" ", "_");
                 if(fileName.equals("")){
                     fileName = "PCAP.pcap";
                 }
@@ -103,82 +86,42 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
 
                 }
 
-                cmds.add("tcpdump -w - -U | tee " + filePath + " | tcpdump -r - -tttt");
+                String cmd = "tcpdump -w - -U | tee " + filePath + " | tcpdump -r -";
+                if(selected > 0){
+                    cmd += " -i " + selected;
+                }
+                printToast(cmd);
+                cmds.add(cmd);
                 if(cmdRunnable != null){
                     if(inProgress){
                         cmdRunnable.stopRun();
+                        numPacketsText.setText("Waiting to start");
                         inProgress = false;
                     }else{
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<String>());
-                                captureOutput.setAdapter(mRVAdapter);
-                                pageText.setText("0/0");
-                            }
-                        });
-                        runCmd(cmds);
-                        inProgress = true;
+                        if(getActivity() != null){
+                            numPacketsText.setText("Capturing...");
+                            runCmd(cmds);
+                            inProgress = true;
+                        }
                     }
                 }else{
                     runCmd(cmds);
+                    numPacketsText.setText("Capturing...");
                     inProgress = true;
                 }
             }
         });
 
-        captureOutput.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        interfaceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (dx > 0) {
-                    final String[] pageInfo = pageText.getText().toString().split("/");
-                    long totalpages = Integer.parseInt(pageInfo[1]) * 1050;
-                    if(movement <= totalpages && pageInfo.length == 3){
-                        movement += dx;
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                pageText.setText((((movement + 200)/1050)) + "/" + pageInfo[1] + "/" + pageInfo[2]);
-                            }
-                        });
-                    }
-                    if(movement > totalpages){
-                        movement = totalpages;
-                    }
-                } else {
-                    final String[] pageInfo = pageText.getText().toString().split("/");
-                    if((movement-1050)<= (dx * -1)){
-                        movement = 1050;
-                    }else{
-                        movement += dx;
-                        if(pageInfo.length == 3){
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    pageText.setText((((movement + 600)/1050)) + "/" + pageInfo[1] + "/" + pageInfo[2]);
-                                }
-                            });
-                        }
-                    }
-
-                    if(movement == 1050 && pageInfo.length == 3){
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                pageText.setText("1/" + pageInfo[1] + "/" + pageInfo[2]);
-                            }
-                        });
-                    }
-
-                }
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selected = position;
+                printToast(position + " " + selected);
             }
-        });
 
-        refreshBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                resetPages();
+            public void onNothingSelected(AdapterView<?> parent) {
+                selected = -1;
             }
         });
     }
@@ -192,11 +135,12 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
             process.waitFor();
             in = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
+            interfaces.add("Default (Any)");
             while ((line = in.readLine()) != null) {
                 Log.d(TAG, line);
                 if(line.matches("(.*)Up(.*)")){
                     String[] availInterface = line.split("\\[");
-                    interfaces.add(availInterface[0].substring(0,availInterface[0].length()-2));
+                    interfaces.add(availInterface[0]);
                 }
             }
 
@@ -222,7 +166,7 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
         }
 
         if(interfaces.isEmpty()){
-            interfaces.add("-");
+            interfaces.add("Default (Any)");
             ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext().getApplicationContext()
                     ,android.R.layout.simple_spinner_dropdown_item,interfaces);
             interfaceSpinner.setAdapter(adp);
@@ -235,23 +179,17 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
 
     private void runCmd(ArrayList<String> args){
         cmdRunnable = new CapturePacketThread(this, args);
-        Thread test = new Thread(cmdRunnable);
-        test.start();
+        Thread packetCapture = new Thread(cmdRunnable);
+        packetCapture.start();
     }
 
     @Override
     public void printResult(final ArrayList<String> result,final long numOfPackets) {
-        if(getActivity() != null && !background){
+        if(getActivity() != null){
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    int prevSize = mRVAdapter.getItemCount();
-                    int diff = result.size() - prevSize;
-                    mRVAdapter.bindList(result);
-                    final String[] pageInfo = pageText.getText().toString().split("/");
-                    mRVAdapter.notifyItemRangeInserted(prevSize, 1);
-                    pageText.setText(pageInfo[0] + "/" + result.size() + "/" + numOfPackets + " packets");
-
+                    numPacketsText.setText(numOfPackets + " packets");
                 }
             });
         }
@@ -273,35 +211,6 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
     @Override
     public void cmdDone() {
         printToast("Packets saved to " + fileOut);
-    }
-
-    @Override
-    public void onPause() {
-        background = true;
-        super.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        background = false;
-        super.onResume();
-    }
-
-    private void resetPages(){
-        if(getActivity() != null){
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    captureOutput.setAdapter(mRVAdapter);
-                    captureOutput.setLayoutManager(mLayoutManager);
-                    final String[] pageInfo = pageText.getText().toString().split("/");
-                    if(pageInfo.length > 3){
-                        pageText.setText("1/" + mRVAdapter.getItemCount() + "/" + pageInfo[2]);
-                    }
-                    movement = 1050;
-                }
-            });
-        }
     }
 
     @Override
