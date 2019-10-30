@@ -219,7 +219,7 @@ public class DeviceConnectFragment extends Fragment {
 
                     numDevices.setText(foundDev.size() + " Devices");
 
-                    RecyclerViewDeviceAdapter adapter = new RecyclerViewDeviceAdapter(foundDev, getContext());
+                    RecyclerViewDeviceAdapter adapter = new RecyclerViewDeviceAdapter(foundDev);
                     deviceList.setVisibility(View.VISIBLE);
                     deviceList.setAdapter(adapter);
                     deviceList.setLayoutManager(new LinearLayoutManager(getActivity()));

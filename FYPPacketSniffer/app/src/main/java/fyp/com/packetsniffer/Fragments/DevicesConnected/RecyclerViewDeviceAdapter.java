@@ -22,11 +22,9 @@ public class RecyclerViewDeviceAdapter extends RecyclerView.Adapter<RecyclerView
     private static final String TAG = "RecyclerViewDevAdapter"; //Tag used for debugging purposes
 
     private ArrayList<DeviceInformation> devices; //ArrayList of DeviceInformation to populate the RecyclerView
-    private Context mContext; //UI Context to display on the correct UI
 
-    public RecyclerViewDeviceAdapter(ArrayList<DeviceInformation> devices, Context context){
+    public RecyclerViewDeviceAdapter(ArrayList<DeviceInformation> devices){
         this.devices = devices;
-        this.mContext = context;
     }
     @NonNull
     @Override

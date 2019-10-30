@@ -3,4 +3,14 @@
 
     <string name="nav_drawer_open">Open Navigation Drawer</string>
     <string name="nav_drawer_close">Close Navigation Drawer</string>
+    <string name="filter_1">All Packets (default)</string>
+    <string name="filter_2">FTP Packets (port 21)</string>
+    <string name="filter_3">HTTP (Cookies,User-Agents,Host Headers)</string>
+    <string name="filter_4">NTP Packets (port 123)</string>
+    <string name="filter_5">DNS Packets (port 53)</string>
+    <string name="filter_6">TCP Packets</string>
+    <string name="filter_7">UDP Packets</string>
+    <string name="filter_8">ICMP Packets</string>
+    <string name="select_file">Select File</string>
+
 </resources>

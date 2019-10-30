@@ -46,12 +46,14 @@ public class CmdExecError extends CmdExec {
                 Log.d(TAG, "Thread Interrupted closing");
             }
         } catch (IOException e){
-            return;
-        } finally {
             if(outputStream != null){
                 try {
                     outputStream.close();
-                } catch (IOException e) { }
+                } catch (IOException ex) { }
+            }
+        } finally {
+            if(p != null){
+                p.destroy();
             }
         }
     }

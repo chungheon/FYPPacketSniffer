@@ -13,7 +13,7 @@
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"></android.support.v4.view.ViewPager>
+        android:layout_weight="1"/>
 
     <LinearLayout
         android:layout_height="match_parent"
@@ -49,7 +49,6 @@
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_menu"
         android:theme="@style/PopupMenu"/>
->>>>>>> GUI-Design
 
 
 </android.support.v4.widget.DrawerLayout>

@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import fyp.com.packetsniffer.R;
@@ -26,6 +27,12 @@ public class RecyclerViewPageAdapter extends RecyclerView.Adapter<RecyclerViewPa
     public RecyclerViewPageAdapter (Context context, ArrayList<String> pages){
         this.mContext = context;
         this.pages = pages;
+    }
+
+    public RecyclerViewPageAdapter (Context context, String message){
+        this.mContext = context;
+        this.pages = new ArrayList<>();
+        pages.add(message);
     }
     @NonNull
     @Override

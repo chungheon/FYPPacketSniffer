@@ -5,11 +5,11 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/test1"
+            android:id="@+id/scan_devices"
             android:icon="@mipmap/device_conn"
             android:title="Scan Network" />
         <item
-            android:id="@+id/test2"
+            android:id="@+id/wifi_details"
             android:icon="@mipmap/wifi_details"
             android:title="Network Details" />
         <item
@@ -28,7 +28,7 @@
             <item
                 android:id="@+id/test5"
                 android:icon="@drawable/ic_test1"
-                android:title="test5" />
+                android:title="Update TCPDUMP" />
             <item
                 android:id="@+id/test6"
                 android:icon="@drawable/ic_test1"

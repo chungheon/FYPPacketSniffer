@@ -189,13 +189,13 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
                         public void run() {
                             mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<String>());
                             output.setAdapter(mRVAdapter);
-                            cmdRunnable = new CmdExecError(mFragment, allCmd);
+                            cmdRunnable = new UpdateVersionThread(mFragment, allCmd);
                             Thread update = new Thread(cmdRunnable);
                             update.start();
                         }
                     });
                 }else{
-                    cmdRunnable = new CmdExecError(mFragment, cmds);
+                    cmdRunnable = new UpdateVersionThread(mFragment, cmds);
                     Thread update = new Thread(cmdRunnable);
                     update.start();
                 }

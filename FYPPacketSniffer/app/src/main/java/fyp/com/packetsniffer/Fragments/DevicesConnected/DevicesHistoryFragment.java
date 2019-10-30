@@ -70,7 +70,7 @@ public class DevicesHistoryFragment extends Fragment {
         Log.d(TAG, "File path: " + path);
         readFromFile(path);
 
-        RecyclerViewDeviceAdapter deviceAdapter = new RecyclerViewDeviceAdapter(devices, getContext());
+        RecyclerViewDeviceAdapter deviceAdapter = new RecyclerViewDeviceAdapter(devices);
         listOfDevices.setAdapter(deviceAdapter);
         listOfDevices.setLayoutManager(new LinearLayoutManager(getActivity()));
     }

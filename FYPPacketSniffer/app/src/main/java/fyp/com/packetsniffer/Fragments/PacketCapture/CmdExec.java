@@ -22,6 +22,7 @@ public class CmdExec extends Thread {
     protected PacketCaptureInterface mFragment;
     protected Process p;
     protected InputStream response;
+    protected DataOutputStream outputStream;
     protected ReadOutput fileReader;
 
 
@@ -37,15 +38,16 @@ public class CmdExec extends Thread {
         }
 
 
-        public synchronized void run() {
-        }
+        public synchronized void run() { }
     }
     public void run() {
-        DataOutputStream outputStream = null;
+        outputStream = null;
         Thread readOutput = null;
         try {
-
-            p = Runtime.getRuntime().exec("su");
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            processBuilder.command("su");
+            //processBuilder.redirectErrorStream(true);
+            p = processBuilder.start();
             outputStream = new DataOutputStream(p.getOutputStream());
             response = p.getInputStream();
             fileReader.setInputStream(response);
@@ -56,7 +58,6 @@ public class CmdExec extends Thread {
                 outputStream.flush();
             }
 
-
             outputStream.writeBytes("exit\n");
             outputStream.flush();
 
@@ -65,13 +66,18 @@ public class CmdExec extends Thread {
             } catch (InterruptedException e) {
                 Log.d(TAG, "Thread Interrupted closing");
             }
+
+            Log.d(TAG, "Process Done");
+            outputStream.close();
         } catch (IOException e){
-            return;
-        } finally {
             if(outputStream != null){
                 try {
                     outputStream.close();
-                } catch (IOException e) { }
+                } catch (IOException ex) { }
+            }
+        } finally {
+            if(p != null){
+                p.destroy();
             }
         }
     }

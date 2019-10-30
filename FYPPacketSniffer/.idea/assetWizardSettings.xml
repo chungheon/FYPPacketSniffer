@@ -140,7 +140,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_refresh_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/hardware/ic_keyboard_arrow_down_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -164,7 +164,7 @@
                                       <entry key="backgroundColor" value="000000" />
                                       <entry key="cropped" value="true" />
                                       <entry key="imageAsset" value="D:\Test\FYP\ICONS\Designed\packetcapture.png" />
-                                      <entry key="outputName" value="refresh_scan_btn" />
+                                      <entry key="outputName" value="view_filters_btn" />
                                     </map>
                                   </option>
                                 </PersistentState>

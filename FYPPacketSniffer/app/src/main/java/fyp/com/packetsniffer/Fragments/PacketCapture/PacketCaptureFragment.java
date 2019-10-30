@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,6 +31,7 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
     private static final String TAG = "PacketCapture";
     private View view;
     private EditText fileOutput;
+
     private TextView numPacketsText;
     private Button captureBtn;
     private boolean inProgress;
@@ -38,6 +40,7 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
     private CmdExec cmdRunnable;
     private String fileOut;
     private int selected = 0;
+    private String selectedFile = "";
 
     private List<String> interfaces;
     @Nullable
@@ -70,42 +73,41 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
                 String fileName = fileOutput.getText().toString();
                 fileName = fileName.replaceAll(" ", "_");
                 if(fileName.equals("")){
-                    fileName = "PCAP.pcap";
+                    fileName = "PCAP";
                 }
+                fileName += ".pcap";
                 String filePath = Environment.getExternalStorageDirectory().toString() +
                         "/" + fileName;
                 File file = new File(filePath);
                 fileOut = fileName;
-                int count = 1;
+                int count = 0;
                 while(file.exists()){
+                    count++;
                     filePath = Environment.getExternalStorageDirectory().toString() +
                             "/" + count + "_" + fileName;
                     fileOut = count + "_" + fileName;
-                    count++;
                     file = new File(filePath);
-
                 }
 
-                String cmd = "tcpdump -w - -U | tee " + filePath + " | tcpdump -r -";
-                if(selected > 0){
-                    cmd += " -i " + selected;
+                String cmd = "tcpdump";
+                if(selected > -1) {
+                    cmd += " -i " + (selected + 1);
                 }
-                printToast(cmd);
+                cmd += " -w - -U | tee " + filePath + " | tcpdump -r -";
                 cmds.add(cmd);
                 if(cmdRunnable != null){
                     if(inProgress){
                         cmdRunnable.stopRun();
-                        numPacketsText.setText("Waiting to start");
                         inProgress = false;
                     }else{
                         if(getActivity() != null){
                             numPacketsText.setText("Capturing...");
-                            runCmd(cmds);
+                            runCmd(cmds, filePath);
                             inProgress = true;
                         }
                     }
                 }else{
-                    runCmd(cmds);
+                    runCmd(cmds, filePath);
                     numPacketsText.setText("Capturing...");
                     inProgress = true;
                 }
@@ -116,7 +118,6 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selected = position;
-                printToast(position + " " + selected);
             }
 
             @Override
@@ -126,16 +127,19 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
         });
     }
 
+    /*
+
+
+    */
     private void updateSpinner(){
 
         BufferedReader in = null;
+        Process p = null;
         try {
             String[] cmds = {"su", "-c", "tcpdump -D"};
-            Process process = Runtime.getRuntime().exec(cmds);
-            process.waitFor();
-            in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            p = Runtime.getRuntime().exec(cmds);
+            in = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
-            interfaces.add("Default (Any)");
             while ((line = in.readLine()) != null) {
                 Log.d(TAG, line);
                 if(line.matches("(.*)Up(.*)")){
@@ -143,25 +147,27 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
                     interfaces.add(availInterface[0]);
                 }
             }
-
-
-
             in.close();
+            int exitCode = p.waitFor();
         } catch (IOException e) {
             e.printStackTrace();
+            interfaces.clear();
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ex) {
+                }
+            }
+        } catch (InterruptedException e) {
             interfaces.clear();
             if(in != null){
                 try{
                     in.close();
                 } catch (IOException ex) { }
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            interfaces.clear();
-            if(in != null){
-                try{
-                    in.close();
-                } catch (IOException ex) { }
+        }finally {
+            if(p != null){
+                p.destroy();
             }
         }
 
@@ -177,10 +183,9 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
         }
     }
 
-    private void runCmd(ArrayList<String> args){
-        cmdRunnable = new CapturePacketThread(this, args);
-        Thread packetCapture = new Thread(cmdRunnable);
-        packetCapture.start();
+    private void runCmd(ArrayList<String> args, String filePath){
+        cmdRunnable = new CapturePacketThread(this, args, filePath);
+        cmdRunnable.start();
     }
 
     @Override

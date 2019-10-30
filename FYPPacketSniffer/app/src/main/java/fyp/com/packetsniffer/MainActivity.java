@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(savedInstanceState == null){
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new DeviceConnectFragment()).commit();
             getSupportActionBar().setTitle("Scan Network");
-            navView.setCheckedItem(R.id.test1);
+            navView.setCheckedItem(R.id.scan_devices);
         }
     }
 
@@ -130,12 +130,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch(menuItem.getItemId()){
-            case R.id.test1: getSupportFragmentManager().beginTransaction()
+            case R.id.scan_devices: getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new DeviceConnectFragment())
                     .commit();
                 toolbar.setTitle("Scan Network");
                 break;
-            case R.id.test2: getSupportFragmentManager().beginTransaction()
+            case R.id.wifi_details: getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new WifiInfoFragment())
                     .commit();
                 toolbar.setTitle("Network Details");
@@ -150,6 +150,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .commit();
                 toolbar.setTitle("Packet Analysis");
                 break;
+            case R.id.test5: getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new UpdateVersionFragment())
+                    .commit();
+                toolbar.setTitle("Packet Capture");
+                    break;
         }
 
         drawerLayout.closeDrawer(Gravity.START);

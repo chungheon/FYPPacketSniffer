@@ -1,9 +1,12 @@
 package fyp.com.packetsniffer.Fragments.PacketCapture;
 
+import android.arch.lifecycle.ViewModel;
+import android.arch.lifecycle.ViewModelProvider;
 import android.os.Bundle;
 import android.os.Environment;
 import android.renderscript.ScriptGroup;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,12 +16,18 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 
+import fyp.com.packetsniffer.Fragments.FileChooser;
+import fyp.com.packetsniffer.MainActivity;
 import fyp.com.packetsniffer.R;
 
 public class PacketAnalysisFragment extends Fragment implements PacketCaptureInterface {
@@ -32,11 +41,20 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
     private Button jumpBtn;
     private EditText pageJump;
     private TextView pageText;
-    private CmdExec cmdRunnable;
     private Button analyseBtn;
-    private long movement = 1050;
+    private TextView selectedText;
+    private Button selectFileBtn;
+    private RadioGroup filters;
+    private CardView filterMenu;
+    private ImageButton expandFilters;
 
+    private long movement = 1050;
+    private String filter = "";
+    private String grep = "";
+    private int mode = 0;
     private boolean inProgress;
+    private CmdExec cmdRunnable;
+    private FileChooser fileChooser;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_packet_analysis, container, false);
@@ -51,6 +69,12 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
         this.jumpBtn = (Button) view.findViewById(R.id.jump_btn);
         this.pageJump = (EditText) view.findViewById(R.id.jump_page);
         this.pageText = (TextView) view.findViewById(R.id.num_page);
+        this.selectedText = (TextView) view.findViewById(R.id.analyse_selected_file);
+        this.selectFileBtn = (Button) view.findViewById(R.id.analyse_select_file);
+        this.filterMenu = (CardView) view.findViewById(R.id.analyse_filters);
+        this.expandFilters = (ImageButton) view.findViewById(R.id.analyse_view_filters_btn);
+        this.filters = (RadioGroup) view.findViewById(R.id.analyse_filter_options);
+
         mLayoutManager = new LinearLayoutManager(getContext().getApplicationContext(),
                 LinearLayout.HORIZONTAL,
                 false);
@@ -59,6 +83,12 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
         output.setLayoutManager(mLayoutManager);
         this.pageText.setText("0/0");
         this.inProgress = false;
+        this.fileChooser = new FileChooser(getActivity());
+        jumpBtn.setVisibility(View.GONE);
+        pageJump.setVisibility(View.GONE);
+        output.setVisibility(View.GONE);
+        pageText.setVisibility(View.GONE);
+        showAllUI();
     }
 
     private void initListener(){
@@ -67,33 +97,61 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
             @Override
             public void onClick(View v) {
                 ArrayList<String> cmds = new ArrayList<>();
-                cmds.add("tcpdump --version");
-                String filePath = getActivity().getFilesDir().toString();
-                String[] cmd = (pageJump.getText().toString())
-                        .split(":");
-                for(String str: cmd){
-                    cmds.add(str);
+                String filePath = selectedText.getText().toString();
+                File file = new File(filePath);
+
+                if(!file.exists()){
+                    printToast("Please select a valid file");
+                    return;
                 }
+
+                String cmd = "tcpdump " + filter + "-ttttvv -r " + filePath + grep;
+
+                printToast(cmd);
+                cmds.add(cmd);
 
                 if(cmdRunnable != null){
                     if(inProgress){
                         cmdRunnable.stopRun();
                         inProgress = false;
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                analyseBtn.setText("Review");
+                                if(mRVAdapter.getItemCount() == 0){
+                                    mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(),
+                                                    "No packets available");
+                                    output.setAdapter(mRVAdapter);
+                                }
+                                showAllUI();
+                            }
+                        });
                     }else{
                         final ArrayList<String> allCmd = cmds;
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<String>());
+                                mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(),
+                                        new ArrayList<String>());
                                 output.setAdapter(mRVAdapter);
                                 pageText.setText("0/0");
-                                runCmd(allCmd);
+                                analyseBtn.setText("Stop Review");
+                                hideAllUI();
                             }
                         });
-
+                        movement = 1050;
+                        runCmd(allCmd);
                         inProgress = true;
                     }
                 }else{
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            pageText.setText("0/0");
+                            analyseBtn.setText("Stop Review");
+                            hideAllUI();
+                        }
+                    });
                     runCmd(cmds);
                     inProgress = true;
                 }
@@ -104,6 +162,7 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                Log.d(TAG, movement + "  " + dx);
                 if (dx > 0) {
                     final String[] pageInfo = pageText.getText().toString().split("/");
                     long totalpages = Integer.parseInt(pageInfo[1]) * 1050;
@@ -121,7 +180,7 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
                     }
                 } else {
                     final String[] pageInfo = pageText.getText().toString().split("/");
-                    if((movement-1050)<= (dx * -1)){
+                    if((movement - 1050) <= (dx * -1)){
                         movement = 1050;
                     }else{
                         movement += dx;
@@ -143,7 +202,6 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
                             }
                         });
                     }
-
                 }
             }
         });
@@ -176,12 +234,130 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
                 }
             }
         });
+
+        fileChooser.setFileListener(new FileChooser.FileSelectedListener() {
+            @Override
+            public void fileSelected(File file) {
+                selectedText.setText(file.getName());
+            }
+        });
+
+        selectFileBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fileChooser.showDialog();
+            }
+        });
+
+
+
+        expandFilters.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    if(filters.isEnabled()){
+                        filters.setEnabled(false);
+                        filters.setVisibility(View.GONE);
+                    }else{
+                        filters.setEnabled(true);
+                        filters.setVisibility(View.VISIBLE);
+                    }
+            }
+        });
+
+        filters.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                String selected = "";
+                switch (checkedId){
+                    case R.id.filter_1: filter = "";
+                        grep = "";
+                        selected = "ALL";
+                        mode = 0;
+                        break;
+                    //FTP Traffic
+                    case  R.id.filter_2: filter = "-s0 ";
+                        grep = " port 21";
+                        selected = "FTP Traffic";
+                        mode = 2;
+                        break;
+                    //HTTP Host Headers
+                    case R.id.filter_3: filter = "-s0 ";
+                        grep = " | grep -e \'Host:\' -e \'User-Agent:\' -e \'Set-Cookie\' - e \'Cookie\'";
+                        selected = "HTTP Host Headers";
+                        mode = 2;
+                        break;
+                    //NTP Traffic
+                    case R.id.filter_4: filter = "";
+                        filter = "-s0 port 123 ";
+                        grep = "";
+                        selected = "NTP Traffic";
+                        mode = 1;
+                        break;
+                    //DNS Traffic
+                    case R.id.filter_5: filter = "-s0 port 53 ";
+                        grep = "";
+                        selected = "DNS Traffic";
+                        mode = 1;
+                        break;
+                    //TCP Traffic
+                    case R.id.filter_6: filter = "tcp ";
+                        grep = "";
+                        selected = "TCP Traffic";
+                        mode = 0;
+                        break;
+                    //UDP Traffic
+                    case R.id.filter_7: filter = "udp ";
+                        grep = "";
+                        selected = "UDP Traffic";
+                        mode = 0;
+                        break;
+                    //ICMP Traffic
+                    case R.id.filter_8: filter = "icmp ";
+                        grep = "";
+                        selected = "ICMP Traffic";
+                        mode = 0;
+                        break;
+                    default: filter = "";
+                        selected = "ALL 2";
+                        mode = 0;
+                        break;
+                }
+                showMessage("SELECTED " + selected);
+            }
+        });
+    }
+
+    private void hideAllUI(){
+        filters.setVisibility(View.GONE);
+        filterMenu.setVisibility(View.GONE);
+        selectFileBtn.setVisibility(View.GONE);
+        selectedText.setVisibility(View.GONE);
+        jumpBtn.setVisibility(View.VISIBLE);
+        pageJump.setVisibility(View.VISIBLE);
+        output.setVisibility(View.VISIBLE);
+        pageText.setVisibility(View.VISIBLE);
+    }
+
+    private void showAllUI(){
+        filterMenu.setVisibility(View.VISIBLE);
+        filters.setVisibility(View.GONE);
+        filters.setEnabled(false);
+        selectFileBtn.setVisibility(View.VISIBLE);
+        selectedText.setVisibility(View.VISIBLE);
+    }
+
+    public void setFileForAnalysis(final String filePath){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                selectedText.setText(filePath);
+            }
+        });
     }
 
     private void runCmd(ArrayList<String> args){
-        cmdRunnable = new CmdExec(this, args);
-        Thread test = new Thread(cmdRunnable);
-        test.start();
+        cmdRunnable = new PacketViewThread(this, args, mode);
+        cmdRunnable.start();
     }
 
     public void printToast(final String message){
@@ -193,17 +369,28 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
         });
     }
 
+    public void showMessage(final String message){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getContext().getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     public void printResult(final ArrayList<String> result, final long numOfPackets){
         if(getActivity() != null){
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     int prevSize = mRVAdapter.getItemCount();
-                    int diff = result.size() - prevSize;
                     mRVAdapter.bindList(result);
                     final String[] pageInfo = pageText.getText().toString().split("/");
-                    mRVAdapter.notifyItemRangeInserted(prevSize - 1, 2);
                     String text = pageInfo[0] + "/" + result.size() + "/" + numOfPackets + " packets";
+                    if(numOfPackets <= 0){
+                        text = pageInfo[0] + "/" + result.size() + "/-";
+                    }
+                    mRVAdapter.notifyItemRangeInserted(prevSize, 1);
                     pageText.setText(text);
                 }
             });
@@ -212,7 +399,19 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
 
     @Override
     public void cmdDone() {
-        this.inProgress = false;
+        inProgress = false;
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                analyseBtn.setText("Review");
+                if(mRVAdapter.getItemCount() == 0){
+                    mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(),
+                            "No packets available");
+                    output.setAdapter(mRVAdapter);
+                }
+                showAllUI();
+            }
+        });
     }
 
     @Override
