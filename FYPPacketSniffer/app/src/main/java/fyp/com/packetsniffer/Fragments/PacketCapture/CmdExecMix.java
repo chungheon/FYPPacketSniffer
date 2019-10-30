@@ -6,9 +6,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class CmdExecError extends CmdExecNormal {
+public class CmdExecMix extends CmdExecNormal {
     private final String TAG = "CmdExecError";
-    public CmdExecError(PacketCaptureInterface fragment, ArrayList<String> cmds) {
+    public CmdExecMix(PacketCaptureInterface fragment, ArrayList<String> cmds) {
         super(fragment, cmds);
     }
 
@@ -17,10 +17,11 @@ public class CmdExecError extends CmdExecNormal {
         DataOutputStream outputStream = null;
         Thread readOutput = null;
         try {
-
-            p = Runtime.getRuntime().exec("su");
+            ProcessBuilder processBuilder = new ProcessBuilder("su");
+            processBuilder.redirectErrorStream(true);
+            p = processBuilder.start();
             outputStream = new DataOutputStream(p.getOutputStream());
-            response = p.getErrorStream();
+            response = p.getInputStream();
             fileReader.setInputStream(response);
             readOutput = new Thread(fileReader);
             readOutput.start();

@@ -30,13 +30,12 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
     private final String TAG = "UpdateVersionFrag";
     private View view;
 
-    private TextView pageText;
     private Button updateBtn;
     private Spinner optionSpinner;
     private RecyclerView output;
     private int selected = 0;
     private UpdateVersionFragment mFragment = this;
-    private CmdExecError cmdRunnable;
+    private UpdateVersionThread cmdRunnable;
 
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerViewPageAdapter mRVAdapter;
@@ -54,7 +53,6 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
         this.output = (RecyclerView) view.findViewById(R.id.result_text);
         this.updateBtn = (Button) view.findViewById(R.id.update_btn);
         optionSpinner = (Spinner) view.findViewById(R.id.ver_spinner);
-        pageText = (TextView) view.findViewById(R.id.page_text);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext().getApplicationContext(),
                 R.array.update_choices, android.R.layout.simple_spinner_item);
@@ -69,57 +67,9 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
         mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<String>());
         output.setAdapter(mRVAdapter);
         output.setLayoutManager(mLayoutManager);
-        this.pageText.setText("0/0");
     }
 
     private void initListener(){
-        output.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (dx > 0) {
-                    final String[] pageInfo = pageText.getText().toString().split("/");
-                    long totalpages = Integer.parseInt(pageInfo[1]) * 1050;
-                    if(movement <= totalpages && pageInfo.length == 3){
-                        movement += dx;
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                pageText.setText((((movement + 200)/1050)) + "/" + pageInfo[1] + "/" + pageInfo[2]);
-                            }
-                        });
-                    }
-                    if(movement > totalpages){
-                        movement = totalpages;
-                    }
-                } else {
-                    final String[] pageInfo = pageText.getText().toString().split("/");
-                    if((movement-1050)<= (dx * -1)){
-                        movement = 1050;
-                    }else{
-                        movement += dx;
-                        if(pageInfo.length == 3){
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    pageText.setText((((movement + 600)/1050)) + "/" + pageInfo[1] + "/" + pageInfo[2]);
-                                }
-                            });
-                        }
-                    }
-
-                    if(movement == 1050 && pageInfo.length == 3){
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                pageText.setText("1/" + pageInfo[1] + "/" + pageInfo[2]);
-                            }
-                        });
-                    }
-
-                }
-            }
-        });
 
         optionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -138,7 +88,7 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
             public void onClick(View v) {
                 ArrayList<String> cmds = new ArrayList<>();
 
-                String dirPath = "/data/data/" + getActivity().getPackageName() + "/MyFiles";
+                String dirPath = getActivity().getFilesDir().getPath() + "/bin";
                 File dir = new File(dirPath);
                 if(!dir.exists()){
                     dir.mkdirs();
@@ -148,6 +98,7 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
                     printToast("Please select one of the choices");
                     return;
                 }else if(selected == 0){
+                    cmds.add("mount -o rw,remount /system");
 
                     try {
                         InputStream is = getActivity().getAssets().open("tcpdump_arm");
@@ -158,7 +109,27 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
                         FileOutputStream fileOutputStream = new FileOutputStream(targetFile);
                         fileOutputStream.write(buffer);
 
+                        is.close();
                         fileOutputStream.close();
+
+                        is = getActivity().getAssets().open("aircrack-ng");
+                        buffer = new byte[is.available()];
+                        is.read(buffer);
+                        targetFile = new File(dirPath + "/aircrack-ng");
+                        fileOutputStream = new FileOutputStream(targetFile);
+                        fileOutputStream.write(buffer);
+
+                        is.close();
+                        fileOutputStream.close();
+
+                        cmds.add("cp " + dirPath + "/aircrack-ng /system/xbin/aircrack-ng");
+                        cmds.add("chmod 777 " + "system/xbin/aircrack-ng");
+                        cmds.add("rm " + dirPath + "/aircrack-ng");
+                        cmds.add("which aircrack-ng");
+                        cmds.add("cp " + dirPath + "/tcpdump /system/xbin/tcpdump");
+                        cmds.add("chmod 777 " + "system/xbin/tcpdump");
+                        cmds.add("rm " + dirPath + "/tcpdump");
+                        cmds.add("tcpdump --version");
                     } catch (IOException e) { }
                 }else if(selected == 1){
                     try {
@@ -170,15 +141,15 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
                         FileOutputStream fileOutputStream = new FileOutputStream(targetFile);
                         fileOutputStream.write(buffer);
 
+                        is.close();
                         fileOutputStream.close();
+                        cmds.add("cp " + dirPath + "/tcpdump /system/xbin/tcpdump");
+                        cmds.add("chmod 777 " + "system/xbin/tcpdump");
+                        cmds.add("rm " + dirPath + "/tcpdump");
+                        cmds.add("tcpdump --version");
                     } catch (IOException e) { }
                 }
 
-                cmds.add("mount -o rw,remount /system");
-                cmds.add("chmod 777 " +  dirPath + "/tcpdump");
-                cmds.add("cp " + dirPath + "/tcpdump /system/xbin/tcpdump");
-                cmds.add("rm " + dirPath + "/tcpdump");
-                cmds.add("tcpdump --version");
                 cmds.add("mount -o ro,remount /system");
 
                 if(cmdRunnable != null){
@@ -214,10 +185,7 @@ public class UpdateVersionFragment extends Fragment implements PacketCaptureInte
                 public void run() {
                     int prevSize = mRVAdapter.getItemCount();
                     mRVAdapter.bindList(result);
-                    final String[] pageInfo = pageText.getText().toString().split("/");
-                    mRVAdapter.notifyItemRangeInserted(prevSize, 5);
-                    String text = pageInfo[0] + "/" + result.size();
-                    pageText.setText(text);
+                    mRVAdapter.notifyItemRangeInserted(prevSize, 1);
                 }
             });
         }

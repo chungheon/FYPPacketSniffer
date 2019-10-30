@@ -1,10 +1,6 @@
 package fyp.com.packetsniffer.Fragments.PacketCapture;
 
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
 import android.os.Bundle;
-import android.os.Environment;
-import android.renderscript.ScriptGroup;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,10 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
@@ -27,7 +21,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import fyp.com.packetsniffer.Fragments.FileChooser;
-import fyp.com.packetsniffer.MainActivity;
 import fyp.com.packetsniffer.R;
 
 public class PacketAnalysisFragment extends Fragment implements PacketCaptureInterface {
@@ -53,8 +46,9 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
     private String grep = "";
     private int mode = 0;
     private boolean inProgress;
-    private CmdExec cmdRunnable;
+    private CmdExecNormal cmdRunnable;
     private FileChooser fileChooser;
+    private String fileName = "";
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_packet_analysis, container, false);
@@ -97,15 +91,14 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
             @Override
             public void onClick(View v) {
                 ArrayList<String> cmds = new ArrayList<>();
-                String filePath = selectedText.getText().toString();
-                File file = new File(filePath);
+                File file = new File(fileName);
 
                 if(!file.exists()){
                     printToast("Please select a valid file");
                     return;
                 }
 
-                String cmd = "tcpdump " + filter + "-ttttvv -r " + filePath + grep;
+                String cmd = "tcpdump " + filter + "-ttttvv -r " + fileName + grep;
 
                 printToast(cmd);
                 cmds.add(cmd);
@@ -239,6 +232,7 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
             @Override
             public void fileSelected(File file) {
                 selectedText.setText(file.getName());
+                fileName = file.getPath();
             }
         });
 

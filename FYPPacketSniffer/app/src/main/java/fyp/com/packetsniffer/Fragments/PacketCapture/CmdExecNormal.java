@@ -16,7 +16,7 @@ import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class CmdExec extends Thread {
+public class CmdExecNormal extends Thread {
     private final String TAG = "CmdExecution";
     protected ArrayList<String> cmds;
     protected PacketCaptureInterface mFragment;
@@ -26,7 +26,7 @@ public class CmdExec extends Thread {
     protected ReadOutput fileReader;
 
 
-    public CmdExec(PacketCaptureInterface fragment, ArrayList<String> cmds){
+    public CmdExecNormal(PacketCaptureInterface fragment, ArrayList<String> cmds){
         this.mFragment = fragment;
         this.cmds = cmds;
     }
@@ -46,7 +46,6 @@ public class CmdExec extends Thread {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
             processBuilder.command("su");
-            //processBuilder.redirectErrorStream(true);
             p = processBuilder.start();
             outputStream = new DataOutputStream(p.getOutputStream());
             response = p.getInputStream();

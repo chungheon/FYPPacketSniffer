@@ -18,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -37,7 +36,7 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
     private boolean inProgress;
     private Spinner interfaceSpinner;
 
-    private CmdExec cmdRunnable;
+    private CmdExecNormal cmdRunnable;
     private String fileOut;
     private int selected = 0;
     private String selectedFile = "";

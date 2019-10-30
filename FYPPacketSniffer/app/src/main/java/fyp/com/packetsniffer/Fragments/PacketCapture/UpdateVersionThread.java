@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class UpdateVersionThread extends CmdExecError {
+public class UpdateVersionThread extends CmdExecMix {
 
     private final String TAG = "UpdateVersion";
 
