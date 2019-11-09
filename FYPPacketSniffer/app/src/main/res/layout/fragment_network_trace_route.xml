@@ -1,0 +1,45 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
+
+    <EditText
+        android:id="@+id/trace_route_edit_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:hint="@string/placeholder"
+        android:inputType="text"
+        android:ems="10" />
+
+    <Button
+        android:id="@+id/trace_route_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/trace_route_edit_text"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:text="@string/activity_button" />
+
+    <ListView
+        android:id="@+id/trace_route_result_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/trace_route_btn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp" >
+    </ListView>
+
+    <ProgressBar
+        android:id="@+id/trace_route_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/trace_route_result_list"
+        android:layout_toRightOf="@+id/trace_route_btn"
+        android:visibility="gone" />
+
+</RelativeLayout>

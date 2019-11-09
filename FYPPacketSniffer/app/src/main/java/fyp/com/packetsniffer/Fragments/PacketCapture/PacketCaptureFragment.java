@@ -18,15 +18,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import fyp.com.packetsniffer.Fragments.CmdExecInterface;
+import fyp.com.packetsniffer.Fragments.CmdExecNormal;
 import fyp.com.packetsniffer.R;
 
-public class PacketCaptureFragment extends Fragment implements PacketCaptureInterface {
+public class PacketCaptureFragment extends Fragment implements CmdExecInterface {
     private static final String TAG = "PacketCapture";
     private View view;
     private EditText fileOutput;
@@ -92,23 +95,28 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
                 if(selected > -1) {
                     cmd += " -i " + (selected + 1);
                 }
-                cmd += " -w - -U | tee " + filePath + " | tcpdump -r -";
+                cmd += " -w - | tee " +  filePath + " | tcpdump -tttt -r -";
+
                 cmds.add(cmd);
                 if(cmdRunnable != null){
                     if(inProgress){
                         cmdRunnable.stopRun();
                         inProgress = false;
-                    }else{
-                        if(getActivity() != null){
-                            numPacketsText.setText("Capturing...");
-                            runCmd(cmds, filePath);
-                            inProgress = true;
+                        captureBtn.setText("Start Capture");
+                        if(numPacketsText.getText().toString().equals("Capturing...")){
+                            numPacketsText.setText("0 Packets");
                         }
+                    }else{
+                        numPacketsText.setText("Capturing...");
+                        runCmd(cmds, filePath);
+                        inProgress = true;
+                        captureBtn.setText("Stop Capturing");
                     }
                 }else{
                     runCmd(cmds, filePath);
                     numPacketsText.setText("Capturing...");
                     inProgress = true;
+                    captureBtn.setText("Stop Capturing");
                 }
             }
         });
@@ -133,11 +141,17 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
     private void updateSpinner(){
 
         BufferedReader in = null;
+        DataOutputStream outputStream = null;
         Process p = null;
         try {
-            String[] cmds = {"su", "-c", "tcpdump -D"};
-            p = Runtime.getRuntime().exec(cmds);
+            ProcessBuilder pb = new ProcessBuilder("su");
+            p = pb.start();
             in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            outputStream = new DataOutputStream(p.getOutputStream());
+            outputStream.writeBytes("tcpdump -D\n");
+            outputStream.flush();
+            outputStream.writeBytes("exit\n");
+            outputStream.flush();
             String line;
             while ((line = in.readLine()) != null) {
                 Log.d(TAG, line);
@@ -148,8 +162,8 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
             }
             in.close();
             int exitCode = p.waitFor();
+            Log.d(TAG, "EXIT CODE: " + exitCode);
         } catch (IOException e) {
-            e.printStackTrace();
             interfaces.clear();
             if (in != null) {
                 try {
@@ -165,13 +179,11 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
                 } catch (IOException ex) { }
             }
         }finally {
-            if(p != null){
                 p.destroy();
-            }
         }
 
         if(interfaces.isEmpty()){
-            interfaces.add("Default (Any)");
+            interfaces.add("-");
             ArrayAdapter<String> adp = new ArrayAdapter<String>(getContext().getApplicationContext()
                     ,android.R.layout.simple_spinner_dropdown_item,interfaces);
             interfaceSpinner.setAdapter(adp);
@@ -220,7 +232,9 @@ public class PacketCaptureFragment extends Fragment implements PacketCaptureInte
     @Override
     public void onDestroy() {
         if(cmdRunnable != null){
-            cmdRunnable.stopRun();
+            if(inProgress){
+                cmdRunnable.stopRun();
+            }
         }
         super.onDestroy();
     }

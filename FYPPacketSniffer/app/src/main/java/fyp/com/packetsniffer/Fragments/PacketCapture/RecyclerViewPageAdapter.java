@@ -1,21 +1,16 @@
 package fyp.com.packetsniffer.Fragments.PacketCapture;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import fyp.com.packetsniffer.R;
@@ -38,7 +33,7 @@ public class RecyclerViewPageAdapter extends RecyclerView.Adapter<RecyclerViewPa
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(mContext)
-                .inflate(R.layout.layout_packet_capture_page, viewGroup, false);
+                .inflate(R.layout.layout_packet_page, viewGroup, false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }

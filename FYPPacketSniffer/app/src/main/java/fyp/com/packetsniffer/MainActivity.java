@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fyp.com.packetsniffer.Fragments.DevicesConnected.DeviceConnectFragment;
+import fyp.com.packetsniffer.Fragments.NetworkUtils.TraceActivity;
 import fyp.com.packetsniffer.Fragments.PacketCapture.PacketAnalysisFragment;
 import fyp.com.packetsniffer.Fragments.PacketCapture.PacketCaptureFragment;
-import fyp.com.packetsniffer.Fragments.PacketCapture.TestFragment;
-import fyp.com.packetsniffer.Fragments.PacketCapture.UpdateVersionFragment;
 import fyp.com.packetsniffer.Fragments.Tab1Fragment;
+import fyp.com.packetsniffer.Fragments.UpdateVersion.UpdateVersionFragment;
 import fyp.com.packetsniffer.Fragments.WifiInfo.WifiInfoFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -63,9 +63,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         if(savedInstanceState == null){
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new DeviceConnectFragment()).commit();
-            getSupportActionBar().setTitle("Scan Network");
-            navView.setCheckedItem(R.id.scan_devices);
+            //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new DeviceConnectFragment()).commit();
+            //getSupportActionBar().setTitle("Scan Network");
+            //navView.setCheckedItem(R.id.scan_devices);
         }
     }
 
@@ -155,6 +155,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .commit();
                 toolbar.setTitle("Packet Capture");
                     break;
+            case R.id.test6: getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new TraceActivity())
+                    .commit();
+                toolbar.setTitle("Trace Route");
         }
 
         drawerLayout.closeDrawer(Gravity.START);

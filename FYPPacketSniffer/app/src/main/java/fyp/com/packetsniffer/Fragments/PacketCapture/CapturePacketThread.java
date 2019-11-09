@@ -8,23 +8,27 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import fyp.com.packetsniffer.Fragments.CmdExecInterface;
+import fyp.com.packetsniffer.Fragments.CmdExecNormal;
+
 public class CapturePacketThread extends CmdExecNormal {
     private final String TAG = "CapturePacket";
 
     private BufferedReader br;
     private String filePath;
 
-    public CapturePacketThread(PacketCaptureInterface fragment, ArrayList<String> cmds, String filePath) {
+    public CapturePacketThread(CmdExecInterface fragment, ArrayList<String> cmds, String filePath) {
         super(fragment, cmds);
         this.filePath = filePath;
         fileReader = new ReadCaptureOutput();
+        this.cmds.add("exit");
     }
 
     private class ReadCaptureOutput extends ReadOutput{
         private boolean stopRunning;
 
         @Override
-        public synchronized void run() {
+        public void run() {
             br = null;
             long numOfPackets = 0;
             try {
@@ -32,27 +36,25 @@ public class CapturePacketThread extends CmdExecNormal {
                 String line = null;
                 int updateCounter = 0;
                 while(true){
-                    if(br == null){
-                        break;
-                    }
-
                     if(br.ready()){
                         line = br.readLine();
                     }
                     if(line != null){
-                        Log.d(TAG, line);
-                        Log.d(TAG, numOfPackets + "");
-                        if(line.matches(".*\\d*:\\d*:\\d*.*")) {
+                        if(line.matches("\\d*-\\d*-\\d* \\d*:\\d*:\\d*.*")) {
                             numOfPackets++;
                             updateCounter++;
                         }
-                        if(updateCounter > 10){
+                        if(updateCounter >= 1){
                             updateResult(null, numOfPackets);
                             updateCounter = 0;
                         }
+                        line = null;
+                    }
+                    if(interrupted()){
+                        break;
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException e) { }finally {
                 if(br != null){
                     try{
                         br.close();
@@ -62,50 +64,71 @@ public class CapturePacketThread extends CmdExecNormal {
                 }
             }
         }
+
+        public void stopRun(){
+            interrupt();
+        }
     }
 
     @Override
     public void stopRun() {
-        if(br != null){
+        /*if(br != null){
             try {
                 br.close();
                 br = null;
             } catch (IOException e) { }
-        }
-
+        }*/
+        fileReader.stopRun();
         Process kill = null;
         try {
             kill = Runtime.getRuntime().exec("su");
             DataOutputStream killOut = new DataOutputStream(kill.getOutputStream());
-            killOut.writeBytes("killall -q 2 tcpdump\n");
+            killOut.writeBytes("ps\n");
             killOut.flush();
-            killOut.writeBytes("tcpdump -r " + filePath + " | wc -l\n");
-            killOut.flush();
-            killOut.writeBytes("exit\n");
-            killOut.flush();
-
-
             BufferedReader reader = new BufferedReader(new InputStreamReader(kill.getInputStream()));
-            String line;
+            String line = null;
             try{
-                while((line = reader.readLine()) != null){
-                    Log.d(TAG, line);
-                    if(line.matches("\\d*")){
+                int count = 0;
+                while(true){
+                    if(reader.ready()){
+                        line = reader.readLine();
+                    }
+                    if(line != null){
+                        if(line.matches(".*tcpdump.*")){
+                            String killStr[] = line.substring(10).split(" ");
+                            killOut.writeBytes("kill -2 " + killStr[0] + "\n");
+                            killOut.flush();
+                        }
+                        line = null;
+                        count = 0;
+                    }
+                    synchronized (this){
                         try{
-                            long packets = Long.parseLong(line);
-                            updateResult(null, packets);
-                            break;
-                        }catch (NumberFormatException e){
+
+                            wait(10);
+                            count++;
+                        }catch (InterruptedException e){
                             break;
                         }
                     }
+                    if(count > 50){
+                        break;
+                    }
                 }
             } catch (IOException e) { }
+
+            killOut.writeBytes("exit\n");
+            killOut.flush();
+
             kill.waitFor();
         }catch (IOException e) {
             Log.e(TAG, "Error with stream");
         } catch (InterruptedException e) {
             Log.e(TAG, "Interrupted");
+        }finally {
+            if(kill != null){
+                kill.destroy();
+            }
         }
     }
 

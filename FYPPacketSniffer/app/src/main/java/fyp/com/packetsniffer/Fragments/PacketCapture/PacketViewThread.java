@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import fyp.com.packetsniffer.Fragments.CmdExecInterface;
+import fyp.com.packetsniffer.Fragments.CmdExecNormal;
+
 public class PacketViewThread extends CmdExecNormal {
     private final String TAG = "PacketView";
     private BufferedReader br;
@@ -18,7 +21,7 @@ public class PacketViewThread extends CmdExecNormal {
     private String page;
     private int mode;
 
-    public PacketViewThread(PacketCaptureInterface fragment, ArrayList<String> cmds, int mode) {
+    public PacketViewThread(CmdExecInterface fragment, ArrayList<String> cmds, int mode) {
         super(fragment, cmds);
         fileReader = new ReadCaptureOutput();
         this.mode = mode;
@@ -64,16 +67,17 @@ public class PacketViewThread extends CmdExecNormal {
                             }
                         }
                         lineAdded++;
+                        line = null;
                         waitCounter = 0;
                     }else{
                         try{
-                            this.wait(100);
+                            this.wait(10);
                         }catch (InterruptedException e){
                             break;
                         }
                         waitCounter++;
                     }
-                    if(waitCounter > 3){
+                    if(waitCounter > 100){
                         break;
                     }
                 }
@@ -84,6 +88,8 @@ public class PacketViewThread extends CmdExecNormal {
                 if(br != null){
                     br.close();
                 }
+                outputStream.writeBytes("exit\n");
+                outputStream.flush();
             } catch (IOException e) {
                 if(br != null){
                     try{
@@ -166,8 +172,41 @@ public class PacketViewThread extends CmdExecNormal {
         try {
             kill = Runtime.getRuntime().exec("su");
             DataOutputStream killOut = new DataOutputStream(kill.getOutputStream());
-            killOut.writeBytes("killall -q 2 tcpdump\n");
+            killOut.writeBytes("ps\n");
             killOut.flush();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(kill.getInputStream()));
+            String line = null;
+            try{
+                int count = 0;
+                while(true){
+                    if(reader.ready()){
+                        line = reader.readLine();
+                    }
+                    if(line != null){
+                        if(line.matches(".*tcpdump.*")){
+                            String killStr[] = line.substring(10).split(" ");
+                            Log.d(TAG, killStr[0]);
+                            killOut.writeBytes("kill -2 " + killStr[0] + "\n");
+                            killOut.flush();
+                        }
+                        line = null;
+                        count = 0;
+                    }
+                    synchronized (this){
+                        try{
+
+                            wait(1);
+                            count++;
+                        }catch (InterruptedException e){
+                            break;
+                        }
+                    }
+                    if(count > 1000){
+                        break;
+                    }
+                }
+            } catch (IOException e) { }
+
             killOut.writeBytes("exit\n");
             killOut.flush();
 

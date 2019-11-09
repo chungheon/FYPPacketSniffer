@@ -28,7 +28,7 @@
             <item
                 android:id="@+id/test5"
                 android:icon="@drawable/ic_test1"
-                android:title="Update TCPDUMP" />
+                android:title="Update Versions" />
             <item
                 android:id="@+id/test6"
                 android:icon="@drawable/ic_test1"

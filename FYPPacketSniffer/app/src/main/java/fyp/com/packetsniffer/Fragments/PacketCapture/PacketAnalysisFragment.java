@@ -20,10 +20,12 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 
+import fyp.com.packetsniffer.Fragments.CmdExecInterface;
+import fyp.com.packetsniffer.Fragments.CmdExecNormal;
 import fyp.com.packetsniffer.Fragments.FileChooser;
 import fyp.com.packetsniffer.R;
 
-public class PacketAnalysisFragment extends Fragment implements PacketCaptureInterface {
+public class PacketAnalysisFragment extends Fragment implements CmdExecInterface {
 
     private final String TAG = "PCapFragment";
     private View view;
@@ -155,7 +157,6 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                Log.d(TAG, movement + "  " + dx);
                 if (dx > 0) {
                     final String[] pageInfo = pageText.getText().toString().split("/");
                     long totalpages = Integer.parseInt(pageInfo[1]) * 1050;
@@ -277,7 +278,7 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
                     //HTTP Host Headers
                     case R.id.filter_3: filter = "-s0 ";
                         grep = " | grep -e \'Host:\' -e \'User-Agent:\' -e \'Set-Cookie\' - e \'Cookie\'";
-                        selected = "HTTP Host Headers";
+                        selected = "HTTP Information";
                         mode = 2;
                         break;
                     //NTP Traffic
@@ -311,6 +312,13 @@ public class PacketAnalysisFragment extends Fragment implements PacketCaptureInt
                         selected = "ICMP Traffic";
                         mode = 0;
                         break;
+                    //ARP Traffic
+                    case R.id.filter_9: filter = "arp ";
+                        grep = "";
+                        selected = "ARP Traffic";
+                        mode = 0;
+                        break;
+
                     default: filter = "";
                         selected = "ALL 2";
                         mode = 0;

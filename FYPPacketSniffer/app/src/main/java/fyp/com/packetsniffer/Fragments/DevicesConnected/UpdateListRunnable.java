@@ -165,7 +165,7 @@ public class UpdateListRunnable implements Runnable{
                         devInfo.setHostName(hostname);
                         devInfo.setIpAddrs(info[0]);
                         devInfo.setMacVendor(vendor);
-                        devInfo.setMacAddrs(mac);
+                        devInfo.setMacAddrs(mac.toUpperCase());
                         devices.add(devInfo);
                     }else if (!mac.equals("00:00:00:00:00:00")) {
                         int index = getHost(devices,info[0]);
@@ -174,7 +174,7 @@ public class UpdateListRunnable implements Runnable{
                             devInfo.setHostName(hostname);
                             devInfo.setIpAddrs(info[0]);
                             devInfo.setMacVendor(vendor);
-                            devInfo.setMacAddrs(mac);
+                            devInfo.setMacAddrs(mac.toUpperCase());
                             devices.set(index, devInfo);
                         }
                     }
@@ -212,7 +212,7 @@ public class UpdateListRunnable implements Runnable{
                         devInfo.setHostName(hostname);
                         devInfo.setIpAddrs(info[0]);
                         devInfo.setMacVendor(vendor);
-                        devInfo.setMacAddrs(mac);
+                        devInfo.setMacAddrs(mac.toUpperCase());
                         devices.add(devInfo);;
                     }else if (!mac.equals("00:00:00:00:00:00")) {
                         int index = getHost(devices, info[0]);
@@ -221,7 +221,7 @@ public class UpdateListRunnable implements Runnable{
                             devInfo.setHostName(hostname);
                             devInfo.setIpAddrs(info[0]);
                             devInfo.setMacVendor(vendor);
-                            devInfo.setMacAddrs(mac);
+                            devInfo.setMacAddrs(mac.toUpperCase());
                             devices.set(index, devInfo);
                         }
                     }
