@@ -30,4 +30,14 @@
     <color name="title_color">#262626</color>
     <color name="transparent_color">#00000000</color>
     <color name="transparent_dark_color">#bb000000</color>
+
+
+    <color name="primaryColor">#691b9a</color>
+    <color name="primaryLightColor">#9b4dcc</color>
+    <color name="primaryDarkColor">#37006b</color>
+    <color name="secondaryColor">#00c9b4</color>
+    <color name="secondaryLightColor">#60fde6</color>
+    <color name="secondaryDarkColor">#009784</color>
+    <color name="primaryTextColor">#ffffff</color>
+    <color name="secondaryTextColor">#000000</color>
 </resources>
