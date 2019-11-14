@@ -17,7 +17,6 @@ public class CmdExecMix extends CmdExecNormal {
         DataOutputStream outputStream = null;
         Thread readOutput = null;
         try {
-            Log.d(TAG, mode);
             ProcessBuilder processBuilder = new ProcessBuilder("su");
             processBuilder.redirectErrorStream(true);
             p = processBuilder.start();
@@ -34,13 +33,21 @@ public class CmdExecMix extends CmdExecNormal {
             }
 
             try {
-                int res = p.waitFor();
+                p.waitFor();
             } catch (InterruptedException e) {
                 Log.d(TAG, "Thread Interrupted...");
             }
+            join();
+            outputStream.close();
+            cmdDone();
 
-            Log.d(TAG, "Cmd Done");
         } catch (IOException e){
+            if(outputStream != null){
+                try {
+                    outputStream.close();
+                } catch (IOException ex) { }
+            }
+        } catch (InterruptedException e) {
             if(outputStream != null){
                 try {
                     outputStream.close();

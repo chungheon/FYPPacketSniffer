@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle toggle;
     private boolean mNavListenerReg = false;
 
+    private ArrayList<String> result;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,13 +65,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         if(savedInstanceState == null){
-            //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new DeviceConnectFragment()).commit();
-            //getSupportActionBar().setTitle("Scan Network");
-            //navView.setCheckedItem(R.id.scan_devices);
+            /*getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new Tab1Fragment()).commit();
+            getSupportActionBar().setTitle("Scan Network");
+            //navView.setCheckedItem(R.id.scan_devices);*/
         }
     }
 
-    public void enableViews(final boolean enable, final int mode) {
+    public void enableViews(final boolean enable, final int mode, final String title) {
         if(enable) {
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             toggle.setDrawerIndicatorEnabled(false);
@@ -77,11 +79,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        getSupportActionBar().setTitle("Scan Network");
+                        getSupportActionBar().setTitle(title);
                         if(mode == 1){
-                            enableViews(false, 1);
+                            enableViews(false, 1, "");
                         }else{
-                            enableViews(false, 2);
+                            enableViews(false, 2, "");
                         }
 
                         onBackPressed();
@@ -104,20 +106,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    enableViews(false, 1);
+                    enableViews(false, 1, "");
                     onBackPressed();
                 }
             });
             drawerLayout.addDrawerListener(toggle);
             toggle.syncState();
         }
-        Log.d(TAG, enable + " " + " Mode" + mode);
     }
 
     public void printToast(String message){
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
     }
 
+    public void storeResult(ArrayList<String> result){
+        this.result = result;
+    }
+
+    public void clearResult(){
+        if(this.result != null){
+            this.result.clear();
+        }
+    }
+
+    public ArrayList<String> getResult(){
+        return this.result;
+    }
     @Override
     public void onBackPressed() {
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){

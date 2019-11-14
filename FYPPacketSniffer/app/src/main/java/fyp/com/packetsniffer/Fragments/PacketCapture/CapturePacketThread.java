@@ -25,7 +25,6 @@ public class CapturePacketThread extends CmdExecNormal {
     }
 
     private class ReadCaptureOutput extends ReadOutput{
-        private boolean stopRunning;
 
         @Override
         public void run() {
@@ -72,12 +71,11 @@ public class CapturePacketThread extends CmdExecNormal {
 
     @Override
     public void stopRun() {
-        /*if(br != null){
+        if(response != null){
             try {
-                br.close();
-                br = null;
+                response.close();
             } catch (IOException e) { }
-        }*/
+        }
         fileReader.stopRun();
         Process kill = null;
         try {

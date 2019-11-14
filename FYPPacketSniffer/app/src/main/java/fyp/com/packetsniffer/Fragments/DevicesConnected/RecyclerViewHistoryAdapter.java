@@ -29,6 +29,7 @@ public class RecyclerViewHistoryAdapter extends RecyclerView.Adapter<RecyclerVie
     private ArrayList<Pair<String, String>> wifiSSIDs;
     private Context mContext;
     private OnItemClickListener listener;
+
     public RecyclerViewHistoryAdapter(ArrayList<Pair<String, String>> wifiSSIDs, Context context, OnItemClickListener listener){
         this.wifiSSIDs = wifiSSIDs;
         this.mContext = context;
@@ -80,7 +81,6 @@ public class RecyclerViewHistoryAdapter extends RecyclerView.Adapter<RecyclerVie
             super(itemView);
             wifiSSID = (TextView) itemView.findViewById(R.id.wifiSSID);
             viewBtn = (ImageButton) itemView.findViewById(R.id.view_history_btn);
-            saveBtn = (ImageButton) itemView.findViewById(R.id.save_history_btn);
         }
 
     }
