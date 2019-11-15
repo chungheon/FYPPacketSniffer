@@ -27,6 +27,8 @@ import java.util.List;
 
 import fyp.com.packetsniffer.Fragments.CmdExecInterface;
 import fyp.com.packetsniffer.Fragments.CmdExecNormal;
+import fyp.com.packetsniffer.Fragments.DirectoryChooser;
+import fyp.com.packetsniffer.Fragments.FileChooser;
 import fyp.com.packetsniffer.R;
 
 public class PacketCaptureFragment extends Fragment implements CmdExecInterface {
@@ -35,6 +37,8 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
     private EditText fileOutput;
 
     private TextView numPacketsText;
+    private TextView dirText;
+    private Button dirBtn;
     private Button captureBtn;
     private boolean inProgress;
     private Spinner interfaceSpinner;
@@ -43,6 +47,8 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
     private String fileOut;
     private int selected = 0;
     private String selectedFile = "";
+    private DirectoryChooser directoryChooser;
+    private String dirPath = "";
 
     private List<String> interfaces;
     @Nullable
@@ -59,10 +65,13 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
         this.captureBtn = (Button) view.findViewById(R.id.capture_btn);
         this.numPacketsText = (TextView) view.findViewById(R.id.capture_num_page);
         this.interfaceSpinner = (Spinner) view.findViewById(R.id.capture_interface);
+        this.dirBtn = (Button) view.findViewById(R.id.capture_directory_btn);
+        this.dirText = (TextView) view.findViewById(R.id.capture_directory_text);
 
         this.numPacketsText.setText("Waiting to start");
         inProgress = false;
         interfaces = new ArrayList<String>();
+        dirText.setText("External Storage");
         updateSpinner();
     }
 
@@ -78,14 +87,17 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
                     fileName = "PCAP";
                 }
                 fileName += ".pcap";
-                String filePath = Environment.getExternalStorageDirectory().toString() +
+                if (dirPath.equals("")) {
+                    dirPath = Environment.getExternalStorageDirectory().toString();
+                }
+                String filePath = dirPath +
                         "/" + fileName;
                 File file = new File(filePath);
                 fileOut = fileName;
                 int count = 0;
                 while(file.exists()){
                     count++;
-                    filePath = Environment.getExternalStorageDirectory().toString() +
+                    filePath = dirPath +
                             "/" + count + "_" + fileName;
                     fileOut = count + "_" + fileName;
                     file = new File(filePath);
@@ -105,18 +117,24 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
                         captureBtn.setText("Start Capture");
                         if(numPacketsText.getText().toString().equals("Capturing...")){
                             numPacketsText.setText("0 Packets");
+                            interfaceSpinner.setEnabled(true);
+                            fileOutput.setEnabled(true);
                         }
                     }else{
                         numPacketsText.setText("Capturing...");
                         runCmd(cmds, filePath);
                         inProgress = true;
                         captureBtn.setText("Stop Capturing");
+                        interfaceSpinner.setEnabled(false);
+                        fileOutput.setEnabled(false);
                     }
                 }else{
                     runCmd(cmds, filePath);
                     numPacketsText.setText("Capturing...");
                     inProgress = true;
                     captureBtn.setText("Stop Capturing");
+                    interfaceSpinner.setEnabled(false);
+                    fileOutput.setEnabled(false);
                 }
             }
         });
@@ -130,6 +148,22 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 selected = -1;
+            }
+        });
+
+        dirBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                directoryChooser = new DirectoryChooser(getActivity());
+                directoryChooser.setDirectoryListener(new DirectoryChooser.DirectorySelectedListener() {
+                    @Override
+                    public void fileSelected(File file) {
+                        dirText.setText(file.getName());
+                        dirPath = file.getPath();
+                        printToast("Selected Directory: " + file.getPath());
+                    }
+                });
+                directoryChooser.showDialog();
             }
         });
     }
@@ -154,7 +188,6 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
             outputStream.flush();
             String line;
             while ((line = in.readLine()) != null) {
-                Log.d(TAG, line);
                 if(line.matches("(.*)Up(.*)")){
                     String[] availInterface = line.split("\\[");
                     interfaces.add(availInterface[0]);
@@ -162,7 +195,7 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
             }
             in.close();
             int exitCode = p.waitFor();
-            Log.d(TAG, "EXIT CODE: " + exitCode);
+
         } catch (IOException e) {
             interfaces.clear();
             if (in != null) {
@@ -179,7 +212,9 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
                 } catch (IOException ex) { }
             }
         }finally {
+            if(p != null){
                 p.destroy();
+            }
         }
 
         if(interfaces.isEmpty()){
@@ -200,7 +235,7 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
     }
 
     @Override
-    public void printResult(final ArrayList<String> result,final long numOfPackets) {
+    public void printResult(String result,final long numOfPackets) {
         if(getActivity() != null){
             getActivity().runOnUiThread(new Runnable() {
                 @Override

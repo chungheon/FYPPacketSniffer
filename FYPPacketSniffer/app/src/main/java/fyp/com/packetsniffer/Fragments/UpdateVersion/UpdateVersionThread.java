@@ -30,11 +30,11 @@ public class UpdateVersionThread extends CmdExecMix {
             try {
                 br = new BufferedReader(new InputStreamReader(this.input));
                 String line = null;
+                Log.d("Output", output);
                 while((line = br.readLine()) != null){
                     output += line + "\n";
                 }
-                result.add(output);
-                updateResult(result, 0);
+                updateResult(output, 0);
                 br.close();
             } catch (IOException e) {
                 if(br != null){

@@ -72,4 +72,8 @@ public class RecyclerViewPageAdapter extends RecyclerView.Adapter<RecyclerViewPa
             ViewCompat.setNestedScrollingEnabled(pageScroll, true);
         }
     }
+
+    public void addPage(String page){
+        pages.add(page);
+    }
 }

@@ -14,12 +14,12 @@ import fyp.com.packetsniffer.Fragments.CmdExecNormal;
 public class PacketViewThread extends CmdExecNormal {
     private final String TAG = "PacketView";
     private BufferedReader br;
-    private ArrayList<String> result;
     private int lineAdded = 0;
     private int pageNum = 1;
     private long numOfPackets;
     private String page;
     private int mode;
+    private PacketAnalysisFragment fragment;
 
     public PacketViewThread(CmdExecInterface fragment, ArrayList<String> cmds, int mode) {
         super(fragment, cmds);
@@ -33,11 +33,10 @@ public class PacketViewThread extends CmdExecNormal {
         @Override
         public synchronized void run() {
             br = null;
-            numOfPackets = 1;
+            numOfPackets = 0;
             boolean first = true;
-            page = "Page 1";
+            page = "Page 1|";
             int waitCounter = 0;
-            result = new ArrayList<>();
             try {
                 br = new BufferedReader(new InputStreamReader(this.input));
                 String line = null;
@@ -53,6 +52,9 @@ public class PacketViewThread extends CmdExecNormal {
                     if(line != null){
                         if(first) {
                             page += "\n" + line;
+                            if(line.matches("\\d*-\\d*-\\d* \\d*:\\d*:\\d*.*")){
+                                numOfPackets++;
+                            }
                             first = false;
                         }else {
                             switch (mode){
@@ -82,14 +84,11 @@ public class PacketViewThread extends CmdExecNormal {
                     }
                 }
                 if(lineAdded > 0){
-                    result.add(page);
-                    updateResult(result, numOfPackets);
+                    updateResult(page, numOfPackets);
                 }
                 if(br != null){
                     br.close();
                 }
-                outputStream.writeBytes("exit\n");
-                outputStream.flush();
             } catch (IOException e) {
                 if(br != null){
                     try{
@@ -107,16 +106,15 @@ public class PacketViewThread extends CmdExecNormal {
         if(line.matches("\\d*-\\d*-\\d* \\d*:\\d*:\\d*.*")){
             if( lineAdded >= 300){
                 pageNum++;
+                updateResult(page, numOfPackets);
                 lineAdded = 0;
-                result.add(page);
-                page = "Page " + pageNum + "\n" + line;
-                updateResult(result, numOfPackets);
+                page = "Page " + pageNum + "|\n" + line;
             }else{
-                page += "\n\n" + line;
+                page += "|\n" + line;
             }
             numOfPackets++;
         }else{
-            page += "\n" + line;
+            page += "|" + line;
         }
     }
 
@@ -124,36 +122,33 @@ public class PacketViewThread extends CmdExecNormal {
         if(line.matches("\\d*-\\d*-\\d* \\d*:\\d*:\\d*.*")){
             if( lineAdded >= 300){
                 pageNum++;
+                updateResult(page, numOfPackets);
                 lineAdded = 0;
-                result.add(page);
                 page = "Page " + pageNum + "\n" + line;
-                updateResult(result, numOfPackets);
             }else{
-                page += "\n\n" + line;
+                page += "|\n" + line;
             }
             numOfPackets++;
         }else if(line.matches(".*AAAAAAAAA.*")){
             if( lineAdded >= 300){
                 pageNum++;
+                updateResult(page, numOfPackets);
                 lineAdded = 0;
-                result.add(page);
                 page = "Page " + pageNum + "\n" + line;
-                updateResult(result, numOfPackets);
             }else{
-                page += "\n\n" + line;
+                page += "|\n" + line;
             }
         }else{
-            page += "\n" + line;
+            page += "|" + line;
         }
     }
 
     private void lineFilter(String line){
         if (lineAdded >= 300) {
             pageNum++;
+            updateResult(page, 0);
             lineAdded = 0;
-            result.add(page);
             page = "Page " + pageNum + "\n" + line;
-            updateResult(result, 0);
         } else {
             page += "\n\n" + line;
         }
@@ -185,7 +180,6 @@ public class PacketViewThread extends CmdExecNormal {
                     if(line != null){
                         if(line.matches(".*tcpdump.*")){
                             String killStr[] = line.substring(10).split(" ");
-                            Log.d(TAG, killStr[0]);
                             killOut.writeBytes("kill -2 " + killStr[0] + "\n");
                             killOut.flush();
                         }

@@ -34,7 +34,16 @@ public class CmdExecError extends CmdExecNormal {
             } catch (InterruptedException e) {
                 Log.d(TAG, "Thread Interrupted...");
             }
+            join();
+            outputStream.close();
+            cmdDone();
         } catch (IOException e){
+            if(outputStream != null){
+                try {
+                    outputStream.close();
+                } catch (IOException ex) { }
+            }
+        } catch (InterruptedException e) {
             if(outputStream != null){
                 try {
                     outputStream.close();

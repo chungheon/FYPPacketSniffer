@@ -142,9 +142,6 @@ public class UpdateVersionFragment extends Fragment implements CmdExecInterface 
                     });
                 }else{
                     cmdRunnable = new UpdateVersionThread(mFragment, cmds);
-                    for(String str: cmds){
-                        Log.d(TAG, "Command: " + str);
-                    }
                     Thread update = new Thread(cmdRunnable);
                     update.start();
                 }
@@ -195,13 +192,13 @@ public class UpdateVersionFragment extends Fragment implements CmdExecInterface 
     }
 
     @Override
-    public void printResult(final ArrayList<String> result, final long numOfPackets) {
+    public void printResult(final String result, final long numOfPackets) {
         if(getActivity() != null){
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     int prevSize = mRVAdapter.getItemCount();
-                    mRVAdapter.bindList(result);
+                    mRVAdapter.addPage(result);
                     mRVAdapter.notifyItemRangeInserted(prevSize, 1);
                 }
             });

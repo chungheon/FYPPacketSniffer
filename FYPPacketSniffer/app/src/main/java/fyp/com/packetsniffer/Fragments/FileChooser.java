@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
 
+import fyp.com.packetsniffer.R;
+
 public class FileChooser {
     private static final String PARENT_DIR = "..";
 
@@ -94,6 +96,9 @@ public class FileChooser {
                 }
             });
 
+            if(dirs == null || files == null){
+                return;
+            }
             // convert to an array
             int i = 0;
             String[] fileList;

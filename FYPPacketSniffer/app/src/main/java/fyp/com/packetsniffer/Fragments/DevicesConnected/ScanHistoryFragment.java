@@ -38,12 +38,18 @@ public class ScanHistoryFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_scan_history, container, false);
         initView();
+        initListener();
         displayHistory();
         return this.view;
     }
 
     //Initialization of all objects and UI components
     private void initView(){
+        this.wifiList = (RecyclerView) this.view.findViewById(R.id.recycler_view_history);
+        this.wifiSSIDs = new ArrayList<>();
+    }
+
+    private void initListener(){
         this.view.setFocusableInTouchMode(true);
         this.view.requestFocus();
         this.view.setOnKeyListener(new View.OnKeyListener() {
@@ -51,15 +57,11 @@ public class ScanHistoryFragment extends Fragment {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if( keyCode == KeyEvent.KEYCODE_BACK ) {
                     ((MainActivity)getActivity()).getSupportActionBar().setTitle("Scan Network");
-                    ((MainActivity)getActivity()).enableViews(false, 1);
+                    ((MainActivity)getActivity()).enableViews(false, 1, "Scan Network");
                 }
-                Log.d(TAG, keyCode + " pressed");
                 return false;
             }
         });
-
-        this.wifiList = (RecyclerView) this.view.findViewById(R.id.recycler_view_history);
-        this.wifiSSIDs = new ArrayList<>();
     }
 
     //Retrieve history of past scans saved in caches
@@ -81,7 +83,7 @@ public class ScanHistoryFragment extends Fragment {
                                     args.putString("Filename", path);
                                     devHistory.setArguments(args);
                                     ((MainActivity) getActivity()).getSupportActionBar().setTitle(item.first);
-                                    ((MainActivity) getActivity()).enableViews(true, 2);
+                                    ((MainActivity) getActivity()).enableViews(true, 2, "Scan History");
                                     getActivity().getSupportFragmentManager().beginTransaction()
                                             .addToBackStack(null)
                                             .replace(R.id.fragment_container, devHistory, "DevicesHistory")

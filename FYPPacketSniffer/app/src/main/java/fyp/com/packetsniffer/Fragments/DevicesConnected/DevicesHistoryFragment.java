@@ -75,7 +75,7 @@ public class DevicesHistoryFragment extends Fragment {
         listOfDevices.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    //Initialize all necessary listeners for buttons etc
+    //Set back press button
     private void initListener(){
         this.view.setFocusableInTouchMode(true);
         this.view.requestFocus();
@@ -84,9 +84,8 @@ public class DevicesHistoryFragment extends Fragment {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if( keyCode == KeyEvent.KEYCODE_BACK ) {
                     ((MainActivity)getActivity()).getSupportActionBar().setTitle("Scan History");
-                    ((MainActivity)getActivity()).enableViews(true, 1);
+                    ((MainActivity)getActivity()).enableViews(true, 1, "Scan History");
                 }
-                Log.d(TAG, keyCode + " pressed");
                 return false;
             }
         });

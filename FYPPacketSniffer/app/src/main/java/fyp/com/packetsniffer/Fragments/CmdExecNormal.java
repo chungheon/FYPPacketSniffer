@@ -15,7 +15,6 @@ public class CmdExecNormal extends Thread {
     protected InputStream response;
     protected DataOutputStream outputStream;
     protected ReadOutput fileReader;
-    protected String mode;
 
 
     public CmdExecNormal(CmdExecInterface fragment, ArrayList<String> cmds){
@@ -55,11 +54,16 @@ public class CmdExecNormal extends Thread {
             } catch (InterruptedException e) {
                 Log.d(TAG, "Thread Interrupted...");
             }
-
+            join();
             outputStream.close();
-            p.destroy();
-            p = null;
+            cmdDone();
         } catch (IOException e){
+            if(outputStream != null){
+                try {
+                    outputStream.close();
+                } catch (IOException ex) { }
+            }
+        } catch (InterruptedException e) {
             if(outputStream != null){
                 try {
                     outputStream.close();
@@ -74,7 +78,7 @@ public class CmdExecNormal extends Thread {
 
     public void stopRun(){   }
 
-    protected void updateResult(ArrayList<String> result, long numOfPackets) {
+    protected void updateResult(String result, long numOfPackets) {
         mFragment.printResult(result, numOfPackets);
     }
 
