@@ -45,6 +45,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         askForMultiplePermissions();
         initView(savedInstanceState);
+
+        // Default Fragment when Startup
+        if (savedInstanceState == null) {
+            navView.getMenu().performIdentifierAction(R.id.scan_devices,0);
+        }
+
+
     }
 
     private void initView(Bundle savedInstanceState) {
