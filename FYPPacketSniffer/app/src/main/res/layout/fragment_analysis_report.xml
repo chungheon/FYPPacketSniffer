@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:nestedScrollingEnabled="true">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -31,11 +32,32 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/report_select_file_text" />
 
+        <HorizontalScrollView
+            android:id="@+id/report_packet_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbarSize="2dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@+id/report_file_information">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+                <com.jjoe64.graphview.GraphView
+                    android:id="@+id/report_num_packet_graph"
+                    android:layout_width="wrap_content"
+                    android:layout_height="300dp" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@+id/report_file_information" >
+            app:layout_constraintTop_toBottomOf="@+id/report_packet_layout" >
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/report_analysis_information"
                 android:layout_width="match_parent"

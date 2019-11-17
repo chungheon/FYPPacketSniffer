@@ -107,6 +107,11 @@ public class PacketViewThread extends CmdExecNormal {
             if( lineAdded >= 300){
                 pageNum++;
                 updateResult(page, numOfPackets);
+                if(numOfPackets > 270000){
+                    this.stopRun();
+                    printToast("Stopping Run... Unable to read more than " + numOfPackets + " packets");
+                    return;
+                }
                 lineAdded = 0;
                 page = "Page " + pageNum + "|\n" + line;
             }else{
@@ -124,6 +129,10 @@ public class PacketViewThread extends CmdExecNormal {
                 pageNum++;
                 updateResult(page, numOfPackets);
                 lineAdded = 0;
+                if(numOfPackets > 270000){
+                    this.stopRun();
+                    return;
+                }
                 page = "Page " + pageNum + "\n" + line;
             }else{
                 page += "|\n" + line;
@@ -133,6 +142,11 @@ public class PacketViewThread extends CmdExecNormal {
             if( lineAdded >= 300){
                 pageNum++;
                 updateResult(page, numOfPackets);
+                if(numOfPackets > 270000){
+                    this.stopRun();
+                    printToast("Stopping Run... Unable to read more than " + numOfPackets + " packets");
+                    return;
+                }
                 lineAdded = 0;
                 page = "Page " + pageNum + "\n" + line;
             }else{

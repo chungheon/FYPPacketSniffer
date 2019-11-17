@@ -181,7 +181,7 @@ public class DeviceConnectFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ((MainActivity)getActivity()).getSupportActionBar().setTitle("Scan History");
-                ((MainActivity)getActivity()).enableViews(true, 1);
+                ((MainActivity)getActivity()).enableViews(true, 1, "Scan Network", "");
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, new ScanHistoryFragment(), "ScanHistory")
                         .addToBackStack(null)

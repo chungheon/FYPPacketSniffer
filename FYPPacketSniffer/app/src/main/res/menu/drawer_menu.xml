@@ -22,17 +22,16 @@
             android:title="Packet Analysis"/>
     </group>
 
-    <item android:title="test4"
-        android:id="@+id/test4">
+    <item android:title="">
         <menu>
             <item
-                android:id="@+id/test5"
+                android:id="@+id/update_libraries"
                 android:icon="@drawable/ic_test1"
-                android:title="Update Versions" />
+                android:title="Update Libraries" />
             <item
-                android:id="@+id/test6"
+                android:id="@+id/about_us"
                 android:icon="@drawable/ic_test1"
-                android:title="test6" />
+                android:title="About Us" />
         </menu>
     </item>
 </menu>

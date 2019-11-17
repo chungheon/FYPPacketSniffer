@@ -57,7 +57,7 @@ public class ScanHistoryFragment extends Fragment {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if( keyCode == KeyEvent.KEYCODE_BACK ) {
                     ((MainActivity)getActivity()).getSupportActionBar().setTitle("Scan Network");
-                    ((MainActivity)getActivity()).enableViews(false, 1, "Scan Network");
+                    ((MainActivity)getActivity()).enableViews(false, 1, "", "");
                 }
                 return false;
             }
@@ -83,7 +83,7 @@ public class ScanHistoryFragment extends Fragment {
                                     args.putString("Filename", path);
                                     devHistory.setArguments(args);
                                     ((MainActivity) getActivity()).getSupportActionBar().setTitle(item.first);
-                                    ((MainActivity) getActivity()).enableViews(true, 2, "Scan History");
+                                    ((MainActivity) getActivity()).enableViews(true, 2, "Scan History", "Scan Network");
                                     getActivity().getSupportFragmentManager().beginTransaction()
                                             .addToBackStack(null)
                                             .replace(R.id.fragment_container, devHistory, "DevicesHistory")

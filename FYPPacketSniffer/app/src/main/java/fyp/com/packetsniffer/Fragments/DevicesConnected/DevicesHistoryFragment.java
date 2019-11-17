@@ -84,7 +84,7 @@ public class DevicesHistoryFragment extends Fragment {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if( keyCode == KeyEvent.KEYCODE_BACK ) {
                     ((MainActivity)getActivity()).getSupportActionBar().setTitle("Scan History");
-                    ((MainActivity)getActivity()).enableViews(true, 1, "Scan History");
+                    ((MainActivity)getActivity()).enableViews(true, 1, "Scan Network", "");
                 }
                 return false;
             }

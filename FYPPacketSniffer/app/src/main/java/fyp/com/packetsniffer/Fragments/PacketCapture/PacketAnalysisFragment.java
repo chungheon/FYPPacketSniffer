@@ -48,9 +48,11 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
     private ImageButton expandFilters;
     private RadioGroup hexFilters;
     private Button reportBtn;
+    private TextView numPacket;
 
     private long movement = 1050;
     private String filter = "";
+    private String numOfPackets = "";
     private String grep = "";
     private String hex = "";
     private int mode = 0;
@@ -82,11 +84,13 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
         this.filters = (RadioGroup) view.findViewById(R.id.analyse_filter_options);
         this.hexFilters = (RadioGroup) view.findViewById(R.id.analyse_hex_filters);
         this.reportBtn = (Button) view.findViewById(R.id.analyse_get_report);
+        this.numPacket = (TextView) view.findViewById(R.id.num_packets);
 
         mLayoutManager = new LinearLayoutManager(getContext().getApplicationContext(),
                 LinearLayout.HORIZONTAL,
                 false);
         mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<String>());
+
         output.setAdapter(mRVAdapter);
         output.setLayoutManager(mLayoutManager);
         this.pageText.setText("0/0");
@@ -96,6 +100,7 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
         pageJump.setVisibility(View.GONE);
         output.setVisibility(View.GONE);
         pageText.setVisibility(View.GONE);
+        numPacket.setVisibility(View.GONE);
         showAllUI();
     }
 
@@ -147,7 +152,7 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                                 mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(),
                                         new ArrayList<String>());
                                 output.setAdapter(mRVAdapter);
-                                pageText.setText("0/0");
+                                pageText.setText("1/1");
                                 analyseBtn.setText("Stop Review");
                                 hideAllUI();
                             }
@@ -181,12 +186,12 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                     final String[] pageInfo = pageText.getText().toString().split("/");
                     if(pageInfo.length >= 2){
                         long totalpages = Integer.parseInt(pageInfo[1]) * 1050;
-                        if(movement <= totalpages && pageInfo.length >= 3){
+                        if(movement <= totalpages && pageInfo.length >= 2){
                             movement += dx;
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    pageText.setText((((movement + 200)/1050)) + "/" + pageInfo[1] + "/" + pageInfo[2]);
+                                    pageText.setText((((movement + 200)/1050)) + "/" + pageInfo[1]);
                                 }
                             });
                         }
@@ -200,21 +205,21 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                         movement = 1050;
                     }else{
                         movement += dx;
-                        if(pageInfo.length == 3){
+                        if(pageInfo.length >= 2){
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    pageText.setText((((movement + 600)/1050)) + "/" + pageInfo[1] + "/" + pageInfo[2]);
+                                    pageText.setText((((movement + 600)/1050)) + "/" + pageInfo[1]);
                                 }
                             });
                         }
                     }
 
-                    if(movement == 1050 && pageInfo.length == 3){
+                    if(movement == 1050 && pageInfo.length >= 2){
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                pageText.setText("1/" + pageInfo[1] + "/" + pageInfo[2]);
+                                pageText.setText("1/" + pageInfo[1]);
                             }
                         });
                     }
@@ -307,10 +312,6 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                     case R.id.analyse_hex_5: hex = "x";
                         selected = "No Hex/ASCII";
                         break;
-
-                    default: hex = "";
-                        selected = "No Hex/ASCII";
-                        break;
                 }
                 showMessage("SELECTED " + selected);
             }
@@ -375,11 +376,6 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                         selected = "ARP Traffic";
                         mode = 0;
                         break;
-
-                    default: filter = "";
-                        selected = "No Filter";
-                        mode = 0;
-                        break;
                 }
                 showMessage("SELECTED " + selected);
             }
@@ -390,12 +386,17 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
             public void onClick(View v) {
                 ((MainActivity) getActivity()).storeResult(resultList);
                 if(resultList != null && !resultList.isEmpty() && !http){
+                    String packets = numPacket.getText().toString();
+                    numOfPackets = packets;
+                    packets = packets.replace(" packets", "");
+                    Log.d("numPackets", packets);
                     Bundle args = new Bundle();
                     args.putString("capturefile", captureName);
+                    args.putString("numpackets", packets);
                     AnalysisReportFragment nFrag = new AnalysisReportFragment();
                     nFrag.setArguments(args);
                     ((MainActivity)getActivity()).getSupportActionBar().setTitle("Analysis Report");
-                    ((MainActivity)getActivity()).enableViews(true, 1);
+                    ((MainActivity)getActivity()).enableViews(true, 1, "Packet Analysis", "");
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, nFrag, "AnalysisReport")
                             .addToBackStack(null)
@@ -409,6 +410,34 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(getActivity() != null && resultList != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    for(String result: resultList){
+                        String processRes = result.replace("|", "\n");
+                        mRVAdapter.addPage(processRes);
+                    }
+                    File file = new File(fileName);
+                    if(file.exists()){
+                        selectedText.setText(file.getName());
+                    }else{
+                        fileName = "";
+                    }
+                    output.setAdapter(mRVAdapter);
+                    numPacket.setText(numOfPackets);
+                    hideAllUI();
+                    showAllUI();
+                    pageText.setText("1/" + mRVAdapter.getItemCount());
+                }
+            });
+        }
+    }
+
     private void hideAllUI(){
         filters.setVisibility(View.GONE);
         filterMenu.setVisibility(View.GONE);
@@ -420,6 +449,7 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
         pageJump.setVisibility(View.VISIBLE);
         output.setVisibility(View.VISIBLE);
         pageText.setVisibility(View.VISIBLE);
+        numPacket.setVisibility(View.VISIBLE);
     }
 
     private void showAllUI(){
@@ -465,9 +495,11 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                     int prevSize = mRVAdapter.getItemCount();
                     mRVAdapter.addPage(processRes);
                     final String[] pageInfo = pageText.getText().toString().split("/");
-                    String text = pageInfo[0] + "/" + mRVAdapter.getItemCount() + "/" + numOfPackets + " packets";
+                    String text = pageInfo[0] + "/" + mRVAdapter.getItemCount();
                     if(numOfPackets <= 0){
-                        text = pageInfo[0] + "/" + mRVAdapter.getItemCount()  + "/-";
+                        numPacket.setText("-");
+                    }else{
+                        numPacket.setText(numOfPackets + " packets");
                     }
                     mRVAdapter.notifyItemRangeInserted(prevSize, 1);
                     pageText.setText(text);

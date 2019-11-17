@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public void enableViews(final boolean enable, final int mode, final String title) {
+    public void enableViews(final boolean enable, final int mode, final String title, final String backTitle) {
         if(enable) {
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             toggle.setDrawerIndicatorEnabled(false);
@@ -81,9 +81,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     public void onClick(View v) {
                         getSupportActionBar().setTitle(title);
                         if(mode == 1){
-                            enableViews(false, 1, "");
+                            enableViews(false, 1, "", "");
                         }else{
-                            enableViews(false, 2, "");
+                            enableViews(false, 2, backTitle, "");
                         }
 
                         onBackPressed();
@@ -93,7 +93,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             toggle.syncState();
 
         } else if(mode == 1){
-            Log.d(TAG, "Do false");
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             toggle.setDrawerIndicatorEnabled(true);
@@ -106,7 +105,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    enableViews(false, 1, "");
+                    getSupportActionBar().setTitle(title);
+                    enableViews(false, 1, "", "");
                     onBackPressed();
                 }
             });
@@ -164,12 +164,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .commit();
                 toolbar.setTitle("Packet Analysis");
                 break;
-            case R.id.test5: getSupportFragmentManager().beginTransaction()
+            case R.id.update_libraries: getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new UpdateVersionFragment())
                     .commit();
-                toolbar.setTitle("Packet Capture");
+                toolbar.setTitle("Update Libraries");
                     break;
-            case R.id.test6: getSupportFragmentManager().beginTransaction()
+            case R.id.about_us: getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new TraceActivity())
                     .commit();
                 toolbar.setTitle("Trace Route");

@@ -188,8 +188,17 @@
 
                 </RadioGroup>
 
+                <View
+                    android:id="@+id/separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="3dp"
+                    android:background="@android:color/darker_gray"
+                    app:layout_constraintTop_toBottomOf="@+id/analyse_filter_options"/>
+
                 <RadioGroup
                     android:id="@+id/analyse_hex_filters"
+                    android:tooltipText="Display Hex and ASCII"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -220,13 +229,13 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginLeft="10dp" />
                     <RadioButton
-                    android:id="@+id/analyse_hex_4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="-XX"
-                    android:textSize="20sp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginLeft="10dp" />
+                        android:id="@+id/analyse_hex_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-XX"
+                        android:textSize="20sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp" />
                     <RadioButton
                         android:id="@+id/analyse_hex_5"
                         android:layout_width="wrap_content"
@@ -234,10 +243,9 @@
                         android:text="Normal"
                         android:textSize="15sp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp" />
+                        android:layout_marginLeft="10dp"
+                        android:checked="true"/>
                 </RadioGroup>
-
-
 
             </android.support.constraint.ConstraintLayout>
 
@@ -259,8 +267,6 @@
             app:layout_constraintLeft_toRightOf="@+id/jump_page"/>
     </android.support.constraint.ConstraintLayout>
 
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -277,9 +283,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="No of Pages"
-            android:layout_gravity="center"
-            android:layout_marginBottom="100dp"/>
+            android:layout_gravity="center"/>
 
+        <TextView
+            android:id="@+id/num_packets"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No of Packets"
+            android:layout_gravity="center"
+            android:layout_marginBottom="50dp" />
     </LinearLayout>
 
 
