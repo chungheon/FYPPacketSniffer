@@ -4,6 +4,7 @@
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="android:windowNoTitle">true</item>
         <!-- Customize your theme here. -->
+        <item name="android:activatedBackgroundIndicator">@color/primaryLightColor</item>
     </style>
 
     <style name="MyToolbarTheme"
@@ -19,7 +20,8 @@
 
     <style name="PopupMenu">
         <item name="android:textColorSecondary">@color/dark_grey</item>
-        <item name="android:listDivider">@color/black</item>
+        <item name="android:listDivider">@color/grey</item>
+        <item name="colorControlHighlight">@color/primaryLightColor </item>
     </style>
 
 
