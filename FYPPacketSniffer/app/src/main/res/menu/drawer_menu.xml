@@ -20,6 +20,19 @@
             android:id="@+id/packet_analysis"
             android:icon="@mipmap/records"
             android:title="Packet Analysis"/>
+        <item
+            android:id="@+id/network_utils"
+            android:icon="@mipmap/records"
+            android:title="Network Utilities"/>
+
+        <item
+            android:id="@+id/nmap_services"
+            android:icon="@mipmap/records"
+            android:title="Nmap Services"/>
+        <item
+            android:id="@+id/extra_utilities"
+            android:icon="@mipmap/records"
+            android:title="Extra Utilities"/>
     </group>
 
     <item android:title="">

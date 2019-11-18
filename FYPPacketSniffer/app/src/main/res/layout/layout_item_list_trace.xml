@@ -14,7 +14,7 @@
         android:layout_gravity="center_vertical"
         android:layout_weight="0.2"
         android:gravity="left"
-        android:text="@string/string_test"
+        android:text="No."
         android:textColor="@color/red_color" />
 
     <TextView
@@ -25,7 +25,7 @@
         android:layout_weight="1"
         android:gravity="left"
         android:paddingLeft="12dp"
-        android:text="@string/string_test"
+        android:text="IP Address"
         android:textColor="@color/green_color" />
 
     <TextView
@@ -35,7 +35,7 @@
         android:layout_gravity="center_vertical"
         android:layout_weight="0.4"
         android:gravity="right"
-        android:text="@string/string_test"
-        android:textColor="@color/black_color" />
+        android:text="Latency"
+        android:textColor="@color/white" />
 
 </LinearLayout>

@@ -3,6 +3,7 @@ package fyp.com.packetsniffer;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Trace;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
@@ -39,7 +40,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle toggle;
     private boolean mNavListenerReg = false;
 
-    private ArrayList<String> result;
+    private ArrayList<byte[]> result = new ArrayList<>();
+    private Long numPackets = new Long(0);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,19 +128,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
     }
 
-    public void storeResult(ArrayList<String> result){
+    public void storeResult(ArrayList<byte[]> result, Long numPackets){
         this.result = result;
+        this.numPackets = numPackets;
     }
 
     public void clearResult(){
         if(this.result != null){
             this.result.clear();
         }
+        if(numPackets != null){
+            numPackets = new Long(0);
+        }
     }
 
-    public ArrayList<String> getResult(){
+    public ArrayList<byte[]> getResult(){
         return this.result;
     }
+
+    public Long getNumPackets(){
+        return this.numPackets;
+    }
+
     @Override
     public void onBackPressed() {
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
@@ -176,8 +187,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .commit();
                 toolbar.setTitle("Update Libraries");
                     break;
-            case R.id.about_us: getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new TraceActivity())
+            case R.id.network_utils:
+                TraceActivity test = new TraceActivity();
+                Bundle testArgs = new Bundle();
+                testArgs.putString("host", "www.google.com");
+                test.setArguments(testArgs);
+                     getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, test)
                     .commit();
                 toolbar.setTitle("Trace Route");
         }

@@ -1,5 +1,7 @@
 package fyp.com.packetsniffer.Fragments.PacketCapture;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.net.sip.SipSession;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,8 +21,18 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import fyp.com.packetsniffer.Fragments.CmdExecInterface;
 import fyp.com.packetsniffer.Fragments.CmdExecNormal;
@@ -51,6 +63,7 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
     private TextView numPacket;
 
     private long movement = 1050;
+    private String architect = "";
     private String filter = "";
     private String numOfPackets = "";
     private String grep = "";
@@ -60,8 +73,8 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
     private CmdExecNormal cmdRunnable;
     private FileChooser fileChooser;
     private String fileName = "";
-    private ArrayList<String> resultList;
     private String captureName = "-";
+    private long seconds = new Long(1);
     private boolean http = false;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -89,7 +102,7 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
         mLayoutManager = new LinearLayoutManager(getContext().getApplicationContext(),
                 LinearLayout.HORIZONTAL,
                 false);
-        mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<String>());
+        mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<byte[]>());
 
         output.setAdapter(mRVAdapter);
         output.setLayoutManager(mLayoutManager);
@@ -136,33 +149,30 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                             @Override
                             public void run() {
                                 analyseBtn.setText("Review");
-                                if(mRVAdapter.getItemCount() == 0){
-                                    mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(),
-                                                    "No packets available");
-                                    output.setAdapter(mRVAdapter);
-                                }
                                 showAllUI();
                             }
                         });
                     }else{
                         final ArrayList<String> allCmd = cmds;
+                        ((MainActivity) getActivity()).clearResult();
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(),
-                                        new ArrayList<String>());
+                                        new ArrayList<byte[]>());
                                 output.setAdapter(mRVAdapter);
                                 pageText.setText("1/1");
                                 analyseBtn.setText("Stop Review");
                                 hideAllUI();
                             }
                         });
-                        resultList = new ArrayList<>();
                         movement = 1050;
                         runCmd(allCmd);
                         inProgress = true;
+
                     }
                 }else{
+                    ((MainActivity) getActivity()).clearResult();
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -171,7 +181,6 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                             hideAllUI();
                         }
                     });
-                    resultList = new ArrayList<>();
                     runCmd(cmds);
                     inProgress = true;
                 }
@@ -276,15 +285,15 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
         expandFilters.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    if(filters.isEnabled()){
-                        filters.setEnabled(false);
-                        filters.setVisibility(View.GONE);
-                        hexFilters.setVisibility(View.GONE);
-                    }else{
-                        filters.setEnabled(true);
-                        filters.setVisibility(View.VISIBLE);
-                        hexFilters.setVisibility(View.VISIBLE);
-                    }
+                if(filters.isEnabled()){
+                    filters.setEnabled(false);
+                    filters.setVisibility(View.GONE);
+                    hexFilters.setVisibility(View.GONE);
+                }else{
+                    filters.setEnabled(true);
+                    filters.setVisibility(View.VISIBLE);
+                    hexFilters.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -294,8 +303,8 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                 String selected = "";
                 switch (checkedId){
                     case R.id.analyse_hex_1: hex = "x";
-                                selected = "Hex Enabled";
-                                break;
+                        selected = "Hex Enabled";
+                        break;
 
                     case R.id.analyse_hex_2: hex = "xx";
                         selected = "Hex Enabled (With ethernet header)";
@@ -315,7 +324,7 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                 }
                 showMessage("SELECTED " + selected);
             }
-            });
+        });
 
         filters.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -384,19 +393,38 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
         reportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity) getActivity()).storeResult(resultList);
-                if(resultList != null && !resultList.isEmpty() && !http){
+                if (mRVAdapter != null && !mRVAdapter.getData().isEmpty() && !http) {
+
                     String packets = numPacket.getText().toString();
                     numOfPackets = packets;
                     packets = packets.replace(" packets", "");
-                    Log.d("numPackets", packets);
+                    Long numPackets;
+                    try{
+                        numPackets = Long.parseLong(packets);
+                    }catch (NumberFormatException e){
+                        numPackets = new Long(0);
+                    }
+                    ((MainActivity) getActivity()).storeResult(mRVAdapter.getData(), numPackets);
                     Bundle args = new Bundle();
                     args.putString("capturefile", captureName);
                     args.putString("numpackets", packets);
                     AnalysisReportFragment nFrag = new AnalysisReportFragment();
                     nFrag.setArguments(args);
-                    ((MainActivity)getActivity()).getSupportActionBar().setTitle("Analysis Report");
-                    ((MainActivity)getActivity()).enableViews(true, 1, "Packet Analysis", "");
+                    ((MainActivity) getActivity()).getSupportActionBar().setTitle("Analysis Report");
+                    ((MainActivity) getActivity()).enableViews(true, 1, "Packet Analysis", "");
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, nFrag, "AnalysisReport")
+                            .addToBackStack(null)
+                            .commit();
+                } else if (((MainActivity) getActivity()).getResult() != null && !((MainActivity) getActivity()).getResult().isEmpty()){
+                    long packets = ((MainActivity) getActivity()).getNumPackets();
+                    Bundle args = new Bundle();
+                    args.putString("capturefile", captureName);
+                    args.putString("numpackets", packets + "");
+                    AnalysisReportFragment nFrag = new AnalysisReportFragment();
+                    nFrag.setArguments(args);
+                    ((MainActivity) getActivity()).getSupportActionBar().setTitle("Analysis Report");
+                    ((MainActivity) getActivity()).enableViews(true, 1, "Packet Analysis", "");
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, nFrag, "AnalysisReport")
                             .addToBackStack(null)
@@ -414,14 +442,12 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
     public void onResume() {
         super.onResume();
 
-        if(getActivity() != null && resultList != null){
+        if(getActivity() != null){
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    for(String result: resultList){
-                        String processRes = result.replace("|", "\n");
-                        mRVAdapter.addPage(processRes);
-                    }
+                    mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(),
+                            new ArrayList<byte[]>());
                     File file = new File(fileName);
                     if(file.exists()){
                         selectedText.setText(file.getName());
@@ -429,10 +455,6 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                         fileName = "";
                     }
                     output.setAdapter(mRVAdapter);
-                    numPacket.setText(numOfPackets);
-                    hideAllUI();
-                    showAllUI();
-                    pageText.setText("1/" + mRVAdapter.getItemCount());
                 }
             });
         }
@@ -486,14 +508,12 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
     }
 
     public void printResult(final String result, final long numOfPackets){
-        resultList.add(new String(result));
         if(getActivity() != null){
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    String processRes = result.replace("|", "\n");
                     int prevSize = mRVAdapter.getItemCount();
-                    mRVAdapter.addPage(processRes);
+                    mRVAdapter.addPage(result);
                     final String[] pageInfo = pageText.getText().toString().split("/");
                     String text = pageInfo[0] + "/" + mRVAdapter.getItemCount();
                     if(numOfPackets <= 0){
