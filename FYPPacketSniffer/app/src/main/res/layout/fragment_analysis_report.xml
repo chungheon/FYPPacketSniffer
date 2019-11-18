@@ -18,6 +18,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:hint="File Name"
+            android:textColor="@color/white"
             android:minWidth="200dp"
             android:textSize="25sp"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -30,6 +31,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:text="Capture Information"
+            android:textColor="@color/white"
             android:textSize="20sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/report_select_file_text" />
@@ -40,12 +42,12 @@
             android:layout_height="wrap_content"
             android:scrollbarSize="2dp"
             android:layout_marginTop="10dp"
+            android:textColor="@color/white"
             app:layout_constraintTop_toBottomOf="@+id/report_file_information">
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                >
+                android:layout_height="wrap_content">
                 <com.jjoe64.graphview.GraphView
                     android:id="@+id/report_num_packet_graph"
                     android:layout_width="wrap_content"
@@ -71,6 +73,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Page Info"
+                android:textColor="@color/white"
                 android:layout_gravity="center"/>
         </LinearLayout>
 

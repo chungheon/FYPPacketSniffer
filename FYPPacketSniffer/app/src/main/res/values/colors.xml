@@ -33,9 +33,10 @@
     <color name="black">#000000</color>
     <color name="grey">#E3E3E3</color>
     <color name="backgroundColor">#121025</color>
-    <color name="wifi_info_1">#202677</color>
+    <color name="textBGColor">#202677</color>
     <color name="wifi_info_2">#021C68</color>
-    <color name="wifi_text_1">#7091BE</color>
+    <color name="textColor">#7091BE</color>
+    <color name="macAddressColor">#A9A9A9</color>
 
 
 

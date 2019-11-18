@@ -99,7 +99,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/hardware/ic_keyboard_backspace_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/hardware/ic_keyboard_arrow_right_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -125,9 +125,7 @@
                                       <entry key="backgroundColor" value="37006b" />
                                       <entry key="foregroundAssetType" value="CLIP_ART" />
                                       <entry key="foregroundImage" value="D:\Test\FYP\ICONS\Designed\spash_icon.png" />
-                                      <entry key="legacyIconShape" value="CIRCLE" />
-                                      <entry key="outputName" value="back_btn_icon" />
-                                      <entry key="webIconShape" value="CIRCLE" />
+                                      <entry key="outputName" value="view_history_btn" />
                                     </map>
                                   </option>
                                 </PersistentState>

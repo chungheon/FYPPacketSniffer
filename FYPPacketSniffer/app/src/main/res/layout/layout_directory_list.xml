@@ -6,14 +6,16 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:background="@color/backgroundColor">
+    android:background="@color/textBGColor">
 
     <TextView
         android:id="@+id/directory_text"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
+        android:textSize="20sp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/textColor"/>
 
     <Button
         android:id="@+id/directory_select_btn"

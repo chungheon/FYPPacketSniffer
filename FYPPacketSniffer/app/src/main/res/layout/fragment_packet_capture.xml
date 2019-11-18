@@ -35,6 +35,7 @@
             android:layout_height="50dp"
             android:hint="eg. PCAP_001.pcap"
             android:textSize="20sp"
+            android:textColor="@color/white"
             app:layout_constraintLeft_toRightOf="@id/capture_file_text"
             app:layout_constraintTop_toBottomOf="@+id/capture_directory_text" />
 
@@ -42,6 +43,7 @@
             android:id="@+id/capture_interface"
             android:layout_width="150dp"
             android:layout_height="50dp"
+            android:textColor="@color/white"
             app:layout_constraintLeft_toRightOf="@id/capture_text_interface"
             app:layout_constraintTop_toBottomOf="@+id/capture_file_name" />
 
@@ -52,6 +54,7 @@
             android:layout_marginTop="10dp"
             android:text="Output File Name:"
             android:textSize="20sp"
+            android:textColor="@color/white"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/capture_directory_btn" />
 
@@ -62,6 +65,7 @@
             android:layout_marginTop="5dp"
             android:layout_marginLeft="10dp"
             android:hint="Directory"
+            android:textColor="@color/white"
             android:textSize="25sp"
             app:layout_constraintLeft_toRightOf="@+id/capture_directory_btn"
             app:layout_constraintTop_toTopOf="parent"
@@ -74,6 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:hint="Available Interfaces:"
+            android:textColor="@color/white"
             android:textSize="20sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/capture_file_name" />
@@ -85,12 +90,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="No. of pages"/>
+            android:text="No. of pages"
+            android:textColor="@color/white"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/capture_guide"
-            android:text="Guide for capturing files"/>
+            android:text="Guide for capturing files"
+            android:textColor="@color/white"/>
 
 </LinearLayout>

@@ -22,7 +22,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="10dp"
                 android:text="CONNECTION DETAILS"
-                android:textColor="@color/wifi_text_1"
+                android:textColor="@color/textColor"
                 android:textSize="18sp" />
 
             <ListView
@@ -36,7 +36,7 @@
                 android:layout_marginLeft="10dp"
                 android:paddingTop="5dp"
                 android:text="WI-FI DETAILS"
-                android:textColor="@color/wifi_text_1"
+                android:textColor="@color/textColor"
                 android:textSize="18sp" />
 
             <ListView
@@ -50,7 +50,7 @@
                 android:layout_marginLeft="10dp"
                 android:paddingTop="5dp"
                 android:text="CELL DETAILS"
-                android:textColor="@color/wifi_text_1"
+                android:textColor="@color/textColor"
                 android:textSize="18sp" />
 
             <ListView

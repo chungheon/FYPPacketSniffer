@@ -9,6 +9,7 @@
         android:layout_height="wrap_content"
         android:textSize="22sp"
         android:text="Item"
+        android:textColor="@color/white"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="25dp"
         app:layout_constraintLeft_toLeftOf="parent"
