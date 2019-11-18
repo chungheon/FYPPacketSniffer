@@ -16,16 +16,16 @@ import java.util.Arrays;
 
 import fyp.com.packetsniffer.R;
 
-public class RecyclerViewPageAdapter extends RecyclerView.Adapter<RecyclerViewPageAdapter.ViewHolder>{
+public class RecyclerViewNormalPageAdapter extends RecyclerView.Adapter<RecyclerViewNormalPageAdapter.ViewHolder>{
 
     private Context mContext;
     private ArrayList<byte[]> pages;
-    public RecyclerViewPageAdapter (Context context, ArrayList<byte[]> pages){
+    public RecyclerViewNormalPageAdapter (Context context, ArrayList<byte[]> pages){
         this.mContext = context;
         this.pages = pages;
     }
 
-    public RecyclerViewPageAdapter (Context context, String message){
+    public RecyclerViewNormalPageAdapter (Context context, String message){
         this.mContext = context;
         this.pages = new ArrayList<>();
         pages.add(message.getBytes());
@@ -41,8 +41,7 @@ public class RecyclerViewPageAdapter extends RecyclerView.Adapter<RecyclerViewPa
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        String processRes = new String(pages.get(i)).replace("|", "\n");
-        viewHolder.pageText.setText(processRes);
+        viewHolder.pageText.setText(new String(pages.get(i)));
         viewHolder.pageScroll.fullScroll(ScrollView.FOCUS_UP);
         int colorId1 = mContext.getResources().getColor(R.color.colorPrimary);
         int colorId2 = mContext.getResources().getColor(R.color.colorPrimaryDark);

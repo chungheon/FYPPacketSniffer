@@ -10,7 +10,13 @@ public class PacketDate {
         Calendar temp = null;
         switch (range){
             //10 min range
-            case 1:
+            case 1:temp = Calendar.getInstance();
+                    temp.setTime(date.getTime());
+                    int min = temp.get(Calendar.MINUTE);
+                    min -= (min % 10);
+                    temp.set(Calendar.MINUTE, min);
+                    temp.set(Calendar.SECOND, 0);
+                    temp.set(Calendar.MILLISECOND, 0);
                     break;
             //30 min range
             case 2:
@@ -30,7 +36,12 @@ public class PacketDate {
         Calendar temp = date;
         switch (range){
             //10 min range
-            case 1:
+            case 1:temp = Calendar.getInstance();
+                temp.setTime(date.getTime());
+                temp.add(Calendar.MINUTE, 10);
+                temp.set(Calendar.SECOND, 0);
+                temp.set(Calendar.MILLISECOND, 0);
+
                 break;
             //30 min range
             case 2:
@@ -58,8 +69,8 @@ public class PacketDate {
         return temp;
     }
 
-    public static String getString(Calendar date){
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh");
+    public static String getString(Calendar date, String format){
+        DateFormat dateFormat = new SimpleDateFormat(format);
         String strDate = dateFormat.format(date.getTime());
         return strDate;
     }

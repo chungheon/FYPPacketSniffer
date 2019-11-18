@@ -47,7 +47,10 @@ public class PacketViewThread extends CmdExecNormal {
                     }
 
                     if(br.ready()){
-                        line = br.readLine();
+                        if((line = br.readLine()) == null){
+                            break;
+                        }
+
                     }
                     if(line != null){
                         if(first) {
@@ -70,16 +73,16 @@ public class PacketViewThread extends CmdExecNormal {
                         }
                         lineAdded++;
                         line = null;
-                        waitCounter = 0;
+                        //waitCounter = 0;
                     }else{
                         try{
                             this.wait(10);
                         }catch (InterruptedException e){
                             break;
                         }
-                        waitCounter++;
+                        waitCounter ++;
                     }
-                    if(waitCounter > 100){
+                    if(waitCounter > 200){
                         break;
                     }
                 }
@@ -104,14 +107,14 @@ public class PacketViewThread extends CmdExecNormal {
 
     private void normalFilter(String line){
         if(line.matches("\\d*-\\d*-\\d* \\d*:\\d*:\\d*.*")){
-            if( lineAdded >= 300){
+            if(page.length() >= 8000){
                 pageNum++;
                 updateResult(page, numOfPackets);
-                if(numOfPackets > 270000){
+                /*if(numOfPackets > 270000){
                     this.stopRun();
                     printToast("Stopping Run... Unable to read more than " + numOfPackets + " packets");
                     return;
-                }
+                }*/
                 lineAdded = 0;
                 page = "Page " + pageNum + "|\n" + line;
             }else{
@@ -125,28 +128,19 @@ public class PacketViewThread extends CmdExecNormal {
 
     private void webFilter(String line){
         if(line.matches("\\d*-\\d*-\\d* \\d*:\\d*:\\d*.*")){
-            if( lineAdded >= 300){
+            if(page.length() >= 8000){
                 pageNum++;
                 updateResult(page, numOfPackets);
                 lineAdded = 0;
-                if(numOfPackets > 270000){
-                    this.stopRun();
-                    return;
-                }
                 page = "Page " + pageNum + "\n" + line;
             }else{
                 page += "|\n" + line;
             }
             numOfPackets++;
         }else if(line.matches(".*AAAAAAAAA.*")){
-            if( lineAdded >= 300){
+            if(page.length() >= 8000){
                 pageNum++;
                 updateResult(page, numOfPackets);
-                if(numOfPackets > 270000){
-                    this.stopRun();
-                    printToast("Stopping Run... Unable to read more than " + numOfPackets + " packets");
-                    return;
-                }
                 lineAdded = 0;
                 page = "Page " + pageNum + "\n" + line;
             }else{

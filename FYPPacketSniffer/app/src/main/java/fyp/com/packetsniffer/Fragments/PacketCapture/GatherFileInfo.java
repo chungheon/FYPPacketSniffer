@@ -1,6 +1,7 @@
 package fyp.com.packetsniffer.Fragments.PacketCapture;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -9,11 +10,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class GatherFileInfo extends AsyncTask<String, Integer, String> {
-    private ArrayList<String> data;
+    private ArrayList<byte[]> data;
     private long numOfPackets;
     private AnalysisReportFragment mFragment;
 
-    public GatherFileInfo(AnalysisReportFragment fragment, ArrayList<String> packets, long numOfPackets){
+    public GatherFileInfo(AnalysisReportFragment fragment, ArrayList<byte[]> packets, long numOfPackets){
         this.data = packets;
         this.numOfPackets = numOfPackets;
         this.mFragment = fragment;
@@ -25,7 +26,7 @@ public class GatherFileInfo extends AsyncTask<String, Integer, String> {
         DateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         boolean found = false;
         for(int j = 0; j < data.size(); j++) {
-            String[] dataInfo = data.get(j).split("\\|");
+            String[] dataInfo = new String(data.get(j)).split("\\|");
             int count = 0;
             for (int i = 0; i < dataInfo.length; i++) {
                 String line = dataInfo[i].replace("\n", "");
@@ -50,7 +51,7 @@ public class GatherFileInfo extends AsyncTask<String, Integer, String> {
         found  = false;
 
         for(int j = data.size() -1; j >= 0; j--){
-            String[] dataInfo = data.get(j).split("\\|");
+            String[] dataInfo = new String(data.get(j)).split("\\|");
             for(int i = dataInfo.length - 1; i > 0; i--) {
                 String line = dataInfo[i].replace("\n", "");
                 if(line.matches(".*\\d*-\\d*-\\d* \\d*:\\d*:\\d*.*")){

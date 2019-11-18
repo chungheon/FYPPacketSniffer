@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ARPReportThread implements Runnable {
-    private Thread thread;
-    private ArrayList<String> data;
+    public Thread thread;
+    private ArrayList<byte[]> data;
     private AnalysisReportFragment mFragment;
     private ArrayList<String> requests;
     private ArrayList<String> replies;
@@ -17,9 +17,10 @@ public class ARPReportThread implements Runnable {
     private ArrayList<String> sameMacs;
     private ArrayList<String> suspiciousIP;
     private ArrayList<String> suspiciousMAC;
+    private boolean exit = false;
     private long numOfPackets;
 
-    public ARPReportThread(AnalysisReportFragment fragment, ArrayList<String> data){
+    public ARPReportThread(AnalysisReportFragment fragment, ArrayList<byte[]> data){
         this.data = data;
         this.mFragment = fragment;
         this.numOfPackets = numOfPackets;
@@ -43,7 +44,7 @@ public class ARPReportThread implements Runnable {
         long reqCount = 0;
         long replyCount = 0;
         for(int j = 0; j < data.size(); j++) {
-            String[] dataInfo = data.get(j).split("\\|");
+            String[] dataInfo = new String(data.get(j)).split("\\|");
             for (String s : dataInfo) {
                 String line = s.replace("\n", "");
                 if (line.matches(".*\\d*-\\d*-\\d* \\d*:\\d*:\\d*.*")) {
@@ -62,6 +63,9 @@ public class ARPReportThread implements Runnable {
                             reply = "";
                         }
                     }
+                }
+                if(this.exit){
+                    return;
                 }
             }
         }
@@ -102,6 +106,9 @@ public class ARPReportThread implements Runnable {
                 }
                 counter++;
             }
+            if(this.exit){
+                return;
+            }
         }
         analysis += "\n\n";
 
@@ -131,6 +138,9 @@ public class ARPReportThread implements Runnable {
                 if (counter == diffRepArray.size() - 1 && countDiff > 0) {
                     mFragment.printAnalysis(analysis);
                 }
+                if(this.exit){
+                    return;
+                }
                 counter++;
             }
         }
@@ -155,6 +165,9 @@ public class ARPReportThread implements Runnable {
                     }
                 }else{
                     mFragment.printAnalysis(header + sus);
+                }
+                if(this.exit){
+                    return;
                 }
             }
         }
@@ -181,6 +194,9 @@ public class ARPReportThread implements Runnable {
                 }else{
                     mFragment.printAnalysis(header + sus);
                 }
+                if(this.exit){
+                    return;
+                }
             }
         }
     }
@@ -205,6 +221,9 @@ public class ARPReportThread implements Runnable {
                             Pair newValue = new Pair(new Long(1), reply);
                             replyStore.put(rep, newValue);
                         }
+                    }
+                    if(this.exit){
+                        return;
                     }
                 }
             }
@@ -248,9 +267,12 @@ public class ARPReportThread implements Runnable {
                     }
                 }
             }
+            if(this.exit){
+                break;
+            }
         }
 
-        if(replies.keySet().size() > 1){
+        if(replies.keySet().size() > 1 && !exit){
             String header = "IP Address Request: " + ipAddr + "\n\n";
             this.suspiciousIP.add(header + allReplies);
             diffRep = "Reply for " + ipAddr + ":\n";
@@ -288,6 +310,9 @@ public class ARPReportThread implements Runnable {
                     if(ipReq.matches(".*Request who-has " + reply + ".*")){
                         count++;
                     }
+                    if(this.exit){
+                        return;
+                    }
                 }
 
             }
@@ -296,6 +321,9 @@ public class ARPReportThread implements Runnable {
             }else{
                 occurance += reply + "- Replies: " + occur + "  Requests: " + count + "\n";
                 lastCounter++;
+            }
+            if(this.exit){
+                return;
             }
         }
         findSameMacs(replyStore, MACs);
@@ -319,50 +347,13 @@ public class ARPReportThread implements Runnable {
                 }
                 suspiciousMAC.add(sus);
             }
+            if(this.exit){
+                return;
+            }
         }
     }
 
-    /*private String combineRepetition(String susReplies){
-        String[] sus = susReplies.split("\n\n");
-        int count = 0;
-        String current = "";
-        String result = "";
-        if(susReplies.equals("")){
-            return "All IP Address ARP Replies equal or less than its ARP Requests";
-        }
-        for(String replys: sus){
-            String[] replyInfo = replys.split("\n");
-            String[] arpReply = new String[replyInfo.length];
-            for(int i = 0; i < replyInfo.length; i++){
-                String[] temp1 = replyInfo[i].split("Reply");
-                if(temp1.length > 1){
-                    String[] temp2 = temp1[1].substring(1).split(" ");
-                    if(temp2.length > 2) {
-                        String key = temp2[0] + " " + temp2[1] + " " + temp2[2];
-                        arpReply[i] = key;
-                    }
-                }
-            }
-            Arrays.sort(arpReply);
-            for(String reply: arpReply){
-                if(count == 0){
-                    current = reply;
-                    count++;
-                }else{
-                    if(current.equals(reply)){
-                        count++;
-                    }else{
-                        result += current + " occur: " + count + "\n";
-                        current = reply;
-                        count = 1;
-                    }
-                }
-            }
-        }
-
-        if(count > 0){
-            result += current + " occur: " + count;
-        }
-        return result;
-    }*/
+    public void stopRun(){
+        this.exit = true;
+    }
 }

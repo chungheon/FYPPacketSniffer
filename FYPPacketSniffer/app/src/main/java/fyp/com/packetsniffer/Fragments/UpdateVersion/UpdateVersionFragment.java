@@ -63,7 +63,7 @@ public class UpdateVersionFragment extends Fragment implements CmdExecInterface 
         mLayoutManager = new LinearLayoutManager(getContext().getApplicationContext(),
                 LinearLayout.HORIZONTAL,
                 false);
-        mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<String>());
+        mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<byte[]>());
         output.setAdapter(mRVAdapter);
         output.setLayoutManager(mLayoutManager);
     }
@@ -133,7 +133,7 @@ public class UpdateVersionFragment extends Fragment implements CmdExecInterface 
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<String>());
+                            mRVAdapter = new RecyclerViewPageAdapter(getContext().getApplicationContext(), new ArrayList<byte[]>());
                             output.setAdapter(mRVAdapter);
                             cmdRunnable = new UpdateVersionThread(mFragment, allCmd);
                             Thread update = new Thread(cmdRunnable);

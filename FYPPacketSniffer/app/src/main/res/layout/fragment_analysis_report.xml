@@ -36,20 +36,64 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/report_select_file_text" />
 
+        <TextView
+            android:id="@+id/report_send_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/report_file_information"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="65dp"
+            android:text="Number Of Packets Sent From IP Address"/>
+
         <HorizontalScrollView
             android:id="@+id/report_packet_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scrollbarSize="2dp"
             android:layout_marginTop="10dp"
+<<<<<<< HEAD
             android:textColor="@color/white"
             app:layout_constraintTop_toBottomOf="@+id/report_file_information">
+=======
+            app:layout_constraintTop_toBottomOf="@+id/report_send_title">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+                <com.jjoe64.graphview.GraphView
+                    android:id="@+id/report_num_send_graph"
+                    android:layout_width="wrap_content"
+                    android:layout_height="300dp" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/report_recv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/report_packet_layout"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="65dp"
+            android:text="Number Of Packets Sent to IP Address"/>
+
+        <HorizontalScrollView
+            android:id="@+id/report_packet_layout_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbarSize="2dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@+id/report_recv_title">
+>>>>>>> 9df19b0d232866a56657a63c976f1806c5f4bd80
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <com.jjoe64.graphview.GraphView
-                    android:id="@+id/report_num_packet_graph"
+                    android:id="@+id/report_num_recv_graph"
                     android:layout_width="wrap_content"
                     android:layout_height="300dp" />
 
@@ -61,7 +105,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@+id/report_packet_layout" >
+            app:layout_constraintTop_toBottomOf="@+id/report_packet_layout_2" >
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/report_analysis_information"
                 android:layout_width="match_parent"
