@@ -23,6 +23,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:text="Select File"
+            android:theme="@style/ButtonTheme"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
@@ -47,6 +48,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:text="Review"
+            android:theme="@style/ButtonTheme"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/analyse_select_file"/>
 
@@ -55,6 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Get Report"
+            android:theme="@style/ButtonTheme"
             app:layout_constraintTop_toBottomOf="@id/analyse_select_file"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginTop="10dp"
@@ -283,6 +286,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Jump To Page"
+            android:theme="@style/ButtonTheme"
             app:layout_constraintTop_toBottomOf="@+id/analyse_filters"
             app:layout_constraintLeft_toRightOf="@+id/jump_page"/>
     </android.support.constraint.ConstraintLayout>
