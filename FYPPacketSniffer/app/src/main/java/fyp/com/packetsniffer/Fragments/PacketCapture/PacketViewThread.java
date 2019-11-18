@@ -47,10 +47,10 @@ public class PacketViewThread extends CmdExecNormal {
                     }
 
                     if(br.ready()){
-                        line = br.readLine();
-                        if(line == null){
+                        if((line = br.readLine()) == null){
                             break;
                         }
+
                     }
                     if(line != null){
                         if(first) {
@@ -73,7 +73,7 @@ public class PacketViewThread extends CmdExecNormal {
                         }
                         lineAdded++;
                         line = null;
-                        waitCounter = 0;
+                        //waitCounter = 0;
                     }else{
                         try{
                             this.wait(10);
@@ -82,7 +82,7 @@ public class PacketViewThread extends CmdExecNormal {
                         }
                         waitCounter ++;
                     }
-                    if(waitCounter > 100){
+                    if(waitCounter > 200){
                         break;
                     }
                 }

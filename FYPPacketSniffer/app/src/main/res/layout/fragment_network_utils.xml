@@ -28,10 +28,20 @@
             app:layout_constraintRight_toRightOf="parent"
             android:gravity="center_vertical"
             android:layout_marginTop="10dp"/>
-        <TextView
-            android:layout_width="370dp"
+        <Button
+            android:id="@+id/network_utils_start_btn"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/network_utils_input_edittext"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:text="Start"
+            android:textSize="20sp"/>
+        <TextView
+            android:id="@+id/network_utils_guide_text"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/network_utils_start_btn"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:gravity="center_vertical"/>

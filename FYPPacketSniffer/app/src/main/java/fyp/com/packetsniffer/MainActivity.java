@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fyp.com.packetsniffer.Fragments.DevicesConnected.DeviceConnectFragment;
+import fyp.com.packetsniffer.Fragments.NetworkUtils.NetworkUtilsFragment;
+import fyp.com.packetsniffer.Fragments.NetworkUtils.PingActivity;
 import fyp.com.packetsniffer.Fragments.NetworkUtils.TraceActivity;
 import fyp.com.packetsniffer.Fragments.PacketCapture.PacketAnalysisFragment;
 import fyp.com.packetsniffer.Fragments.PacketCapture.PacketCaptureFragment;
@@ -188,14 +190,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 toolbar.setTitle("Update Libraries");
                     break;
             case R.id.network_utils:
-                TraceActivity test = new TraceActivity();
-                Bundle testArgs = new Bundle();
-                testArgs.putString("host", "www.google.com");
-                test.setArguments(testArgs);
-                     getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, test)
+                getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new NetworkUtilsFragment())
                     .commit();
-                toolbar.setTitle("Trace Route");
+                toolbar.setTitle("Network Utils");
         }
 
         drawerLayout.closeDrawer(Gravity.START);

@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,12 +35,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import fyp.com.packetsniffer.MainActivity;
 import fyp.com.packetsniffer.R;
 
 public class TraceActivity extends Fragment{
 
-    public static final String tag = "TraceroutePing";
-    public static final String INTENT_TRACE = "INTENT_TRACE";
+    public static final String TAG = "Traceroute";
 
     private TextView address;
     private ProgressBar progressBarPing;
@@ -68,6 +69,7 @@ public class TraceActivity extends Fragment{
         }
         setPermissions();
         initView();
+        initListener();
         return view;
     }
 
@@ -89,6 +91,20 @@ public class TraceActivity extends Fragment{
                     Toast.LENGTH_SHORT).show();
             address.setText("Unknown");
         }
+    }
+
+    private void initListener(){
+        this.view.setFocusableInTouchMode(true);
+        this.view.requestFocus();
+        this.view.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if( keyCode == KeyEvent.KEYCODE_BACK ) {
+                    ((MainActivity)getActivity()).getSupportActionBar().setTitle("Network Utils");
+                }
+                return false;
+            }
+        });
     }
 
     public void printResult(TracerouteContainer trace) {
@@ -200,13 +216,6 @@ public class TraceActivity extends Fragment{
         }
     }
 
-    /*public void hideSoftwareKeyboard(EditText currentEditText) {
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm.isActive()) {
-            imm.hideSoftInputFromWindow(currentEditText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
-    }*/
-
     public void startProgressBar() {
         if(getActivity() != null){
             getActivity().runOnUiThread(new Runnable() {
@@ -229,7 +238,7 @@ public class TraceActivity extends Fragment{
         }
     }
 
-    public void setPermissions() {
+    private void setPermissions() {
         try {
             Process shell = Runtime.getRuntime().exec("chmod 777 " + libPath + "\n");
             shell.waitFor();
@@ -237,7 +246,7 @@ public class TraceActivity extends Fragment{
         } catch (InterruptedException e) { }
     }
 
-    public void installAsset(String assetName, String fileName, String dirPath) {
+    private void installAsset(String assetName, String fileName, String dirPath) {
         InputStream is = null;
         FileOutputStream fileOutputStream = null;
         try {
