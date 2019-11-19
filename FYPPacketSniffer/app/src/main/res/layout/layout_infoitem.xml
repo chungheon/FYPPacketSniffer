@@ -27,7 +27,7 @@
         android:fontFamily="@font/duru_sans"
         android:text="Value"
         android:textAlignment="viewEnd"
-        android:textColor="@color/wifi_text_1"
+        android:textColor="@color/textColor"
         android:textSize="17sp"
         android:maxWidth="250dp"
         android:maxLines="1"

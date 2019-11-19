@@ -23,6 +23,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:text="Select File"
+            android:theme="@style/ButtonTheme"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
@@ -35,6 +36,7 @@
             android:textSize="25dp"
             android:maxLines="1"
             android:ellipsize="end"
+            android:textColor="@color/white"
             app:layout_constraintLeft_toRightOf="@id/analyse_select_file"
             app:layout_constraintTop_toTopOf="parent"
             android:text="@string/select_file"/>
@@ -46,6 +48,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:text="Review"
+            android:theme="@style/ButtonTheme"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/analyse_select_file"/>
 
@@ -54,6 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Get Report"
+            android:theme="@style/ButtonTheme"
             app:layout_constraintTop_toBottomOf="@id/analyse_select_file"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginTop="10dp"
@@ -70,7 +74,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:animateLayoutChanges="true">
+                android:animateLayoutChanges="true"
+                android:background="@color/textBGColor">
                 <android.support.constraint.ConstraintLayout
                     android:id="@+id/analyse_filter_text"
                     android:layout_width="match_parent"
@@ -83,6 +88,7 @@
                         android:layout_marginTop="10dp"
                         android:paddingLeft="20dp"
                         android:text="Filters"
+                        android:textColor="@color/white"
                         android:textSize="20sp"
                         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -104,7 +110,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     app:layout_constraintTop_toBottomOf="@+id/analyse_filter_text"
-                    app:layout_constraintLeft_toLeftOf="parent">
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    android:background="@color/textBGColor">
 
                     <android.support.v7.widget.AppCompatRadioButton
                         android:id="@+id/filter_1"
@@ -114,7 +121,8 @@
                         android:textSize="15sp"
                         android:layout_marginTop="10dp"
                         android:layout_marginLeft="10dp"
-                        android:checked="true"/>
+                        android:checked="true"
+                        android:textColor="@color/textColor"/>
 
                     <android.support.v7.widget.AppCompatRadioButton
                         android:id="@+id/filter_2"
@@ -123,7 +131,8 @@
                         android:text="@string/filter_2"
                         android:textSize="15sp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp" />
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
 
                     <android.support.v7.widget.AppCompatRadioButton
                         android:id="@+id/filter_3"
@@ -132,7 +141,8 @@
                         android:text="@string/filter_3"
                         android:textSize="15sp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp" />
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
 
                     <android.support.v7.widget.AppCompatRadioButton
                         android:id="@+id/filter_4"
@@ -141,7 +151,8 @@
                         android:text="@string/filter_4"
                         android:textSize="15sp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp" />
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
 
                     <android.support.v7.widget.AppCompatRadioButton
                         android:id="@+id/filter_5"
@@ -150,7 +161,8 @@
                         android:text="@string/filter_5"
                         android:textSize="15sp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp" />
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
 
                     <android.support.v7.widget.AppCompatRadioButton
                         android:id="@+id/filter_6"
@@ -159,7 +171,8 @@
                         android:text="@string/filter_6"
                         android:textSize="15sp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp" />
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
 
                     <android.support.v7.widget.AppCompatRadioButton
                         android:id="@+id/filter_7"
@@ -168,7 +181,8 @@
                         android:text="@string/filter_7"
                         android:textSize="15sp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp" />
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
 
                     <android.support.v7.widget.AppCompatRadioButton
                         android:id="@+id/filter_8"
@@ -177,7 +191,8 @@
                         android:text="@string/filter_8"
                         android:textSize="15sp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp" />
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
 
                     <android.support.v7.widget.AppCompatRadioButton
                         android:id="@+id/filter_9"
@@ -186,7 +201,8 @@
                         android:text="@string/filter_9"
                         android:textSize="15sp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp" />
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
 
                 </RadioGroup>
 
@@ -211,6 +227,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="-x"
+                        android:textColor="@color/textColor"
                         android:textSize="20sp"
                         android:layout_marginTop="10dp"
                         android:layout_marginLeft="10dp" />
@@ -219,6 +236,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="-xx"
+                        android:textColor="@color/textColor"
                         android:textSize="20sp"
                         android:layout_marginTop="10dp"
                         android:layout_marginLeft="10dp" />
@@ -227,6 +245,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="-X"
+                        android:textColor="@color/textColor"
                         android:textSize="20sp"
                         android:layout_marginTop="10dp"
                         android:layout_marginLeft="10dp" />
@@ -235,6 +254,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="-XX"
+                        android:textColor="@color/textColor"
                         android:textSize="20sp"
                         android:layout_marginTop="10dp"
                         android:layout_marginLeft="10dp" />
@@ -243,6 +263,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Normal"
+                        android:textColor="@color/textColor"
                         android:textSize="15sp"
                         android:layout_marginTop="10dp"
                         android:layout_marginLeft="10dp"
@@ -265,6 +286,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Jump To Page"
+            android:theme="@style/ButtonTheme"
             app:layout_constraintTop_toBottomOf="@+id/analyse_filters"
             app:layout_constraintLeft_toRightOf="@+id/jump_page"/>
     </android.support.constraint.ConstraintLayout>
@@ -284,6 +306,7 @@
             android:id="@+id/num_page"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/white"
             android:text="No of Pages"
             android:layout_gravity="center"/>
 
@@ -292,6 +315,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="No of Packets"
+            android:textColor="@color/white"
             android:layout_gravity="center"
             android:layout_marginBottom="50dp" />
     </LinearLayout>

@@ -68,7 +68,7 @@
             android:paddingTop="5dp"
             android:paddingBottom="10dp"
             android:text="MAC address"
-            android:textColor="#A9A9A9"
+            android:textColor="@color/macAddressColor"
             android:textSize="12sp"
             android:singleLine="true"
             android:ellipsize="marquee"

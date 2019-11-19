@@ -40,7 +40,7 @@ public class ListViewWifiInfoAdaptor extends ArrayAdapter<Pair<String, String>> 
         try{
             int bgColor = mContext.getResources().getColor(R.color.colorPrimary);
             if(position % 2 == 0){
-                bgColor = mContext.getResources().getColor(R.color.wifi_info_1);
+                bgColor = mContext.getResources().getColor(R.color.textBGColor);
             }else{
                 bgColor = mContext.getResources().getColor(R.color.wifi_info_2);
             }

@@ -3,7 +3,8 @@
     android:id="@+id/page_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/textBGColor">
 
     <ScrollView
         android:id="@+id/page_scroll"
@@ -13,7 +14,8 @@
         <TextView
             android:id="@+id/page_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColor"/>
 
     </ScrollView>
 
