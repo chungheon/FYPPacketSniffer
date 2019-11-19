@@ -22,6 +22,16 @@
     <string name="string_test">test</string>
     <string name="error">An error occurred, please try again</string>
     <string name="timeout">Timeout</string>
-    <string name="placeholder">www.google.fr</string>
+    <string name="captureguide">
+        Packet Capture Guide\n
+        1. Select directory for file to be saved\n
+        2. Enter file name to be saved as.\n
+        3. Select an interface to capture on.\n
+        4. Press Capture Button to begin capturing.\n
+        5. Total number of packets being captured would be shown.\n
+        6. Press Stop Capturing Button to stop capturing.\n
+        \n
+        Total packets will be slightly more than displayed amount.
+    </string>
 
 </resources>

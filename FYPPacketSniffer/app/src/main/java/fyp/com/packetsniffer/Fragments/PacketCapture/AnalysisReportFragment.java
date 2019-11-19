@@ -279,6 +279,30 @@ public class AnalysisReportFragment extends Fragment{
         }
     }
 
+    public void printSynAck(final String result){
+        if(getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mRVAdapter.addPage(result, 0);
+                    mRVAdapter.notifyDataSetChanged();
+                }
+            });
+        }
+    }
+
+    public void printSynAckUpdate(final String result){
+        if(getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mRVAdapter.updatePage(result, 0);
+                    mRVAdapter.notifyItemChanged(0);
+                }
+            });
+        }
+    }
+
     public void printNumSend(final List<Pair<String, Double>> data){
         if(getActivity() != null && data.size() != 0){
             getActivity().runOnUiThread(new Runnable() {

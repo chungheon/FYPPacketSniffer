@@ -51,7 +51,6 @@ public class PingActivity extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_network_ping, container, false);
         installAsset("ping", "ping", getActivity().getFilesDir().toString());
-        setPermissions();
         initView();
         initListener();
         return view;
@@ -150,6 +149,7 @@ public class PingActivity extends Fragment {
 
             is.close();
             fileOutputStream.close();
+            setPermissions();
         } catch (IOException e) {
             if (is != null) {
                 try {

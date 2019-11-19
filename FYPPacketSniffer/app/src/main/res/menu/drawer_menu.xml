@@ -19,32 +19,27 @@
             android:title="Packet Capture" />
         <item
             android:id="@+id/packet_analysis"
-            android:icon="@mipmap/records"
+            android:icon="@mipmap/packet_analysis"
             android:title="Packet Analysis"/>
         <item
             android:id="@+id/network_utils"
-            android:icon="@mipmap/records"
+            android:icon="@mipmap/network_utilities_icon"
             android:title="Network Utilities"/>
-
         <item
-            android:id="@+id/nmap_services"
-            android:icon="@mipmap/records"
-            android:title="Nmap Services"/>
-        <item
-            android:id="@+id/extra_utilities"
-            android:icon="@mipmap/records"
-            android:title="Extra Utilities"/>
+            android:id="@+id/aircrack_suite"
+            android:icon="@mipmap/packet_analysis"
+            android:title="Aircrack-ng"/>
     </group>
 
     <item android:title="">
         <menu>
             <item
                 android:id="@+id/update_libraries"
-                android:icon="@drawable/ic_test1"
+                android:icon="@mipmap/update_versions"
                 android:title="Update Libraries" />
             <item
                 android:id="@+id/about_us"
-                android:icon="@drawable/ic_test1"
+                android:icon="@mipmap/about_us"
                 android:title="About Us" />
         </menu>
     </item>

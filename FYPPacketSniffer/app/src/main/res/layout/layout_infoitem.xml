@@ -16,7 +16,8 @@
         android:fontFamily="@font/duru_sans"
         android:text="Title"
         android:textSize="17sp"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/value"
@@ -28,6 +29,10 @@
         android:textAlignment="viewEnd"
         android:textColor="@color/wifi_text_1"
         android:textSize="17sp"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:maxWidth="250dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

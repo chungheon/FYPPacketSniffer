@@ -76,6 +76,7 @@ public class RecyclerViewPageAdapter extends RecyclerView.Adapter<RecyclerViewPa
         pages.add(page.getBytes());
     }
 
+
     public ArrayList<byte[]> getData(){
         return pages;
     }

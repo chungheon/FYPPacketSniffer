@@ -3,9 +3,7 @@ package fyp.com.packetsniffer;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Trace;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -14,7 +12,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,23 +21,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fyp.com.packetsniffer.Fragments.DevicesConnected.DeviceConnectFragment;
+import fyp.com.packetsniffer.Fragments.DevicesConnected.NmapServices.NmapMainFragment;
 import fyp.com.packetsniffer.Fragments.NetworkUtils.NetworkUtilsFragment;
-import fyp.com.packetsniffer.Fragments.NetworkUtils.PingActivity;
-import fyp.com.packetsniffer.Fragments.NetworkUtils.TraceActivity;
 import fyp.com.packetsniffer.Fragments.PacketCapture.PacketAnalysisFragment;
 import fyp.com.packetsniffer.Fragments.PacketCapture.PacketCaptureFragment;
-import fyp.com.packetsniffer.Fragments.Tab1Fragment;
 import fyp.com.packetsniffer.Fragments.UpdateVersion.UpdateVersionFragment;
 import fyp.com.packetsniffer.Fragments.WifiInfo.WifiInfoFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private final static String TAG = "MainActivity";
-    private TabLayout tabLayout;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navView;
     private ActionBarDrawerToggle toggle;
-    private boolean mNavListenerReg = false;
 
     private ArrayList<byte[]> result = new ArrayList<>();
     private Long numPackets = new Long(0);
@@ -194,6 +187,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .replace(R.id.fragment_container, new NetworkUtilsFragment())
                     .commit();
                 toolbar.setTitle("Network Utils");
+                break;
+            case R.id.aircrack_suite:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new NmapMainFragment())
+                        .commit();
+                toolbar.setTitle("Aircrack-ng");
+                break;
         }
 
         drawerLayout.closeDrawer(Gravity.START);

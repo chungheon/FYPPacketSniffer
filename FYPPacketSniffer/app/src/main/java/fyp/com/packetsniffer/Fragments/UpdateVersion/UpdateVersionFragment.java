@@ -52,12 +52,9 @@ public class UpdateVersionFragment extends Fragment implements CmdExecInterface 
         this.output = (RecyclerView) view.findViewById(R.id.result_text);
         this.updateBtn = (Button) view.findViewById(R.id.update_btn);
         optionSpinner = (Spinner) view.findViewById(R.id.ver_spinner);
-        // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext().getApplicationContext(),
                 R.array.update_choices, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
         optionSpinner.setAdapter(adapter);
 
         mLayoutManager = new LinearLayoutManager(getContext().getApplicationContext(),
@@ -93,39 +90,45 @@ public class UpdateVersionFragment extends Fragment implements CmdExecInterface 
                     dir.mkdirs();
                 }
 
-                if(selected < 0){
+                //For Future Development to cater to both ARM and x86 Architecures
+                /*if(selected < 0){
                     printToast("Please select one of the choices");
                     return;
-                }else if(selected == 0){
+                }else if(selected == 0){*/
                     cmds.add("mount -o rw,remount /system");
                     installAsset("tcpdump_arm", "tcpdump", dirPath, cmds);
                     installAsset("aircrack-ng", "aircrack-ng", dirPath, cmds);
-                    installAsset("nmap_arm", "nmap", dirPath, cmds);
-                    installAsset("nmap-services_arm", "nmap-services", dirPath, cmds);
-                    installAsset("nmap-payloads_arm", "nmap-payloads", dirPath, cmds);
-                    installAsset("nmap-mac-prefixes_arm", "nmap-mac-prefixes", dirPath, cmds);
-                    installAsset("nmap-os-db_arm", "nmap-os-db", dirPath, cmds);
                     installAsset("traceroute_arm", "traceroute", dirPath, cmds);
+                    //For future when nmap suite to be added
+                    /*installAsset("nmap-os-db_arm", "nmap-os-db",dirPath, cmds);
+                    installAsset("nmap-services_arm", "nmap-services",dirPath, cmds);
+                    installAsset("nmap-payloads_arm", "nmap-payloads",dirPath, cmds);
+                    installAsset("nmap-mac-prefixes_arm", "nmap-mac-prefixes",dirPath, cmds);
+                    installAsset("nmap_arm", "nmap",dirPath, cmds);*/
 
+                    //cmds.add("nmap --help | grep \'Nmap 7.31\'");
                     cmds.add("tcpdump --version");
-                    cmds.add("nmap --help | grep \'Nmap 7.31\'");
                     cmds.add("aircrack-ng | grep \'Aircrack-ng 1.2 rc4\'");
                     cmds.add("traceroute --version");
                     cmds.add("mount -o ro,remount /system");
                     cmds.add("exit");
-                }else if(selected == 1){
+
+                /*}else if(selected == 1){
                     cmds.add("mount -o rw,remount /system");
                     installAsset("tcpdump_x86", "tcpdump", dirPath, cmds);
-                    installAsset("nmap_x86", "nmap", dirPath, cmds);
-                    installAsset("nmap-services_x86", "nmap-services", dirPath, cmds);
-                    installAsset("nmap-payloads_x86", "nmap-payloads", dirPath, cmds);
+                    installAsset("nmap-os-db_x86", "nmap-os-db",dirPath, cmds);
+                    installAsset("nmap-services_x86", "nmap-services",dirPath, cmds);
+                    installAsset("nmap-payloads_x86", "nmap-payloads",dirPath, cmds);
+                    installAsset("nmap-mac-prefixes_x86", "nmap-mac-prefixes",dirPath, cmds);
+                    installAsset("nse_main_x86.lua", "nse_main.lua",dirPath, cmds);
+                    installAsset("nmap_x86", "nmap",dirPath, cmds);
                     installAsset("traceroute_x86", "traceroute", dirPath, cmds);
                     cmds.add("tcpdump --version");
                     cmds.add("nmap --help | grep \'Nmap 7.31\'");
                     cmds.add("traceroute --version");
                     cmds.add("mount -o ro,remount /system");
                     cmds.add("exit");
-                }
+                }*/
 
                 if(cmdRunnable != null){
                     cmdRunnable.stopRun();

@@ -61,13 +61,7 @@ public class TraceActivity extends Fragment{
         this.address = (TextView) view.findViewById(R.id.trace_route_address);
         this.listViewTraceroute = (ListView) view.findViewById(R.id.trace_route_result_list);
         this.progressBarPing = (ProgressBar) view.findViewById(R.id.trace_route_progress_bar);
-        getArchitecture();
-        if(arch.equals("aarch64")){
-            installAsset("traceroute_arm", "traceroute",getActivity().getFilesDir().toString());
-        }else if(arch.equals("x86")){
-            installAsset("traceroute_x86", "traceroute",getActivity().getFilesDir().toString());
-        }
-        setPermissions();
+        installAsset("traceroute_arm", "traceroute",getActivity().getFilesDir().toString());
         initView();
         initListener();
         return view;
@@ -120,7 +114,8 @@ public class TraceActivity extends Fragment{
         }
     }
 
-    private void getArchitecture(){
+    //For future integration of both ARM and x86 Architecture
+    /*private void getArchitecture(){
         arch = System.getProperty("os.arch");
         if(arch.equals("") || arch == null){
             final String[] architectures = {"aarch64", "x86"};
@@ -141,7 +136,7 @@ public class TraceActivity extends Fragment{
             builder.show();
         }
         Log.d("ARCH", arch);
-    }
+    }*/
 
     public void refreshList(){
         if(getActivity() != null){
@@ -261,6 +256,7 @@ public class TraceActivity extends Fragment{
 
             is.close();
             fileOutputStream.close();
+            setPermissions();
         } catch (IOException e) {
             if (is != null) {
                 try {

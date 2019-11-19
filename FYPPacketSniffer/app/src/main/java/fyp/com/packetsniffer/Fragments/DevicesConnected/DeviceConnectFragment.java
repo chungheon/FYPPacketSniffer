@@ -151,28 +151,22 @@ public class DeviceConnectFragment extends Fragment {
                             "Not Connected to Network", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                if(!scanInProgress){
+                    scanInProgress = true;
+                    updateListRunnable = new UpdateListRunnable(mConnectivityManager, mWifiManager,
+                            getContext().getApplicationContext(), networkIP, connFragment);
+                    Thread update = new Thread(updateListRunnable);
+                    update.start();
 
-                if(networkIP.getNumberOfHosts() > (255*255)){
-                    Toast.makeText(getContext().getApplicationContext(),
-                            "Network too big for scan", Toast.LENGTH_LONG).show();
+                    scanRunnable = new ScanSubNetRunnable(networkIP, updateListRunnable);
+                    Thread scan = new Thread(scanRunnable);
+                    scan.start();
+
+                    displayPercentage();
                 }else{
-                    if(!scanInProgress){
-                        scanInProgress = true;
-                        updateListRunnable = new UpdateListRunnable(mConnectivityManager, mWifiManager,
-                                getContext().getApplicationContext(), networkIP, connFragment);
-                        Thread update = new Thread(updateListRunnable);
-                        update.start();
-
-                        scanRunnable = new ScanSubNetRunnable(networkIP, updateListRunnable);
-                        Thread scan = new Thread(scanRunnable);
-                        scan.start();
-
-                        displayPercentage();
-                    }else{
-                        updateListRunnable.stopRun();
-                        scanRunnable.stopRun();
-                        scanInProgress = false;
-                    }
+                    updateListRunnable.stopRun();
+                    scanRunnable.stopRun();
+                    scanInProgress = false;
                 }
             }
         });

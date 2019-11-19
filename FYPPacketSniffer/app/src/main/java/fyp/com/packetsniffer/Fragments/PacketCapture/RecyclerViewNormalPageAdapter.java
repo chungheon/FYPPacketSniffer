@@ -75,6 +75,13 @@ public class RecyclerViewNormalPageAdapter extends RecyclerView.Adapter<Recycler
         pages.add(page.getBytes());
     }
 
+    public void addPage(String page, int index) { pages.add(index, page.getBytes());}
+
+    public void updatePage(String page, int index) {
+        pages.remove(index);
+        pages.add(index, page.getBytes());
+    }
+
     public ArrayList<byte[]> getData(){
         return pages;
     }
