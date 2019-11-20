@@ -34,4 +34,29 @@
         Total packets will be slightly more than displayed amount.
     </string>
 
+    <string name="overview">
+        Android Network Sniffer, A.N.S, is a Android-based app that is allows
+        its users to monitor traffic on their network. It also provides the basic
+        capabilities of flagging suspicious activity and keeping track of their network.\n\n
+        A.N.S has a user-friendly interface that allows the user to navigate
+        through the app easily.
+    </string>
+
+    <string name="projectscope">
+        Network Sniffer application for Android\n
+        Functionalities\n
+        \t1.Scan network devices connected to network\n
+        \t2.Sniff packets on the network\n
+        \t3.Analyse packets captured (stored in .pcap file)
+    </string>
+
+    <string name="stakeholders">
+        1. App users (Those who do not have network experience)\n
+        \tLearning Tool for IT students\n
+        2.Office boss\n
+        \tProvides some level of network traffic monitoring\n
+        3.IT Professionals\n
+        \tEasy tool to use on the go
+    </string>
+
 </resources>

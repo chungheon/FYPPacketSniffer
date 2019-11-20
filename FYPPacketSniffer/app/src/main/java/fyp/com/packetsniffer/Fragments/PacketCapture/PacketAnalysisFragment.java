@@ -318,7 +318,7 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                         selected = "Hex & ASCII Enabled (With ethernet header)";
                         break;
 
-                    case R.id.analyse_hex_5: hex = "x";
+                    case R.id.analyse_hex_5: hex = "";
                         selected = "No Hex/ASCII";
                         break;
                 }

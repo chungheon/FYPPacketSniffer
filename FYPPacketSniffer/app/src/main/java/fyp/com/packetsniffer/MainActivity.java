@@ -23,7 +23,6 @@ import java.util.List;
 
 import fyp.com.packetsniffer.Fragments.Aircrack.AircrackFragment;
 import fyp.com.packetsniffer.Fragments.DevicesConnected.DeviceConnectFragment;
-import fyp.com.packetsniffer.Fragments.DevicesConnected.NmapServices.NmapMainFragment;
 import fyp.com.packetsniffer.Fragments.NetworkUtils.NetworkUtilsFragment;
 import fyp.com.packetsniffer.Fragments.PacketCapture.PacketAnalysisFragment;
 import fyp.com.packetsniffer.Fragments.PacketCapture.PacketCaptureFragment;
@@ -46,13 +45,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         askForMultiplePermissions();
         initView(savedInstanceState);
-
-        // Default Fragment when Startup
-        if (savedInstanceState == null) {
-            navView.getMenu().performIdentifierAction(R.id.scan_devices,0);
-        }
-
-
     }
 
     private void initView(Bundle savedInstanceState) {
@@ -71,9 +63,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         if(savedInstanceState == null){
-            /*getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new Tab1Fragment()).commit();
-            getSupportActionBar().setTitle("Scan Network");
-            //navView.setCheckedItem(R.id.scan_devices);*/
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new AboutUsFragment()).commit();
+            getSupportActionBar().setTitle("About App");
         }
     }
 
@@ -218,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, new AboutUsFragment())
                         .commit();
-                toolbar.setTitle("About Us");
+                toolbar.setTitle("About App");
                 break;
         }
 
