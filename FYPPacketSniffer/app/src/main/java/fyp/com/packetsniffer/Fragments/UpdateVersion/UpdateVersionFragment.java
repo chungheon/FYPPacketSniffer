@@ -106,10 +106,10 @@ public class UpdateVersionFragment extends Fragment implements CmdExecInterface 
                     installAsset("nmap-mac-prefixes_arm", "nmap-mac-prefixes",dirPath, cmds);
                     installAsset("nmap_arm", "nmap",dirPath, cmds);
 
-                    cmds.add("nmap --help | grep \'Nmap 7.31\'");
-                    cmds.add("tcpdump --version");
-                    cmds.add("aircrack-ng | grep \'Aircrack-ng 1.2 rc4\'");
-                    cmds.add("traceroute --version | grep \'version\'");
+                    cmds.add("/system/xbin/nmap --help | grep \'Nmap 7.31\'");
+                    cmds.add("/system/xbin/tcpdump --version");
+                    cmds.add("/system/xbin/aircrack-ng | grep \'Aircrack-ng 1.2 rc4\'");
+                    cmds.add("/system/xbin/traceroute --version | grep \'version\'");
                     cmds.add("mount -o ro,remount /system");
                     cmds.add("exit");
 

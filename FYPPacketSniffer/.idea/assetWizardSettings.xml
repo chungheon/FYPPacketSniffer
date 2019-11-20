@@ -152,7 +152,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/notification/ic_adb_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_info_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -186,7 +186,7 @@
                                     <map>
                                       <entry key="cropped" value="true" />
                                       <entry key="imageAsset" value="D:\Test\FYP\ICONS\Designed\packetcapture.png" />
-                                      <entry key="outputName" value="update_versions" />
+                                      <entry key="outputName" value="about_us" />
                                     </map>
                                   </option>
                                 </PersistentState>
