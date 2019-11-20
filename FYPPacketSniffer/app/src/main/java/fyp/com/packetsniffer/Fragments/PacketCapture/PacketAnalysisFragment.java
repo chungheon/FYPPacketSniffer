@@ -63,9 +63,8 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
     private TextView numPacket;
 
     private long movement = 1050;
-    private String architect = "";
+    private String libPath = "";
     private String filter = "";
-    private String numOfPackets = "";
     private String grep = "";
     private String hex = "";
     private int mode = 0;
@@ -79,6 +78,7 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_packet_analysis, container, false);
+        installAsset("tcpdump_arm", "tcpdump", getActivity().getFilesDir().toString());
         initView();
         initListener();
         return view;
@@ -137,7 +137,7 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                 }
                 captureName = selectedText.getText().toString();
 
-                String cmd = "tcpdump " + filter + "-ttttvvvv" + hex + " -r " + fileName + grep;
+                String cmd = libPath + " " + filter + "-ttttvvvv" + hex + " -r " + fileName + grep;
 
                 cmds.add(cmd);
 
@@ -396,7 +396,6 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                 if (mRVAdapter != null && !mRVAdapter.getData().isEmpty() && !http) {
 
                     String packets = numPacket.getText().toString();
-                    numOfPackets = packets;
                     packets = packets.replace(" packets", "");
                     Long numPackets;
                     try{
@@ -458,6 +457,47 @@ public class PacketAnalysisFragment extends Fragment implements CmdExecInterface
                 }
             });
         }
+    }
+
+    private void installAsset(String assetName, String fileName, String dirPath) {
+        InputStream is = null;
+        FileOutputStream fileOutputStream = null;
+        try {
+            is = getActivity().getAssets().open(assetName);
+            byte[] buffer = new byte[is.available()];
+            is.read(buffer);
+
+            File targetFile = new File(dirPath + "/" + fileName);
+            libPath = targetFile.getPath();
+            fileOutputStream = new FileOutputStream(targetFile);
+            fileOutputStream.write(buffer);
+
+            is.close();
+            fileOutputStream.close();
+            setPermissions();
+        } catch (IOException e) {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException ex) {
+                }
+            }
+
+            if (fileOutputStream != null) {
+                try {
+                    fileOutputStream.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
+    }
+
+    private void setPermissions() {
+        try {
+            Process shell = Runtime.getRuntime().exec("chmod 777 " + libPath + "\n");
+            shell.waitFor();
+        } catch (IOException e) {
+        } catch (InterruptedException e) { }
     }
 
     private void hideAllUI(){

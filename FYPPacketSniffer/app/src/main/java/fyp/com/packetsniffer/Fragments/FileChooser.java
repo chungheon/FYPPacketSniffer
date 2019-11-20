@@ -2,12 +2,17 @@ package fyp.com.packetsniffer.Fragments;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Environment;
+import android.support.constraint.ConstraintLayout;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import java.io.File;
@@ -138,6 +143,67 @@ public class FileChooser {
             return currentPath.getParentFile();
         } else {
             return new File(currentPath, fileChosen);
+        }
+    }
+
+    public class FileArrayAdapter extends BaseAdapter {
+        private File[] files;
+        private Context mContext;
+        private String[] fileList;
+        private boolean gotParent = false;
+        public FileArrayAdapter(Context context, File[] files, String[] fileList) {
+            this.mContext = context;
+            this.files = files;
+            this.fileList = fileList;
+            if(files.length < fileList.length){
+                gotParent = true;
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return fileList.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return fileList[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(final int pos, View view, ViewGroup parent) {
+            if (view == null) {
+                view = LayoutInflater.from(activity.getApplicationContext()).inflate(R.layout.layout_directory_list, parent, false);
+            }
+            ConstraintLayout dirItem = view.findViewById(R.id.directory_item);
+            dirItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = pos;
+                    if(gotParent){
+                        position--;
+                    }
+                    if(position < 0){
+                        if(!currentPath.equals(Environment.getExternalStorageDirectory())){
+                            refresh(currentPath.getParentFile());
+                        }
+                    }else{
+                        File chosenDir = files[position];
+                        refresh(chosenDir);
+                    }
+
+                }
+            });
+            TextView dir = (TextView)view.findViewById(R.id.directory_text);
+            dir.setSingleLine(true);
+            dir.setText(this.fileList[pos]);
+
+            return view;
         }
     }
 }

@@ -3,6 +3,7 @@ package fyp.com.packetsniffer;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.app.ActivityCompat;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import fyp.com.packetsniffer.Fragments.Aircrack.AircrackFragment;
 import fyp.com.packetsniffer.Fragments.DevicesConnected.DeviceConnectFragment;
 import fyp.com.packetsniffer.Fragments.DevicesConnected.NmapServices.NmapMainFragment;
 import fyp.com.packetsniffer.Fragments.NetworkUtils.NetworkUtilsFragment;
@@ -37,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private ArrayList<byte[]> result = new ArrayList<>();
     private Long numPackets = new Long(0);
-
+    private boolean doubleBackToExitPressedOnce = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -150,7 +152,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
             drawerLayout.closeDrawer(GravityCompat.START);
         }else{
-            super.onBackPressed();
+            if(getSupportFragmentManager().getBackStackEntryCount() != 0){
+                super.onBackPressed();
+            }else{
+                if (doubleBackToExitPressedOnce) {
+                    super.onBackPressed();
+                    return;
+                }
+
+                this.doubleBackToExitPressedOnce = true;
+                Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+                new Handler().postDelayed(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        doubleBackToExitPressedOnce=false;
+                    }
+                }, 2000);
+            }
         }
     }
 
@@ -190,9 +210,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.aircrack_suite:
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new NmapMainFragment())
+                        .replace(R.id.fragment_container, new AircrackFragment())
                         .commit();
                 toolbar.setTitle("Aircrack-ng");
+                break;
+            case R.id.about_us:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new AboutUsFragment())
+                        .commit();
+                toolbar.setTitle("About Us");
                 break;
         }
 

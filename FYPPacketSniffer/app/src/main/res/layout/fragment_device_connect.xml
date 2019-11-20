@@ -2,7 +2,6 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -16,7 +15,7 @@
 
         <TextView
             android:id="@+id/wifiName"
-            android:layout_width="wrap_conten"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxWidth="200dp"
             android:minWidth="50dp"
@@ -69,6 +68,7 @@
         android:id="@+id/percentText"
         android:text="10%"
         android:textColor="@color/white"/>
+
     <ProgressBar
         android:id="@+id/percentBar"
         android:layout_width="match_parent"
@@ -82,6 +82,10 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_Net"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"/>
 
 </LinearLayout>

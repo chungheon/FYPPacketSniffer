@@ -166,6 +166,7 @@ public class DeviceConnectFragment extends Fragment {
                 }else{
                     updateListRunnable.stopRun();
                     scanRunnable.stopRun();
+
                     scanInProgress = false;
                 }
             }
@@ -353,14 +354,15 @@ public class DeviceConnectFragment extends Fragment {
                     percentText.setVisibility(View.INVISIBLE);
                 }
             });
-            storeCache(devices, wifiInfo);
         }
+        storeCache(devices, wifiInfo);
+        Log.d(TAG, devices.size() + "");
     }
 
     //Store data of the scan done to a file for future reference
     private void storeCache(ArrayList<DeviceInformation> devices, WifiInfo wifiInfo){
         String macName = wifiInfo.getBSSID().replace(":", "");
-        String fileName = wifiInfo.getSSID().replace("\"", "") + '_' + macName;
+        String fileName = wifiInfo.getSSID().replace("\"", "") + '|' + macName;
         File newDir = new File(getActivity().getFilesDir().toString(), "ScanHistory");
         newDir.mkdir();
         String path = getActivity().getFilesDir().toString();

@@ -42,7 +42,6 @@ public class ScanSubNetRunnable implements Runnable {
         try {
             while(i < (ipAddress.getNumberOfHosts() - 2) && !stopThread){
                 String fullBit = firstBit + "." + secondBit + "." + thirdBit + "." + lastBit;
-                Log.d(TAG, "Trying: " + fullBit);
                 inetAddress = InetAddress.getByName(fullBit);
                 inetAddress.isReachable(1);
                 lastBit++;

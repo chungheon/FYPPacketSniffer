@@ -77,7 +77,7 @@ public class ScanHistoryFragment extends Fragment {
                                 @Override
                                 public void onItemClick(Pair<String, String> item) {
                                     String path = getActivity().getFilesDir() + "/ScanHistory/"
-                                            + item.first + "_" + item.second;
+                                            + item.first + "|" + item.second;
                                     DevicesHistoryFragment devHistory = new DevicesHistoryFragment();
                                     Bundle args = new Bundle();
                                     args.putString("Filename", path);
@@ -105,8 +105,10 @@ public class ScanHistoryFragment extends Fragment {
         if (files != null) {
             for (int i = 0; i < files.length; i++)
             {
-                String[] wifiSSID = files[i].getName().split("_");
-                wifiSSIDs.add(new Pair<String,String>(wifiSSID[0], wifiSSID[1]));
+                String[] wifiSSID = files[i].getName().split("\\|");
+                if(wifiSSID.length >= 2){
+                    wifiSSIDs.add(new Pair<String,String>(wifiSSID[0], wifiSSID[1]));
+                }
             }
         }
     }

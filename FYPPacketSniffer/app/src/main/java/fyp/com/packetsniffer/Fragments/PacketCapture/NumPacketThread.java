@@ -64,9 +64,46 @@ public class NumPacketThread implements Runnable{
                             }
                         }
                     }
+                    /*String[] allInfo = packet.split(" ");
+                    if(allInfo.length >= 13) {
+                        Log.d("test", allInfo[11] + " " + allInfo[13]);
+                        if (allInfo[11].matches(".*:.*:.*:.*:.*:.*")) {
+                            Log.d("entered", allInfo[11] + " " + allInfo[13]);
+                                    String addr[] = allInfo[11].split(":");
+                                    String key = "\n" + addr[0].replace(" ", "");
+                                    for (int j = 1; j < addr.length - 1; j++) {
+                                        if(j == 3){
+                                            key += "\n:" + addr[j];
+                                        }else{
+                                            key += ":" + addr[j];
+                                        }
+                                    }
+                                    if(numSend.containsKey(key)){
+                                        numSend.put(key, numSend.get(key) + new Double(1));
+                                    }else{
+                                        numSend.put(key, new Double(1));
+                                    }
+                                    Log.d("added", numSend.get(key) + " " + key);
 
+                                    addr = allInfo[13].split(":");
+                                    key = "\n" + addr[0].replace(" ", "");
+                                    for (int j = 1; j < addr.length - 1; j++) {
+                                        if(j == 3){
+                                            key += "\n:" + addr[j];
+                                        }else{
+                                            key += ":" + addr[j];
+                                        }
+                                    }
+
+                                    if(numRecv.containsKey(key)){
+                                        numRecv.put(key, numRecv.get(key) + new Double(1));
+                                    }else{
+                                        numRecv.put(key, new Double(1));
+                                    }
+                                    Log.d("added", numRecv.get(key) + " " + key);
+                                }
+                    }*/
                     if(packet.matches(".*\\[S\\.?\\].*")){
-                        Log.d("OUT", packet);
                         String[] temp = packetInfo[0].split("\\.");
                         if(temp.length >= 8){
                             String sender = temp[0].replace(" ", "") + "." + temp[1] + "." + temp[2] + "." + temp[3];

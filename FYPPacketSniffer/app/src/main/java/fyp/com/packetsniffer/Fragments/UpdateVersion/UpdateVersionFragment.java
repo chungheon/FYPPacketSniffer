@@ -100,16 +100,16 @@ public class UpdateVersionFragment extends Fragment implements CmdExecInterface 
                     installAsset("aircrack-ng", "aircrack-ng", dirPath, cmds);
                     installAsset("traceroute_arm", "traceroute", dirPath, cmds);
                     //For future when nmap suite to be added
-                    /*installAsset("nmap-os-db_arm", "nmap-os-db",dirPath, cmds);
+                    installAsset("nmap-os-db_arm", "nmap-os-db",dirPath, cmds);
                     installAsset("nmap-services_arm", "nmap-services",dirPath, cmds);
                     installAsset("nmap-payloads_arm", "nmap-payloads",dirPath, cmds);
                     installAsset("nmap-mac-prefixes_arm", "nmap-mac-prefixes",dirPath, cmds);
-                    installAsset("nmap_arm", "nmap",dirPath, cmds);*/
+                    installAsset("nmap_arm", "nmap",dirPath, cmds);
 
-                    //cmds.add("nmap --help | grep \'Nmap 7.31\'");
+                    cmds.add("nmap --help | grep \'Nmap 7.31\'");
                     cmds.add("tcpdump --version");
                     cmds.add("aircrack-ng | grep \'Aircrack-ng 1.2 rc4\'");
-                    cmds.add("traceroute --version");
+                    cmds.add("traceroute --version | grep \'version\'");
                     cmds.add("mount -o ro,remount /system");
                     cmds.add("exit");
 
@@ -172,6 +172,45 @@ public class UpdateVersionFragment extends Fragment implements CmdExecInterface 
 
             cmds.add("chmod 755 " + targetFile.getPath());
             cmds.add("cp " + targetFile.getPath() + " /system/xbin/" + fileName);
+            cmds.add("rm " + targetFile.getPath());
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+            if(is != null){
+                try {
+                    is.close();
+                } catch (IOException ex) {
+                    Log.e(TAG, "Error closing stream");
+                }
+            }
+
+            if(fileOutputStream != null){
+                try {
+                    fileOutputStream.close();
+                } catch (IOException ex) {
+                    Log.e(TAG, "Error closing stream");
+                }
+            }
+        }
+
+    }
+
+    public void installAssetLUA(String assetName, String fileName, String dirPath, ArrayList<String> cmds){
+        InputStream is = null;
+        FileOutputStream fileOutputStream = null;
+        try {
+            is = getActivity().getAssets().open(assetName);
+            byte[] buffer = new byte[is.available()];
+            is.read(buffer);
+
+            File targetFile = new File(dirPath + "/" + fileName);
+            fileOutputStream = new FileOutputStream(targetFile);
+            fileOutputStream.write(buffer);
+
+            is.close();
+            fileOutputStream.close();
+
+            cmds.add("chmod 755 " + targetFile.getPath());
+            cmds.add("cp " + targetFile.getPath() + " /system/xbin/nselib/" + fileName);
             cmds.add("rm " + targetFile.getPath());
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());

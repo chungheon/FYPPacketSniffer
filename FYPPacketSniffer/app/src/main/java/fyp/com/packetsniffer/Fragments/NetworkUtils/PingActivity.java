@@ -179,6 +179,12 @@ public class PingActivity extends Fragment {
         }
     }
 
+    public void printToast(String message){
+        if(getActivity() != null){
+            Toast.makeText(getContext().getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void updateDetails(final ArrayList<String> result){
         if(getActivity() != null){
             getActivity().runOnUiThread(new Runnable() {

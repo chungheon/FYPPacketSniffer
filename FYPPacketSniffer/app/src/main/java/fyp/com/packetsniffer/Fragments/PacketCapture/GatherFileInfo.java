@@ -76,14 +76,14 @@ public class GatherFileInfo extends AsyncTask<String, Integer, String> {
         info += "Number Of Packets: " + numOfPackets +  "\n";
         if(startTime != null){
             String start = timeFormat.format(startTime.getTime());
-            info += "Start Time: " + start + "\n";
+            info += "Start Time: " + start + "(GMT+8)\n";
         }else{
             info += "Start Time: -\n";
         }
 
         if(endTime != null){
             String end = timeFormat.format(endTime.getTime());
-            info += "End Time: " + end;
+            info += "End Time: " + end + "(GMT+8)";
         }else{
             info += "End Time: -";
         }

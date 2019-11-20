@@ -1,11 +1,15 @@
 package fyp.com.packetsniffer.Fragments.PacketCapture;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,16 +17,31 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jjoe64.graphview.DefaultLabelFormatter;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.ValueDependentColor;
+import com.jjoe64.graphview.helper.StaticLabelsFormatter;
+import com.jjoe64.graphview.series.BarGraphSeries;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.DataPointInterface;
+import com.jjoe64.graphview.series.PointsGraphSeries;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import fyp.com.packetsniffer.Fragments.CmdExecInterface;
@@ -38,6 +57,7 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
 
     private TextView numPacketsText;
     private TextView dirText;
+    private TextView guideText;
     private Button dirBtn;
     private Button captureBtn;
     private boolean inProgress;
@@ -49,12 +69,16 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
     private String selectedFile = "";
     private DirectoryChooser directoryChooser;
     private String dirPath = "";
-
+    private GraphView statGraph;
     private List<String> interfaces;
+    private HashMap<String, Double> numSend;
+    private String libPath;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_packet_capture, container, false);
+        installAsset("killall_arm", "killall", getActivity().getFilesDir().toString());
         initView();
         initListener();
         return view;
@@ -67,12 +91,16 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
         this.interfaceSpinner = (Spinner) view.findViewById(R.id.capture_interface);
         this.dirBtn = (Button) view.findViewById(R.id.capture_directory_btn);
         this.dirText = (TextView) view.findViewById(R.id.capture_directory_text);
+        this.guideText = (TextView) view.findViewById(R.id.capture_guide);
+        this.statGraph = (GraphView) view.findViewById(R.id.capture_statical_graph);
 
         this.numPacketsText.setText("Waiting to start");
         inProgress = false;
         interfaces = new ArrayList<String>();
         dirText.setText("External Storage");
         updateSpinner();
+        numSend = new HashMap<>();
+        statGraph.setVisibility(View.GONE);
     }
 
     private void initListener(){
@@ -107,14 +135,14 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
                 if(selected > -1) {
                     cmd += " -i " + (selected + 1);
                 }
-                cmd += " -w - | tee " +  filePath + " | tcpdump -tttt -r -";
+                cmd += " -w - | tee " +  filePath + " | tcpdump -ttttvvvv -r -";
 
                 cmds.add(cmd);
                 if(cmdRunnable != null){
                     if(inProgress){
                         cmdRunnable.stopRun();
-                        inProgress = false;
                         captureBtn.setText("Start Capture");
+                        inProgress = false;
                         if(numPacketsText.getText().toString().equals("Capturing...")){
                             numPacketsText.setText("0 Packets");
                             interfaceSpinner.setEnabled(true);
@@ -127,6 +155,8 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
                         captureBtn.setText("Stop Capturing");
                         interfaceSpinner.setEnabled(false);
                         fileOutput.setEnabled(false);
+                        statGraph.setVisibility(View.VISIBLE);
+                        guideText.setVisibility(View.GONE);
                     }
                 }else{
                     runCmd(cmds, filePath);
@@ -135,6 +165,8 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
                     captureBtn.setText("Stop Capturing");
                     interfaceSpinner.setEnabled(false);
                     fileOutput.setEnabled(false);
+                    guideText.setVisibility(View.GONE);
+                    statGraph.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -168,10 +200,47 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
         });
     }
 
-    /*
+    private void setPermissions() {
+        try {
+            Process shell = Runtime.getRuntime().exec("chmod 777 " + libPath + "\n");
+            shell.waitFor();
+        } catch (IOException e) {
+        } catch (InterruptedException e) { }
+    }
 
+    private void installAsset(String assetName, String fileName, String dirPath) {
+        InputStream is = null;
+        FileOutputStream fileOutputStream = null;
+        try {
+            is = getActivity().getAssets().open(assetName);
+            byte[] buffer = new byte[is.available()];
+            is.read(buffer);
 
-    */
+            File targetFile = new File(dirPath + "/" + fileName);
+            libPath = targetFile.getPath();
+            fileOutputStream = new FileOutputStream(targetFile);
+            fileOutputStream.write(buffer);
+
+            is.close();
+            fileOutputStream.close();
+            setPermissions();
+        } catch (IOException e) {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException ex) {
+                }
+            }
+
+            if (fileOutputStream != null) {
+                try {
+                    fileOutputStream.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
+    }
+
     private void updateSpinner(){
 
         BufferedReader in = null;
@@ -229,21 +298,111 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
     private void runCmd(ArrayList<String> args, String filePath){
-        cmdRunnable = new CapturePacketThread(this, args, filePath);
+        cmdRunnable = new CapturePacketThread(this, args, filePath, libPath);
         cmdRunnable.start();
     }
 
     @Override
-    public void printResult(String result,final long numOfPackets) {
-        if(getActivity() != null){
+    public void printResult(final String result,final long numOfPackets) {
+        if(numSend.containsKey(result)){
+            numSend.put(result, numSend.get(result) + Double.valueOf(1));
+        }else{
+            numSend.put(result, Double.valueOf(1));
+        }
+        final List<Pair<String, Double>> update = updateInfoDouble(numSend);
+
+        if(getActivity() != null) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     numPacketsText.setText(numOfPackets + " packets");
+
+                    statGraph.removeAllSeries();
+
+                    String[] keys = new String[update.size() + 1];
+                    DataPoint[] dataPoints = new DataPoint[update.size() + 1];
+                    DataPoint[] graphPoints = new DataPoint[update.size() + 1];
+                    int count = 0;
+                    keys[0] = "";
+                    dataPoints[0] = new DataPoint(0, 0);
+                    graphPoints[0] = new DataPoint(0, 0);
+
+                    for (Pair<String, Double> val: update) {
+                        keys[count + 1] = val.first;
+                        Double numPackets = val.second;
+                        dataPoints[count + 1] = new DataPoint(count + 1, numPackets);
+                        graphPoints[count + 1] = new DataPoint(count + 1 - 0.15, numPackets);
+                        count++;
+                    }
+
+                    BarGraphSeries<DataPoint> series = new BarGraphSeries<>(dataPoints);
+                    final String[] finalKeys = keys;
+                    statGraph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
+                        @Override
+                        public String formatLabel(double value, boolean isValueX) {
+                            if (isValueX) {
+                                int val = (int) value;
+                                return finalKeys[val];
+                            } else {
+                                return super.formatLabel(value, isValueX);
+                            }
+                        }
+                    });
+
+
+                    series.setValueDependentColor(new ValueDependentColor<DataPoint>() {
+                        @Override
+                        public int get(DataPoint data) {
+                            return Color.rgb((int) data.getX() * 255 / 4, (int) Math.abs(data.getY() * 255 / 6), 100);
+                        }
+                    });
+                    statGraph.setLayoutParams(new LinearLayout.LayoutParams(keys.length * 300, 600));
+
+                    PointsGraphSeries<DataPoint> seriesPoints = new PointsGraphSeries<>(graphPoints);
+                    seriesPoints.setCustomShape(new PointsGraphSeries.CustomShape() {
+                        @Override
+                        public void draw(Canvas canvas, Paint paint, float x, float y, DataPointInterface dataPoint) {
+                            paint.setColor(Color.WHITE);
+                            paint.setTextSize(40);
+                            int dataVal = (int) dataPoint.getY();
+                            if (dataVal != 0) {
+                                canvas.drawText(String.valueOf(dataVal), x, y, paint);
+                            }
+                        }
+                    });
+                    series.setSpacing(70);
+                    StaticLabelsFormatter labelsFormatter = new StaticLabelsFormatter(statGraph);
+                    labelsFormatter.setHorizontalLabels(finalKeys);
+                    statGraph.getGridLabelRenderer().setTextSize(30f);
+                    statGraph.getGridLabelRenderer().reloadStyles();
+                    statGraph.getViewport().setMaxX(keys.length);
+                    statGraph.getViewport().setScrollable(true);
+                    statGraph.addSeries(series);
+                    statGraph.addSeries(seriesPoints);
                 }
             });
         }
+    }
+
+    private List<Pair<String, Double>> updateInfoDouble(HashMap<String, Double> numPackets){
+        List<Pair<String, Double>> dataArr = new ArrayList<>();
+        for(String key: numPackets.keySet()){
+            Pair<String, Double> pair = new Pair<>(key,numPackets.get(key));
+            dataArr.add(pair);
+        }
+        Collections.sort(dataArr, new Comparator<Pair<String, Double>>() {
+            @Override
+            public int compare(Pair<String, Double> o1, Pair<String, Double> o2) {
+                return (int) (o2.second - o1.second);
+            }
+        });
+        return dataArr;
     }
 
 
@@ -262,6 +421,16 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
     @Override
     public void cmdDone() {
         printToast("Packets saved to " + fileOut);
+        if(getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                }
+            });
+
+        }
+
     }
 
     @Override

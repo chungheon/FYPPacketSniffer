@@ -64,6 +64,7 @@ public class PingShell extends Thread {
             fragment.stopProgressBar();
             if(result.isEmpty()){
                 Toast.makeText(fragment.getContext().getApplicationContext(), "Unable to ping " + host, Toast.LENGTH_SHORT).show();
+                fragment.printToast("Unable to ping " + host);
             }
         } catch (IOException e) {
         } catch (InterruptedException e) {

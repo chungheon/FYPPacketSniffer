@@ -97,8 +97,30 @@
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/capture_guide"
             android:text="@string/captureguide"/>
+
+
+
+    <HorizontalScrollView
+        android:id="@+id/capture_sent_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbarSize="2dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/white">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/capture_statical_graph"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"/>
+
+        </LinearLayout>
+    </HorizontalScrollView>
 
 </LinearLayout>

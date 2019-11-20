@@ -16,7 +16,7 @@
 
         <TextView
             android:id="@+id/hostname"
-            android:layout_width="204dp"
+            android:layout_width="210dp"
             android:layout_height="wrap_content"
             android:ellipsize="marquee"
             android:maxLength="15"
@@ -28,14 +28,12 @@
             android:textColor="@color/primaryDarkColor"
             android:textSize="16sp"
             android:textStyle="bold"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="0dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
         <TextView
             android:id="@+id/vendor"
-            android:layout_width="140dp"
+            android:layout_width="170dp"
             android:layout_height="34dp"
             android:ellipsize="marquee"
             android:paddingTop="10dp"
@@ -50,7 +48,7 @@
 
         <TextView
             android:id="@+id/ipaddr"
-            android:layout_width="216dp"
+            android:layout_width="210dp"
             android:layout_height="wrap_content"
             android:paddingLeft="15dp"
             android:paddingTop="5dp"
@@ -63,7 +61,7 @@
 
         <TextView
             android:id="@+id/mac"
-            android:layout_width="168dp"
+            android:layout_width="170dp"
             android:layout_height="wrap_content"
             android:paddingTop="5dp"
             android:paddingBottom="10dp"

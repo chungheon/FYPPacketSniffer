@@ -16,11 +16,13 @@ public class CapturePacketThread extends CmdExecNormal {
 
     private BufferedReader br;
     private String filePath;
+    private String killPath;
 
-    public CapturePacketThread(CmdExecInterface fragment, ArrayList<String> cmds, String filePath) {
+    public CapturePacketThread(CmdExecInterface fragment, ArrayList<String> cmds, String filePath, String killPath) {
         super(fragment, cmds);
         this.filePath = filePath;
         fileReader = new ReadCaptureOutput();
+        this.killPath = killPath;
         this.cmds.add("exit");
     }
 
@@ -30,29 +32,79 @@ public class CapturePacketThread extends CmdExecNormal {
         public void run() {
             br = null;
             long numOfPackets = 0;
+            String result = "";
+            String keyAddr = "";
             try {
                 br = new BufferedReader(new InputStreamReader(this.input));
                 String line = null;
                 int updateCounter = 0;
                 while(true){
-                    if(br.ready()){
+                    if(br.ready() && br != null){
                         line = br.readLine();
                     }
                     if(line != null){
+
                         if(line.matches("\\d*-\\d*-\\d* \\d*:\\d*:\\d*.*")) {
                             numOfPackets++;
                             updateCounter++;
+                        }else{
+                            result += line + "|";
                         }
                         if(updateCounter >= 1){
-                            updateResult(null, numOfPackets);
+                            boolean update = false;
+                            String[] data = result.split(" ");
+                            for (int i = 0; i < data.length; i++) {
+                                /*if (data[i].matches(".*:.*:.*:.*:.*:.*")) {
+                                    if (i != data.length - 1) {
+                                        if (data[i + 1].equals(">")) {
+                                            String addr[] = data[i].split(":");
+                                            String key = "\n" + addr[0].replace(" ", "");
+                                            for (int j = 1; j < addr.length; j++) {
+
+                                                if(j == 3 || j == 6){
+                                                    key += "\n:" + addr[j];
+                                                }else if( j == addr.length - 1){
+                                                    String[] temp = addr[j].split("\\.");
+                                                    key += ":" + temp[0];
+                                                }else{
+                                                    key += ":" + addr[j];
+                                                }
+                                            }
+                                            keyAddr = key;
+                                            update = true;
+                                            break;
+                                        }
+                                    }
+                                }*/
+
+                                if (data[i].matches(".*\\d*\\.\\d*\\.\\d*\\.\\d*.*")) {
+                                    if (i != data.length - 1) {
+                                        if (data[i + 1].equals(">")) {
+                                            String addr[] = data[i].split("\\.");
+                                            String key = addr[0].replace(" ", "");
+                                            for (int j = 1; j < addr.length - 1; j++) {
+                                                key += "." + addr[j];
+                                            }
+                                            keyAddr = key;
+                                            update = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if(update){
+                                updateResult(keyAddr, numOfPackets);
+                            }
+                            result = line;
                             updateCounter = 0;
                         }
                         line = null;
                     }
-                    if(interrupted()){
+                    if(isInterrupted()){
                         break;
                     }
                 }
+                mFragment.cmdDone();
             } catch (IOException e) { }finally {
                 if(br != null){
                     try{
@@ -69,14 +121,15 @@ public class CapturePacketThread extends CmdExecNormal {
         }
     }
 
+
     @Override
     public void stopRun() {
-        if(response != null){
-            try {
-                response.close();
+        fileReader.stopRun();
+        if(br != null){
+            try{
+                br.close();
             } catch (IOException e) { }
         }
-        fileReader.stopRun();
         Process kill = null;
         try {
             kill = Runtime.getRuntime().exec("su");
@@ -103,26 +156,23 @@ public class CapturePacketThread extends CmdExecNormal {
                     synchronized (this){
                         try{
 
-                            wait(10);
+                            wait(1);
                             count++;
                         }catch (InterruptedException e){
                             break;
                         }
                     }
-                    if(count > 50){
+                    if(count > 500){
                         break;
                     }
                 }
             } catch (IOException e) { }
-
             killOut.writeBytes("exit\n");
             killOut.flush();
 
-            kill.waitFor();
+            killOut.close();
         }catch (IOException e) {
             Log.e(TAG, "Error with stream");
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Interrupted");
         }finally {
             if(kill != null){
                 kill.destroy();

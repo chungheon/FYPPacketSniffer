@@ -27,6 +27,32 @@ public class PacketViewThread extends CmdExecNormal {
         this.mode = mode;
     }
 
+    @Override
+    public void run() {
+        try {
+            p = Runtime.getRuntime().exec(cmds.get(0));
+            outputStream = new DataOutputStream(p.getOutputStream());
+            response = p.getInputStream();
+            fileReader.setInputStream(response);
+            Thread thread = new Thread(fileReader);
+            thread.start();
+
+            p.waitFor();
+            thread.join();
+        } catch (IOException e) { } catch (InterruptedException e) {
+            if(outputStream != null){
+                try {
+                    outputStream.close();
+                } catch (IOException ex) { }
+            }
+        }finally {
+            if(p != null){
+                p.destroy();
+            }
+        }
+
+    }
+
     private class ReadCaptureOutput extends ReadOutput{
         private boolean stopRunning;
 
@@ -173,7 +199,7 @@ public class PacketViewThread extends CmdExecNormal {
 
         Process kill = null;
         try {
-            kill = Runtime.getRuntime().exec("su");
+            kill = Runtime.getRuntime().exec("ps");
             DataOutputStream killOut = new DataOutputStream(kill.getOutputStream());
             killOut.writeBytes("ps\n");
             killOut.flush();
@@ -223,4 +249,66 @@ public class PacketViewThread extends CmdExecNormal {
             }
         }
     }
+
+    /*@Override
+    public void stopRun() {
+        if(br != null){
+            try {
+                br.close();
+                br = null;
+            } catch (IOException e) { }
+        }
+
+        Process kill = null;
+        try {
+            kill = Runtime.getRuntime().exec("su");
+            DataOutputStream killOut = new DataOutputStream(kill.getOutputStream());
+            killOut.writeBytes("ps\n");
+            killOut.flush();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(kill.getInputStream()));
+            String line = null;
+            try{
+                int count = 0;
+                while(true){
+                    if(reader.ready()){
+                        line = reader.readLine();
+                    }
+                    if(line != null){
+                        if(line.matches(".*tcpdump.*")){
+                            String killStr[] = line.substring(10).split(" ");
+                            killOut.writeBytes("kill -2 " + killStr[0] + "\n");
+                            killOut.flush();
+                        }
+                        line = null;
+                        count = 0;
+                    }
+                    synchronized (this){
+                        try{
+
+                            wait(1);
+                            count++;
+                        }catch (InterruptedException e){
+                            break;
+                        }
+                    }
+                    if(count > 1000){
+                        break;
+                    }
+                }
+            } catch (IOException e) { }
+
+            killOut.writeBytes("exit\n");
+            killOut.flush();
+
+            kill.waitFor();
+        }catch (IOException e) {
+            Log.e(TAG, "Error with stream");
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Interrupted kill process");
+        }finally{
+            if(kill != null){
+                kill.destroy();
+            }
+        }
+    }*/
 }

@@ -222,7 +222,7 @@ public class AnalysisReportFragment extends Fragment{
                     graphPoints[0] = new DataPoint(0, 0);
                     int count = 0;
                     for(Pair<String, Double> val: data){
-                        keys[count + 1] = val.first;
+                        keys[count + 1] = "\n" + val.first;
                         Double numPackets = val.second;
                         dataPoints[count + 1] = new DataPoint(count + 1, numPackets);
                         graphPoints[count + 1] = new DataPoint(count + 1 - 0.15, numPackets);
@@ -319,7 +319,7 @@ public class AnalysisReportFragment extends Fragment{
                     graphPoints[0] = new DataPoint(0, 0);
                     int count = 0;
                     for(Pair<String, Double> val: data){
-                        keys[count + 1] = val.first;
+                        keys[count + 1] = "\n" + val.first;
                         Double numPackets = val.second;
                         dataPoints[count + 1] = new DataPoint(count + 1, numPackets);
                         graphPoints[count + 1] = new DataPoint(count + 1 - 0.15, numPackets);

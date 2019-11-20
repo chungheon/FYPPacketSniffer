@@ -107,7 +107,6 @@ public class DevicesHistoryFragment extends Fragment {
             br.readLine();
             br.readLine();
             while(((line = br.readLine()) != null)){
-                Log.d(TAG, "LINE: " + line);
                 String[] info = line.split(",");
                 DeviceInformation dev = new DeviceInformation();
                 dev.setHostName(info[0]);

@@ -7,7 +7,6 @@ import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -21,6 +20,7 @@ import java.net.UnknownHostException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import fyp.com.packetsniffer.Fragments.IPv4;
@@ -52,7 +52,7 @@ public class UpdateListRunnable implements Runnable{
     public synchronized void run() {
         running = true;
         int numOfRefresh = 0;
-        ArrayList<DeviceInformation> devices = new ArrayList<>();
+        HashMap<String, DeviceInformation> devicesMap = new HashMap<>();
         WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
         String ip = ipAddressToString(wifiInfo.getIpAddress());
         String userMac = getMacAddr();
@@ -65,61 +65,49 @@ public class UpdateListRunnable implements Runnable{
         }
         numOfHosts = mNetAddress.getNumberOfHosts();
         while(running || lastRun) {
-            Log.d(TAG, "Start List Update");
             if(update) {
-                Log.d(TAG, "List Updated");
                 wifiInfo = mWifiManager.getConnectionInfo();
-                if (Build.VERSION.SDK_INT >= 23 && !lastRun) {
                     if (wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)) {
                         network = mConnManager.getActiveNetwork();
                         if (network != null) {
-                            int hostsFound = readARPTableNew(devices);
-                            for(DeviceInformation dev: devices){
-                                Log.d(TAG, "Found: " + dev.getIpAddrs());
-                            }
+                            int hostsFound = readARPTableNew(devicesMap);
                         }
                     }
-                } else {
-                    if (wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)) {
-                        int hostsFound = readARPTableOld(devices);
-                    }
-                }
-                if(lastRun && Build.VERSION.SDK_INT >= 23){
-                    for(DeviceInformation dev: devices){
-                        if(!dev.getMacAddrs().equals("00:00:00:00:00:00")){
+                if(lastRun){
+                    for(String key: devicesMap.keySet() ){
+                        if(!devicesMap.get(key).getMacAddrs().equals("00:00:00:00:00:00")){
                             network = mConnManager.getActiveNetwork();
                             String hostname = null;
                             try {
-                                hostname = network.getByName(dev.getIpAddrs()).getHostName();
+                                hostname = network.getByName(devicesMap.get(key).getIpAddrs()).getHostName();
                             } catch (UnknownHostException e) {
-                                hostname = dev.getIpAddrs();
+                                hostname = devicesMap.get(key).getIpAddrs();
                             }
 
-                            dev.setHostName(hostname);
-                            Log.d(TAG, "Get Network and hostname" + hostname);
+                            devicesMap.get(key).setHostName(hostname);
                         }
                     }
                 }
-                sortList(devices);
-                mConnFragment.updateSearch(numOfHosts, devices, host, ip + " (ME)",
+                List<DeviceInformation> devices = sortList(devicesMap);
+                mConnFragment.updateSearch(numOfHosts, (ArrayList) devices, host, ip + " (ME)",
                         userMac, getVendor(getMacVendor(userMac)));
                 update = false;
             }else{
                 numOfRefresh++;
             }
 
-            if(numOfHosts - 3 <= devices.size() && !lastRun){
+            if(numOfHosts - 3 <= devicesMap.keySet().size() && !lastRun){
                 running = false;
                 lastRun = true;
                 update = true;
-            }else if(numOfHosts - 3 <= devices.size() && lastRun) {
+            }else if(numOfHosts - 3 <= devicesMap.keySet().size() && lastRun) {
                 lastRun = false;
-            }else if(numOfRefresh > 2){
+            }else if(numOfRefresh > 1){
                 update = true;
                 numOfRefresh = 0;
             }else{
                 try{
-                    wait(200);
+                    wait(10);
                 }catch (InterruptedException e) { }
             }
             if(lastRun){
@@ -128,25 +116,30 @@ public class UpdateListRunnable implements Runnable{
                 }catch (InterruptedException e) { }
             }
         }
-        sortList(devices);
+        List<DeviceInformation> devices = sortList(devicesMap);
         DeviceInformation devInfo = new DeviceInformation();
         devInfo.setHostName(host);
         devInfo.setIpAddrs(ip + "(ME)");
         devInfo.setMacAddrs(userMac);
         devInfo.setMacVendor(getVendor(getMacVendor(userMac)));
         devices.add(devInfo);
-        mConnFragment.scanDone(devices, wifiInfo);
+        mConnFragment.scanDone((ArrayList) devices, wifiInfo);
     }
 
     public synchronized void stopRun(){
         running = false;
     }
 
-    private void sortList(ArrayList<DeviceInformation> devices){
-        Collections.sort(devices);
+    private List<DeviceInformation> sortList(HashMap<String, DeviceInformation> devices){
+        List<DeviceInformation> deviceInfo = new ArrayList<>();
+        for(String key: devices.keySet()){
+            deviceInfo.add(devices.get(key));
+        }
+        Collections.sort(deviceInfo);
+        return deviceInfo;
     }
 
-    private int readARPTableNew(ArrayList<DeviceInformation> devices){
+    private int readARPTableNew(HashMap<String, DeviceInformation> devicesMap){
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader("/proc/net/arp"));
@@ -160,27 +153,24 @@ public class UpdateListRunnable implements Runnable{
                 try {
                     String vendor = getVendor(getMacVendor(mac));
                     String hostname = info[0];
-                    if (!duplicate(devices, info[0])) {
+                    if (!devicesMap.containsKey(info[0])) {
                         DeviceInformation devInfo = new DeviceInformation();
                         devInfo.setHostName(hostname);
                         devInfo.setIpAddrs(info[0]);
                         devInfo.setMacVendor(vendor);
                         devInfo.setMacAddrs(mac.toUpperCase());
-                        devices.add(devInfo);
+                        devicesMap.put(info[0], devInfo);
                     }else if (!mac.equals("00:00:00:00:00:00")) {
-                        int index = getHost(devices,info[0]);
-                        if(index != -1 && index < devices.size()){
+                        if(devicesMap.containsKey(info[0])){
                             DeviceInformation devInfo = new DeviceInformation();
                             devInfo.setHostName(hostname);
                             devInfo.setIpAddrs(info[0]);
                             devInfo.setMacVendor(vendor);
                             devInfo.setMacAddrs(mac.toUpperCase());
-                            devices.set(index, devInfo);
+                            devicesMap.put(info[0], devInfo);
                         }
                     }
-                } catch (Exception e) {
-                    Log.d(TAG, e.getMessage());
-                }
+                } catch (Exception e) { }
                 numOfHost++;
             }
             return numOfHost - 1;
@@ -188,66 +178,6 @@ public class UpdateListRunnable implements Runnable{
 
         } catch (IOException e){
 
-        }
-
-        return -1;
-    }
-
-    private int readARPTableOld(ArrayList<DeviceInformation> devices){
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader("/proc/net/arp"));
-            String line;
-
-            int numOfHost = 1;
-
-            while ((line = br.readLine()) != null) {
-                String mac = line.substring(41, 58);
-                String[] info = line.split(" ");
-                try {
-                    String vendor = getVendor(getMacVendor(mac));
-                    String hostname = info[0];
-                    if (!duplicate(devices, info[0])) {
-                        DeviceInformation devInfo = new DeviceInformation();
-                        devInfo.setHostName(hostname);
-                        devInfo.setIpAddrs(info[0]);
-                        devInfo.setMacVendor(vendor);
-                        devInfo.setMacAddrs(mac.toUpperCase());
-                        devices.add(devInfo);;
-                    }else if (!mac.equals("00:00:00:00:00:00")) {
-                        int index = getHost(devices, info[0]);
-                        if(index != -1 && index < devices.size()){
-                            DeviceInformation devInfo = new DeviceInformation();
-                            devInfo.setHostName(hostname);
-                            devInfo.setIpAddrs(info[0]);
-                            devInfo.setMacVendor(vendor);
-                            devInfo.setMacAddrs(mac.toUpperCase());
-                            devices.set(index, devInfo);
-                        }
-                    }
-                } catch (Exception e) {
-
-                }
-                numOfHost++;
-            }
-
-            return numOfHost - 1;
-        } catch (FileNotFoundException e) {
-
-        } catch (IOException e){
-
-        }
-
-        return -1;
-    }
-
-    private int getHost(ArrayList<DeviceInformation> devices, String address){
-        int count = 0;
-        for(DeviceInformation dev: devices){
-            if(dev.getIpAddrs().equals(address)){
-                return count;
-            }
-            count++;
         }
 
         return -1;
@@ -288,15 +218,6 @@ public class UpdateListRunnable implements Runnable{
         }
 
         return ipAddressString;
-    }
-
-    private boolean duplicate(ArrayList<DeviceInformation> devices, String ipaddr){
-        for(DeviceInformation dev: devices){
-            if(dev.getIpAddrs().equals(ipaddr)){
-                return true;
-            }
-        }
-        return false;
     }
 
     private String getMacVendor(String data){

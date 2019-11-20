@@ -24,10 +24,9 @@ public class CmdExecNormal extends Thread {
 
     protected class ReadOutput implements Runnable{
         protected InputStream input;
-        protected void setInputStream(InputStream input) {
+        public void setInputStream(InputStream input) {
             this.input = input;
         }
-
 
         public void run() { }
 
@@ -53,6 +52,7 @@ public class CmdExecNormal extends Thread {
                 p.waitFor();
             } catch (InterruptedException e) {
                 Log.d(TAG, "Thread Interrupted...");
+                fileReader.stopRun();
             }
             join();
             outputStream.close();
