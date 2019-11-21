@@ -59,4 +59,13 @@
         \tEasy tool to use on the go
     </string>
 
+    <string name="credits">
+        TCPDump (Tcpdump, Libpcap) TCPDUMP and LIBPCAP are under a 3-clause BSD license\n
+        http://www.tcpdump.org/\n\n
+        Traceroute for Linux under License GPL v2 or any later\n
+        Copyright(c) 2016 Dimitry Butskoy\n\n
+        Aircrack-ng 1.2 rc4\n
+        (C) 2006-2015 Thomas d'Otreppe\n\n
+    </string>
+
 </resources>

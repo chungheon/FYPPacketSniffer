@@ -47,6 +47,19 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"/>
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/credit"
+            android:layout_marginLeft="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="17dp"
+            android:text="@string/credits"
+            android:layout_marginLeft="10dp"/>
+
     </LinearLayout>
 
 </ScrollView>
