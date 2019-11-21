@@ -12,10 +12,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:theme="@style/ButtonTheme"/>
+
     <Spinner
         android:id="@+id/ver_spinner"
         android:layout_width="100dp"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:theme="@style/spinnerTheme" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/result_text"

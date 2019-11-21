@@ -28,6 +28,11 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="spinnerTheme">
+        <item name="android:textColor">@color/textColor</item>
+        <item name="android:background">@color/textBGColor</item>
+    </style>
+
 
 
 

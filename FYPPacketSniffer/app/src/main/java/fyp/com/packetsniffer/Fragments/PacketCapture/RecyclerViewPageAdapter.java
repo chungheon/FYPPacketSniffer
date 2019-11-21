@@ -44,8 +44,8 @@ public class RecyclerViewPageAdapter extends RecyclerView.Adapter<RecyclerViewPa
         String processRes = new String(pages.get(i)).replace("|", "\n");
         viewHolder.pageText.setText(processRes);
         viewHolder.pageScroll.fullScroll(ScrollView.FOCUS_UP);
-        int colorId1 = mContext.getResources().getColor(R.color.colorPrimary);
-        int colorId2 = mContext.getResources().getColor(R.color.colorPrimaryDark);
+        int colorId1 = mContext.getResources().getColor(R.color.cyan);
+        int colorId2 = mContext.getResources().getColor(R.color.cyanDark);
         if(i % 2 == 0){
             viewHolder.pageLayout.setBackgroundColor(colorId1);
         }else{
