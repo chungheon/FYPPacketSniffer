@@ -1,31 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#000000</color>
-    <color name="blue_magenta">#5B39C6</color>
-    <color name="purple">#58218B</color>
-    <color name="purple2">#D886F1</color>
-    <color name="light_grey">#F6F6F6</color>
-    <color name="dark_grey">#797979</color>
-    <color name="white_color">#ffffff</color>
-    <color name="light_grey_color">#aeadad</color>
-    <color name="grey_color">#575757</color>
-    <color name="dark_grey_color">#5e5e5e</color>
-    <color name="black_color">#000000</color>
-    <color name="blue_color">#0000ff</color>
-    <color name="purple_color">#882252</color>
-    <color name="purple_error_color">#b90459</color>
-    <color name="green_color">#007b76</color>
-    <color name="light_green_color">#a2c537</color>
-    <color name="red_color">#ff0000</color>
-    <color name="welcome_color">#7e7e7e</color>
-    <color name="title_color">#262626</color>
-    <color name="transparent_color">#00000000</color>
-    <color name="transparent_dark_color">#bb000000</color>
-
-
-
     <color name="primaryColor">#691b9a</color>
     <color name="primaryLightColor">#9b4dcc</color>
     <color name="primaryDarkColor">#37006b</color>
@@ -37,6 +11,11 @@
     <color name="wifi_info_2">#021C68</color>
     <color name="textColor">#7091BE</color>
     <color name="macAddressColor">#A9A9A9</color>
+
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="green_color">#007b76</color>
+    <color name="red_color">#ff0000</color>
 
 
 

@@ -15,6 +15,7 @@
             android:layout_height="wrap_content"
             android:text="Option Title"
             android:textSize="25sp"
+            android:textColor="@color/white"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -37,7 +38,8 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:text="Start"
-            android:textSize="20sp"/>
+            android:textSize="20sp"
+            android:theme="@style/ButtonTheme"/>
         <TextView
             android:id="@+id/network_utils_guide_text"
             android:layout_width="300dp"

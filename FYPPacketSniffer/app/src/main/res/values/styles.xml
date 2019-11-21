@@ -19,7 +19,6 @@
     </style>
 
     <style name="PopupMenu">
-        <item name="android:textColorSecondary">@color/dark_grey</item>
         <item name="android:listDivider">@color/grey</item>
         <item name="colorControlHighlight">@color/primaryLightColor </item>
     </style>
