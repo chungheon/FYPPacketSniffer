@@ -39,7 +39,6 @@ public class RecyclerViewDeviceAdapter extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        Log.d(TAG, "onBindViewHolder: called");
         String hostname = devices.get(i).getHostName();
         String ipaddr = devices.get(i).getIpAddrs();
         String vendor = devices.get(i).getMacVendor();

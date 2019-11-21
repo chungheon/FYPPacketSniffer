@@ -31,7 +31,6 @@ public class PingShell extends Thread {
             String pingResult = "";
             ArrayList<String> result = new ArrayList<>();
             while(!exit && (line = br.readLine()) != null){
-                Log.d("TAG", line);
                 if(line.matches("PING.*")){
                     String[] startPing = line.split(" ");
                     if(startPing.length >= 7
@@ -45,7 +44,7 @@ public class PingShell extends Thread {
                     }else{
                         fragment.printHostIP("-");
                     }
-                }else if(line.matches(".*from \\d*\\.\\d*\\.\\d*\\.\\d*.*")){
+                }else if(line.matches(".*from.*\\d*\\.\\d*\\.\\d*\\.\\d*.*")){
                     result.add(line);
                     fragment.updateDetails(result);
                 }else if(line.matches(".*transmitted.*received.*")){
@@ -63,7 +62,6 @@ public class PingShell extends Thread {
             p.waitFor();
             fragment.stopProgressBar();
             if(result.isEmpty()){
-                Toast.makeText(fragment.getContext().getApplicationContext(), "Unable to ping " + host, Toast.LENGTH_SHORT).show();
                 fragment.printToast("Unable to ping " + host);
             }
         } catch (IOException e) {

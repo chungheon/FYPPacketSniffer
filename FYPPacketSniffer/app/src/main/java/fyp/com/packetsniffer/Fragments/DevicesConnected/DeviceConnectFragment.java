@@ -239,7 +239,6 @@ public class DeviceConnectFragment extends Fragment {
         if(scanRunnable != null){
             scanRunnable.stopRun();
         }
-        Log.d(TAG, "destroyed devConn");
         super.onDestroy();
     }
 
@@ -344,7 +343,6 @@ public class DeviceConnectFragment extends Fragment {
     //Called by UpdateListRunnable when scan is completed and no further update would be done
     public void scanDone(ArrayList<DeviceInformation> devices, WifiInfo wifiInfo){
         scanInProgress = false;
-        Log.d(TAG, "Scan Done");
         if(getActivity() != null){
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -356,7 +354,6 @@ public class DeviceConnectFragment extends Fragment {
             });
         }
         storeCache(devices, wifiInfo);
-        Log.d(TAG, devices.size() + "");
     }
 
     //Store data of the scan done to a file for future reference
@@ -366,10 +363,8 @@ public class DeviceConnectFragment extends Fragment {
         File newDir = new File(getActivity().getFilesDir().toString(), "ScanHistory");
         newDir.mkdir();
         String path = getActivity().getFilesDir().toString();
-        Log.d("Files", "Path: " + path);
         File cacheFile = new File(path + "/ScanHistory", fileName);
 
-        Log.d(TAG, "Cache File:" + fileName);
         ArrayList<DeviceInformation> foundDev = new ArrayList<>();
         for(int i = 0; i < devices.size(); i++){
             if(!devices.get(i).getMacAddrs().equals("00:00:00:00:00:00")){
@@ -390,7 +385,6 @@ public class DeviceConnectFragment extends Fragment {
                 if(!dev.getIpAddrs().equals(devices.get(devices.size()-1).getIpAddrs())){
                     bw.newLine();
                 }
-                Log.d(TAG, dev.getHostName() + ":" + dev.getIpAddrs());
             }
 
             bw.close();

@@ -30,7 +30,6 @@ public class NmapViewThread implements Runnable{
             String line;
             String ipAddrs = "";
             while((line = br.readLine()) != null){
-                Log.d("Line", line);
                 if(line.matches(".*Nmap scan report for.*")){
                     String[] nameInfo = line.split("for");
                     if(nameInfo.length >= 2){

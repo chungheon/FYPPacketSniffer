@@ -179,9 +179,14 @@ public class PingActivity extends Fragment {
         }
     }
 
-    public void printToast(String message){
+    public void printToast(final String message){
         if(getActivity() != null){
-            Toast.makeText(getContext().getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getContext().getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
@@ -196,17 +201,13 @@ public class PingActivity extends Fragment {
                     }
                     pingDetailText.setVisibility(View.VISIBLE);
                     packetGraph.removeAllSeries();
-                    //String[] xAxis = new String[result.size()];
                     int count = 0;
-                    Log.d("size", result.size() + "");
                     DataPoint[] dataPoints = new DataPoint[result.size()];
                     for(String res: result){
-                        //xAxis[count] = count + "";
                         String[] time = res.replace("=", "").split("time")[1].split(" ");
                         double resTime;
                         try{
                             resTime = Double.parseDouble(time[0]);
-                            Log.d("res", resTime + "");
                         }catch (NumberFormatException e){
                             resTime = Double.valueOf(0);
                         }

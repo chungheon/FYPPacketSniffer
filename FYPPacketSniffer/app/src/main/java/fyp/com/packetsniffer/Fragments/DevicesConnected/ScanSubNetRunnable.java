@@ -27,7 +27,6 @@ public class ScanSubNetRunnable implements Runnable {
     public void run() { scanSubNet(); }
 
     private void scanSubNet(){
-        Log.d(TAG, "Start Scan");
         String hostAddr = ipAddress.getFirstHostAddress();
         String[] hostIP = hostAddr.split("\\.");
         int firstBit = Integer.parseInt(hostIP[0]);
@@ -75,8 +74,6 @@ public class ScanSubNetRunnable implements Runnable {
         } catch (IOException e) {
 
         }
-
-        Log.d(TAG, "Scan stopped");
     }
 
     public synchronized void stopRun(){

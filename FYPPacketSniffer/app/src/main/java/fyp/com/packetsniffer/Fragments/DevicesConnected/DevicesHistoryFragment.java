@@ -67,7 +67,6 @@ public class DevicesHistoryFragment extends Fragment {
 
         listOfDevices = (RecyclerView) this.view.findViewById(R.id.recycler_view_devices);
 
-        Log.d(TAG, "File path: " + path);
         readFromFile(path);
 
         RecyclerViewDeviceAdapter deviceAdapter = new RecyclerViewDeviceAdapter(devices);

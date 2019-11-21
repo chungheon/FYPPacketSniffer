@@ -121,7 +121,6 @@ public class NmapMainFragment extends Fragment {
 
                 if(!scanInProgress){
                     String cmd = libPath + " -Pn -v " + networkIP.getCIDR();
-                    Log.d("TAG", cmd);
                     nmapThread = new NmapViewThread(fragment, cmd);
                 }
             }
