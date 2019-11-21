@@ -45,7 +45,7 @@
             android:id="@+id/capture_interface"
             android:layout_width="150dp"
             android:layout_height="50dp"
-            android:textColor="@color/white"
+            android:theme="@style/spinnerTheme"
             app:layout_constraintLeft_toRightOf="@id/capture_text_interface"
             app:layout_constraintTop_toBottomOf="@+id/capture_file_name" />
 

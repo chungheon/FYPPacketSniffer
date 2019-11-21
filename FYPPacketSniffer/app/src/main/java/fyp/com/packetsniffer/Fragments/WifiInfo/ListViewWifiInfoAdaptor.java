@@ -38,7 +38,7 @@ public class ListViewWifiInfoAdaptor extends ArrayAdapter<Pair<String, String>> 
         ConstraintLayout layout = (ConstraintLayout) view.findViewById(R.id.info_bg);
 
         try{
-            int bgColor = mContext.getResources().getColor(R.color.colorPrimary);
+            int bgColor = mContext.getResources().getColor(R.color.cyan);
             if(position % 2 == 0){
                 bgColor = mContext.getResources().getColor(R.color.textBGColor);
             }else{

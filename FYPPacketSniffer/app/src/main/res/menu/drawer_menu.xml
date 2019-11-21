@@ -3,12 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:shownIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group
+        android:id="@+id/menu_top"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/scan_devices"
             android:icon="@mipmap/device_conn"
-            android:title="Scan Network"
-            android:checked="true"/>
+            android:title="Scan Network" />
         <item
             android:id="@+id/wifi_details"
             android:icon="@mipmap/wifi_details"
@@ -19,20 +20,21 @@
             android:title="Packet Capture" />
         <item
             android:id="@+id/packet_analysis"
-            android:icon="@mipmap/packet_analysis"
+            android:icon="@mipmap/packet_analysis_round"
             android:title="Packet Analysis"/>
         <item
             android:id="@+id/network_utils"
-            android:icon="@mipmap/network_utilities_icon"
+            android:icon="@mipmap/network_utilities_icon_round"
             android:title="Network Utilities"/>
         <item
             android:id="@+id/aircrack_suite"
-            android:icon="@mipmap/packet_analysis"
+            android:icon="@mipmap/aircrack_round"
             android:title="Aircrack-ng"/>
     </group>
 
-    <item android:title="">
-        <menu>
+    <group
+        android:id="@+id/menu_bottom"
+        android:checkableBehavior="single">
             <item
                 android:id="@+id/update_libraries"
                 android:icon="@mipmap/update_versions"
@@ -40,7 +42,7 @@
             <item
                 android:id="@+id/about_us"
                 android:icon="@mipmap/about_us"
-                android:title="About App" />
-        </menu>
-    </item>
+                android:title="About App"
+                android:checked="true"/>
+    </group>
 </menu>

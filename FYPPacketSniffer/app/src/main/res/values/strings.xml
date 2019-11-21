@@ -39,7 +39,7 @@
         its users to monitor traffic on their network. It also provides the basic
         capabilities of flagging suspicious activity and keeping track of their network.\n\n
         A.N.S has a user-friendly interface that allows the user to navigate
-        through the app easily.
+        through the app easily.\n
     </string>
 
     <string name="projectscope">
@@ -47,7 +47,7 @@
         Functionalities\n
         \t1.Scan network devices connected to network\n
         \t2.Sniff packets on the network\n
-        \t3.Analyse packets captured (stored in .pcap file)
+        \t3.Analyse packets captured (stored in .pcap file)\n
     </string>
 
     <string name="stakeholders">

@@ -29,10 +29,10 @@
 
         <ImageButton
             android:id="@+id/historyBtn"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginTop="20dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
             android:background="@mipmap/view_all_history_btn"
             app:layout_constraintLeft_toRightOf="@+id/wifiName"
             app:layout_constraintTop_toTopOf="parent" />
