@@ -99,7 +99,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/maps/ic_pin_drop_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/device/ic_wifi_tethering_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -125,7 +125,7 @@
                                       <entry key="backgroundColor" value="ffffff" />
                                       <entry key="foregroundAssetType" value="CLIP_ART" />
                                       <entry key="foregroundImage" value="D:\Downloads\web-and-seo-outline-10-17-512.png" />
-                                      <entry key="outputName" value="network_utilities_icon" />
+                                      <entry key="outputName" value="aircrack" />
                                     </map>
                                   </option>
                                 </PersistentState>
