@@ -43,6 +43,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import fyp.com.packetsniffer.Fragments.CmdExecInterface;
 import fyp.com.packetsniffer.Fragments.CmdExecNormal;
@@ -110,6 +112,13 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
             public void onClick(View v) {
                 ArrayList<String> cmds = new ArrayList<>();
                 String fileName = fileOutput.getText().toString();
+                Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+                Matcher m = p.matcher("I am a string");
+                boolean specialChar = m.find();
+                if(specialChar){
+                    printToast("The file name should contain only letters and numbers");
+                    return;
+                }
                 fileName = fileName.replaceAll(" ", "_");
                 if(fileName.equals("")){
                     fileName = "PCAP";

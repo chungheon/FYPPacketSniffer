@@ -35,7 +35,7 @@
             android:id="@+id/capture_file_name"
             android:layout_width="250dp"
             android:layout_height="50dp"
-            android:hint="eg. PCAP_001.pcap"
+            android:hint="eg. PCAP001"
             android:textSize="20sp"
             android:textColor="@color/white"
             app:layout_constraintLeft_toRightOf="@id/capture_file_text"
