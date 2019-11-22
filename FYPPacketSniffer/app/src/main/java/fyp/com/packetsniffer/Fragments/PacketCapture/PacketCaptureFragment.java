@@ -152,6 +152,7 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
                     if(inProgress){
                         cmdRunnable.stopRun();
                         captureBtn.setText("Start Capture");
+                        interfaceSpinner.setEnabled(true);
                         inProgress = false;
                         if(numPacketsText.getText().toString().equals("Capturing...")){
                             numPacketsText.setText("0 Packets");
