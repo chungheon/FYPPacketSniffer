@@ -80,7 +80,7 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_packet_capture, container, false);
-        installAsset("killall_arm", "killall", getActivity().getFilesDir().toString());
+        installAsset("tcpdump_arm", "tcpdump", getActivity().getFilesDir().toString());
         initView();
         initListener();
         return view;
@@ -141,17 +141,18 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
                     file = new File(filePath);
                 }
 
-                String cmd = "tcpdump";
+                String cmd = libPath;
                 if(selected > -1) {
                     cmd += " -i " + (selected + 1);
                 }
-                cmd += " -w - | tee " +  filePath + " | tcpdump -ttttvvvv -r -";
+                cmd += " -w - | tee " +  filePath + " | " + libPath + " -ttttvvvv -r -";
 
                 cmds.add(cmd);
                 if(cmdRunnable != null){
                     if(inProgress){
                         cmdRunnable.stopRun();
                         captureBtn.setText("Start Capture");
+                        interfaceSpinner.setEnabled(true);
                         inProgress = false;
                         if(numPacketsText.getText().toString().equals("Capturing...")){
                             numPacketsText.setText("0 Packets");
@@ -261,7 +262,7 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
             p = pb.start();
             in = new BufferedReader(new InputStreamReader(p.getInputStream()));
             outputStream = new DataOutputStream(p.getOutputStream());
-            outputStream.writeBytes("tcpdump -D\n");
+            outputStream.writeBytes(libPath + " -D\n");
             outputStream.flush();
             outputStream.writeBytes("exit\n");
             outputStream.flush();
@@ -314,7 +315,7 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
     }
 
     private void runCmd(ArrayList<String> args, String filePath){
-        cmdRunnable = new CapturePacketThread(this, args, filePath, libPath);
+        cmdRunnable = new CapturePacketThread(this, args, filePath);
         cmdRunnable.start();
     }
 
