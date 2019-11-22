@@ -67,21 +67,21 @@ public class UpdateListRunnable implements Runnable{
         while(running || lastRun) {
             if(update) {
                 wifiInfo = mWifiManager.getConnectionInfo();
-                    if (wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)) {
-                        network = mConnManager.getActiveNetwork();
-                        if (network != null) {
-                            int hostsFound = readARPTableNew(devicesMap);
-                        }
+                if (wifiInfo.getSupplicantState().equals(SupplicantState.COMPLETED)) {
+                    network = mConnManager.getActiveNetwork();
+                    if (network != null) {
+                        int hostsFound = readARPTableNew(devicesMap);
                     }
+                }
                 if(lastRun){
                     for(String key: devicesMap.keySet() ){
                         if(!devicesMap.get(key).getMacAddrs().equals("00:00:00:00:00:00")){
                             network = mConnManager.getActiveNetwork();
-                            String hostname = null;
-                            try {
-                                hostname = network.getByName(devicesMap.get(key).getIpAddrs()).getHostName();
-                            } catch (UnknownHostException e) {
-                                hostname = devicesMap.get(key).getIpAddrs();
+                            String hostname = devicesMap.get(key).getIpAddrs();
+                            if(network != null) {
+                                try {
+                                    hostname = network.getByName(devicesMap.get(key).getIpAddrs()).getHostName();
+                                } catch (UnknownHostException e) { }
                             }
 
                             devicesMap.get(key).setHostName(hostname);
@@ -146,7 +146,7 @@ public class UpdateListRunnable implements Runnable{
             String line;
             line = br.readLine();
 
-            int numOfHost = 1;
+            int numOfHost = 0;
             while ((line = br.readLine()) != null) {
                 String mac = line.substring(41, 58);
                 String[] info = line.split(" ");
@@ -160,6 +160,7 @@ public class UpdateListRunnable implements Runnable{
                         devInfo.setMacVendor(vendor);
                         devInfo.setMacAddrs(mac.toUpperCase());
                         devicesMap.put(info[0], devInfo);
+                        numOfHost++;
                     }else if (!mac.equals("00:00:00:00:00:00")) {
                         if(devicesMap.containsKey(info[0])){
                             DeviceInformation devInfo = new DeviceInformation();
@@ -171,9 +172,8 @@ public class UpdateListRunnable implements Runnable{
                         }
                     }
                 } catch (Exception e) { }
-                numOfHost++;
             }
-            return numOfHost - 1;
+            return numOfHost;
         } catch (FileNotFoundException e) {
 
         } catch (IOException e){
