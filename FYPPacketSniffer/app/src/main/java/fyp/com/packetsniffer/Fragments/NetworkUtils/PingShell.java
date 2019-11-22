@@ -25,7 +25,7 @@ public class PingShell extends Thread {
         Process p = null;
         BufferedReader br = null;
         try {
-            p = Runtime.getRuntime().exec(libPath + " -c 10 " + host);
+            p = Runtime.getRuntime().exec("ping -c 10 " + host);
             br = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line = null;
             String pingResult = "";

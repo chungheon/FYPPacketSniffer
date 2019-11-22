@@ -50,7 +50,6 @@ public class PingActivity extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_network_ping, container, false);
-        installAsset("ping", "ping", getActivity().getFilesDir().toString());
         initView();
         initListener();
         return view;
@@ -126,7 +125,7 @@ public class PingActivity extends Fragment {
         }
     }
 
-    private void setPermissions() {
+    /*private void setPermissions() {
         try {
             Process shell = Runtime.getRuntime().exec("chmod 777 " + libPath + "\n");
             shell.waitFor();
@@ -165,7 +164,7 @@ public class PingActivity extends Fragment {
                 }
             }
         }
-    }
+    }*/
 
     public void printHostIP(final String ip){
         if(getActivity() != null){
