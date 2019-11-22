@@ -16,13 +16,11 @@ public class CapturePacketThread extends CmdExecNormal {
 
     private BufferedReader br;
     private String filePath;
-    private String killPath;
 
-    public CapturePacketThread(CmdExecInterface fragment, ArrayList<String> cmds, String filePath, String killPath) {
+    public CapturePacketThread(CmdExecInterface fragment, ArrayList<String> cmds, String filePath) {
         super(fragment, cmds);
         this.filePath = filePath;
         fileReader = new ReadCaptureOutput();
-        this.killPath = killPath;
         this.cmds.add("exit");
     }
 
