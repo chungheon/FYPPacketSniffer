@@ -112,14 +112,15 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
             public void onClick(View v) {
                 ArrayList<String> cmds = new ArrayList<>();
                 String fileName = fileOutput.getText().toString();
+                fileName = fileName.replaceAll(" ", "_");
                 Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
                 Matcher m = p.matcher(fileName);
                 boolean specialChar = m.find();
                 if(specialChar){
-                    printToast("The file name should contain only letters and numbers");
+                    printToast("The file name should contain only letters and numbers.");
                     return;
                 }
-                fileName = fileName.replaceAll(" ", "_");
+
                 if(fileName.equals("")){
                     fileName = "PCAP";
                 }
