@@ -113,7 +113,7 @@ public class PacketCaptureFragment extends Fragment implements CmdExecInterface 
                 ArrayList<String> cmds = new ArrayList<>();
                 String fileName = fileOutput.getText().toString();
                 Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
-                Matcher m = p.matcher("I am a string");
+                Matcher m = p.matcher(fileName);
                 boolean specialChar = m.find();
                 if(specialChar){
                     printToast("The file name should contain only letters and numbers");
