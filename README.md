@@ -6,7 +6,9 @@ The app is able to sniff packets in Promiscuos Mode and provide user to read pca
 
 Requirements:
     Mobile Device has to be using 64-bit ARM architecture
+    
     Root permissions available on Mobile Device
+    
     API level 23 and above (Marshmallow and above)
 
 # Credits
