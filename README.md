@@ -2,12 +2,12 @@
 
 Development of a Packet Sniffing App.
 
-The app is able to sniff packets in Promiscuos Mode and provide user to read pcap files.
+The app is able to sniff packets in Promiscuos Mode and provide user to read pcap files.____
 
-Requirements:
-    -Mobile Device has to be using 64-bit ARM architecture
-    -Root permissions available on Mobile Device
-    -API level 23 and above (Marshmallow and above)
+Requirements:__
+    -Mobile Device has to be using 64-bit ARM architecture__
+    -Root permissions available on Mobile Device__
+    -API level 23 and above (Marshmallow and above)__
 
 # Credits
 TCPDUMP (Tcpdump, Libpcap) TCPDUMP and LIBPCAP are under a 3-clause BSD License
