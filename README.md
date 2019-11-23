@@ -5,6 +5,7 @@ Development of a Packet Sniffing App.
 The app is able to sniff packets in Promiscuos Mode and provide user to read pcap files.
 
 Requirements:
+
     Mobile Device has to be using 64-bit ARM architecture
     
     Root permissions available on Mobile Device
