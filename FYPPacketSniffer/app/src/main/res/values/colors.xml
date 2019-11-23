@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="primaryColor">#691b9a</color>
+    <color name="primaryLightColor">#9b4dcc</color>
+    <color name="primaryDarkColor">#37006b</color>
     <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="grey">#E3E3E3</color>
+    <color name="backgroundColor">#121025</color>
+    <color name="textBGColor">#202677</color>
+    <color name="wifi_info_2">#021C68</color>
+    <color name="textColor">#7091BE</color>
+    <color name="macAddressColor">#A9A9A9</color>
+    <color name="red">#ff0000</color>
+    <color name="cyan">#008577</color>
+    <color name="cyanDark">#00574B</color>
 </resources>

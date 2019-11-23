@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/backgroundColor">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true">
+
+        <Button
+            android:id="@+id/analyse_select_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:text="Select File"
+            android:theme="@style/ButtonTheme"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/analyse_selected_file"
+            android:layout_width="250dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:textSize="25dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textColor="@color/white"
+            app:layout_constraintLeft_toRightOf="@id/analyse_select_file"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="@string/select_file"/>
+
+        <Button
+            android:id="@+id/analyse_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:text="Review"
+            android:theme="@style/ButtonTheme"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/analyse_select_file"/>
+
+        <Button
+            android:id="@+id/analyse_get_report"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get Report"
+            android:theme="@style/ButtonTheme"
+            app:layout_constraintTop_toBottomOf="@id/analyse_select_file"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"/>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/analyse_filters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:animateLayoutChanges="true"
+            app:layout_constraintTop_toBottomOf="@+id/analyse_btn">
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:animateLayoutChanges="true"
+                android:background="@color/textBGColor">
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/analyse_filter_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@color/primaryDarkColor"
+                    app:layout_constraintTop_toTopOf="parent">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:paddingLeft="20dp"
+                        android:text="Filters"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                    <ImageButton
+                        android:id="@+id/analyse_view_filters_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:background="@mipmap/view_filters_btn"/>
+
+
+                </android.support.constraint.ConstraintLayout>
+
+
+                <RadioGroup
+                    android:id="@+id/analyse_filter_options"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toBottomOf="@+id/analyse_filter_text"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    android:background="@color/textBGColor">
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/filter_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_1"
+                        android:textSize="15sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:checked="true"
+                        android:textColor="@color/textColor"/>
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/filter_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_2"
+                        android:textSize="15sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/filter_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_3"
+                        android:textSize="15sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/filter_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_4"
+                        android:textSize="15sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/filter_5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_5"
+                        android:textSize="15sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/filter_6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_6"
+                        android:textSize="15sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/filter_7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_7"
+                        android:textSize="15sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/filter_8"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_8"
+                        android:textSize="15sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/filter_9"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_9"
+                        android:textSize="15sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textColor="@color/textColor"/>
+
+                </RadioGroup>
+
+                <View
+                    android:id="@+id/separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="3dp"
+                    android:background="@android:color/darker_gray"
+                    app:layout_constraintTop_toBottomOf="@+id/analyse_filter_options"/>
+
+                <RadioGroup
+                    android:id="@+id/analyse_hex_filters"
+                    android:tooltipText="Display Hex and ASCII"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toBottomOf="@id/analyse_filter_options"
+                    app:layout_constraintLeft_toLeftOf="parent">
+                    <RadioButton
+                        android:id="@+id/analyse_hex_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-x"
+                        android:textColor="@color/textColor"
+                        android:textSize="20sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp" />
+                    <RadioButton
+                        android:id="@+id/analyse_hex_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-xx"
+                        android:textColor="@color/textColor"
+                        android:textSize="20sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp" />
+                    <RadioButton
+                        android:id="@+id/analyse_hex_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-X"
+                        android:textColor="@color/textColor"
+                        android:textSize="20sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp" />
+                    <RadioButton
+                        android:id="@+id/analyse_hex_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-XX"
+                        android:textColor="@color/textColor"
+                        android:textSize="20sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp" />
+                    <RadioButton
+                        android:id="@+id/analyse_hex_5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Normal"
+                        android:textColor="@color/textColor"
+                        android:textSize="15sp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:checked="true"/>
+                </RadioGroup>
+
+            </android.support.constraint.ConstraintLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+        <EditText
+            android:id="@+id/jump_page"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/analyse_filters"/>
+        <Button
+            android:id="@+id/jump_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jump To Page"
+            android:theme="@style/ButtonTheme"
+            app:layout_constraintTop_toBottomOf="@+id/analyse_filters"
+            app:layout_constraintLeft_toRightOf="@+id/jump_page"/>
+    </android.support.constraint.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/output_content"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"/>
+        <TextView
+            android:id="@+id/num_page"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:text="No of Pages"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:id="@+id/num_packets"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No of Packets"
+            android:textColor="@color/white"
+            android:layout_gravity="center"
+            android:layout_marginBottom="50dp" />
+    </LinearLayout>
+
+
+    </LinearLayout>
+
+</ScrollView>

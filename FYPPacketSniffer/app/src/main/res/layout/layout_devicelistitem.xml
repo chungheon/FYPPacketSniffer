@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:weightSum="100"
+    android:id="@+id/parent_layout_device"
+    android:background="@drawable/base_deviceconn">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/hostname"
+            android:layout_width="210dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:maxLength="15"
+            android:paddingLeft="15dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="3dp"
+            android:singleLine="true"
+            android:text="Host Name"
+            android:textColor="@color/primaryDarkColor"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/vendor"
+            android:layout_width="170dp"
+            android:layout_height="34dp"
+            android:ellipsize="marquee"
+            android:paddingTop="10dp"
+            android:paddingBottom="5dp"
+            android:singleLine="true"
+            android:text="Vendor"
+            android:textColor="@color/primaryDarkColor"
+            android:textSize="12sp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteY="0dp" />
+
+        <TextView
+            android:id="@+id/ipaddr"
+            android:layout_width="210dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="15dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="10dp"
+            android:text="IP address"
+            android:textColor="@color/primaryDarkColor"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@+id/hostname"
+            app:layout_constraintLeft_toLeftOf="parent"/>
+
+        <TextView
+            android:id="@+id/mac"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="10dp"
+            android:text="MAC address"
+            android:textColor="@color/macAddressColor"
+            android:textSize="12sp"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/vendor" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</LinearLayout>
